@@ -41,6 +41,8 @@ export default defineConfig({
             text: '项目实战',
             items: [
               { text: '博欣试剂管理系统', link: '/project/ggzx/index1' },
+              { text: '小兔鲜-web端', link: 'https://ihong-he.github.io/rabbit-doc/' },
+              { text: '小兔鲜-小程序端', link: 'https://ihong-he.github.io/rabbit-h5-doc/' },
               { text: '优医问诊APP', link: 'https://fhguo.github.io/yywz-doc/' },
               // { text: 'Section B Item B', link: '...' }
             ]
