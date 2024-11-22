@@ -21,9 +21,9 @@ export default defineConfig({
       copyright: 'Copyright © 2024-2025 Panda工作室'
     },
     algolia: { // algolia 搜索服务 与 内置 search 可二选一
-      appId: 'HNXM9QS2NZ',
-      apiKey: 'd5a27725079c01b493d3ee2766469c6c',
-      indexName: 'fhguoio'
+      appId: 'Q6LPLP9RKV',
+      apiKey: '62070545d5fa41557099978a4e3e16c0',
+      indexName: 'ihong-heio'
     },
     // search: {
     //   provider: 'local', // 可以开启本地搜索
@@ -74,7 +74,7 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: 'Vue3基础', link: '/note/vue3' },
-            { text: 'Typescript', link: '/note/ts' },
+            { text: 'TS快速上手', link: '/note/ts' },
             { text: '小程序开发', link: '/note/miniApp' },
             { text: '数据可视化', link: '/note/visualization' },
             { text: 'Electron', link: '/note/electron' },
