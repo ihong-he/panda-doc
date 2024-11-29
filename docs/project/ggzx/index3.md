@@ -1,352 +1,467 @@
 ---
-outline: deep
+outline: [1, 3]
 ---
 
-## 三、后台模板
+# 页面搭建
 
-### 4.1 静态路由配置
+## 一、登录模块
 
-1. 安装`vue-router`
+### 1. 静态路由配置
 
-   ```
-   pnpm i vue-router
-   ```
+> `Vue Router` 是 Vue 官方的客户端路由解决方案。
 
-2. 根组件添加路由占位符
+- 安装`vue-router`
 
-   ```html
-   <!-- App.vue -->
-   <!-- 路由占位 -->
-   <router-view></router-view>
-   ```
+  ```bash
+  pnpm i vue-router
+  ```
 
-3. 创建 router 路由文件
+- 创建 router 路由文件
 
-   ```js
-   // src/router/index.ts
-   import { createRouter, createWebHashHistory } from "vue-router";
-   // 创建路由器
-   const router = createRouter({
-     // 路由模式
-     history: createWebHashHistory(),
-     routes: [
-       {
-         // 登录
-         path: "/login",
-         component: () => import("@/views/login/index.vue"),
-         name: "login", // 命名路由
-       },
-       {
-         // 首页
-         path: "/",
-         component: () => import("@/views/home/index.vue"),
-         name: "home", // 命名路由
-       },
-       {
-         // 404
-         path: "/404",
-         component: () => import("@/views/404/index.vue"),
-         name: "404", // 命名路由
-       },
-       {
-         // 上面路由都没匹配
-         path: "/:pathMatch(.*)*",
-         redirect: "/404",
-         name: "any",
-       },
-     ],
-     // 滚动行为
-     scrollBehavior() {
-       return {
-         top: 0,
-         left: 0,
-       };
-     },
-   });
-   export default router;
-   ```
+  ```js
+  // src/router/index.ts
+  import { createRouter, createWebHashHistory } from "vue-router";
+  // 创建路由器
+  const router = createRouter({
+    // 路由模式
+    history: createWebHashHistory(),
+    routes: [
+      {
+        // 登录
+        path: "/login",
+        component: () => import("@/views/login/index.vue"),
+        name: "login", // 命名路由
+      },
+      {
+        // 首页
+        path: "/",
+        component: () => import("@/views/home/index.vue"),
+        name: "home", // 命名路由
+      },
+      {
+        // 404
+        path: "/404",
+        component: () => import("@/views/404/index.vue"),
+        name: "404", // 命名路由
+      },
+      {
+        // 上面路由都没匹配
+        path: "/:pathMatch(.*)*",
+        redirect: "/404",
+        name: "any",
+      },
+    ],
+    // 滚动行为
+    scrollBehavior() {
+      return {
+        top: 0,
+        left: 0,
+      };
+    },
+  });
+  export default router;
+  ```
 
-4. 入口文件引入路由文件
+- 入口文件引入路由文件
 
-   ```js
-   // main.ts
-   // 引入路由文件
-   import router from "./router";
-   // 安装router
-   app.use(router);
-   ```
+  ```js
+  // main.ts
+  // 引入路由文件
+  import router from "./router";
+  // 安装router
+  app.use(router);
+  ```
 
-5. 创建路由对应的页面
+- 创建路由对应的页面
 
-   ```vue
-   // 404页面
-   <template>
-     <div>
-       <h3>404</h3>
-     </div>
-   </template>
-   <script setup lang="ts"></script>
-   <style scoped></style>
-   ```
+  ```vue
+  <!-- 首页 -->
+  <template>
+    <div>
+      <h3>首页</h3>
+    </div>
+  </template>
+  <script setup lang="ts"></script>
+  <style scoped></style>
+  ```
 
-   ### 4.2 登录页
+- 根组件添加路由占位符
 
-   > 效果图（兼容移动端）
+  ```html
+  <!-- App.vue -->
+  <!-- 路由占位 -->
+  <router-view></router-view>
+  ```
 
-   ![An image](/item/rms-login.png)
+### 2. 登录页
 
-   1. 全部代码
-      ::: details 点击查看
+- 效果图（兼容移动端）
 
-      ```vue
-      <template>
-        <div class="login-container flx-center">
-          <div class="login-box">
-            <div class="login-left">
-              <img
-                class="login-left-img"
-                src="@/assets/images/login_left.png"
-                alt="login"
-              />
-            </div>
-            <div class="login-form">
-              <div class="login-logo">
-                <img class="login-icon" src="@/assets/images/logo.png" alt="" />
-                <h2 class="logo-text">RMS试剂管理系统</h2>
-              </div>
+![An image](/item/rms-login.png)
 
-              <el-form ref="loginFormRef" size="large" :model="loginForm">
-                <el-form-item prop="username">
-                  <el-input
-                    v-model="loginForm.username"
-                    placeholder="请输入用户名"
-                    :prefix-icon="User"
-                  >
-                  </el-input>
-                </el-form-item>
-                <el-form-item prop="password">
-                  <el-input
-                    v-model="loginForm.password"
-                    type="password"
-                    placeholder="请输入密码"
-                    show-password
-                    autocomplete="new-password"
-                  >
-                    <template #prefix>
-                      <el-icon class="el-input__icon">
-                        <lock />
-                      </el-icon>
-                    </template>
-                  </el-input>
-                </el-form-item>
-              </el-form>
-              <div class="login-btn">
-                <el-button :icon="CircleClose" round size="large">
-                  重置
-                </el-button>
-                <el-button :icon="UserFilled" round size="large" type="primary">
-                  登录
-                </el-button>
-              </div>
-            </div>
+- 登录页模板
+  ::: details 点击查看
+
+  ```vue
+  <template>
+    <div class="login-container flx-center">
+      <div class="login-box">
+        <div class="login-left">
+          <img
+            class="login-left-img"
+            src="@/assets/images/login_left.png"
+            alt="login"
+          />
+        </div>
+        <div class="login-form">
+          <div class="login-logo">
+            <img class="login-icon" src="@/assets/images/logo.png" alt="" />
+            <h2 class="logo-text">RMS试剂管理系统</h2>
+          </div>
+
+          <el-form ref="loginFormRef" size="large" :model="loginForm">
+            <el-form-item prop="username">
+              <el-input
+                v-model="loginForm.username"
+                placeholder="请输入用户名"
+                :prefix-icon="User"
+              >
+              </el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input
+                v-model="loginForm.password"
+                type="password"
+                placeholder="请输入密码"
+                show-password
+                autocomplete="new-password"
+              >
+                <template #prefix>
+                  <el-icon class="el-input__icon">
+                    <lock />
+                  </el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <div class="login-btn">
+            <el-button :icon="CircleClose" round size="large"> 重置 </el-button>
+            <el-button :icon="UserFilled" round size="large" type="primary">
+              登录
+            </el-button>
           </div>
         </div>
-      </template>
+      </div>
+    </div>
+  </template>
 
-      <script setup lang="ts">
-      import { reactive } from "vue";
-      import {
-        CircleClose,
-        User,
-        UserFilled,
-        Lock,
-      } from "@element-plus/icons-vue";
-      const loginForm = reactive({
-        username: "",
-        password: "",
-      });
-      </script>
+  <script setup lang="ts">
+  import { reactive } from "vue";
+  import { CircleClose, User, UserFilled, Lock } from "@element-plus/icons-vue";
+  const loginForm = reactive({
+    username: "",
+    password: "",
+  });
+  </script>
 
-      <style scoped lang="scss">
-      .flx-center {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+  <style scoped lang="scss">
+  .flx-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-container {
+    height: 100%;
+    min-height: 550px;
+    background-color: #eeeeee;
+    background-image: url("@/assets/images/login_bg.svg");
+    background-size: 100% 100%;
+    background-size: cover;
+
+    .login-box {
+      position: relative;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 96.5%;
+      height: 94%;
+      padding: 0 50px;
+      background-color: rgb(255 255 255 / 80%);
+      border-radius: 10px;
+
+      .dark {
+        position: absolute;
+        top: 13px;
+        right: 18px;
       }
-      .login-container {
-        height: 100%;
-        min-height: 550px;
-        background-color: #eeeeee;
-        background-image: url("@/assets/images/login_bg.svg");
-        background-size: 100% 100%;
-        background-size: cover;
 
-        .login-box {
-          position: relative;
-          box-sizing: border-box;
+      .login-left {
+        width: 800px;
+        margin-right: 10px;
+
+        .login-left-img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      .login-form {
+        width: 420px;
+        padding: 50px 40px 45px;
+        background-color: var(--el-bg-color);
+        border-radius: 10px;
+        box-shadow: rgb(0 0 0 / 10%) 0 2px 10px 2px;
+
+        .login-logo {
           display: flex;
           align-items: center;
-          justify-content: space-around;
-          width: 96.5%;
-          height: 94%;
-          padding: 0 50px;
-          background-color: rgb(255 255 255 / 80%);
-          border-radius: 10px;
+          justify-content: center;
+          margin-bottom: 45px;
 
-          .dark {
-            position: absolute;
-            top: 13px;
-            right: 18px;
+          .login-icon {
+            width: 60px;
+            height: 52px;
           }
 
-          .login-left {
-            width: 800px;
-            margin-right: 10px;
-
-            .login-left-img {
-              width: 100%;
-              height: 100%;
-            }
+          .logo-text {
+            padding: 0 0 0 25px;
+            margin: 0;
+            font-size: 30px;
+            font-weight: bold;
+            color: #34495e;
+            white-space: nowrap;
           }
+        }
 
-          .login-form {
-            width: 420px;
-            padding: 50px 40px 45px;
-            background-color: var(--el-bg-color);
-            border-radius: 10px;
-            box-shadow: rgb(0 0 0 / 10%) 0 2px 10px 2px;
+        .el-form-item {
+          margin-bottom: 40px;
+        }
 
-            .login-logo {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-bottom: 45px;
+        .login-btn {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+          margin-top: 40px;
+          white-space: nowrap;
 
-              .login-icon {
-                width: 60px;
-                height: 52px;
-              }
-
-              .logo-text {
-                padding: 0 0 0 25px;
-                margin: 0;
-                font-size: 30px;
-                font-weight: bold;
-                color: #34495e;
-                white-space: nowrap;
-              }
-            }
-
-            .el-form-item {
-              margin-bottom: 40px;
-            }
-
-            .login-btn {
-              display: flex;
-              justify-content: space-between;
-              width: 100%;
-              margin-top: 40px;
-              white-space: nowrap;
-
-              .el-button {
-                width: 185px;
-              }
-            }
+          .el-button {
+            width: 185px;
           }
         }
       }
+    }
+  }
 
-      @media screen and (width <=1250px) {
-        .login-left {
-          display: none;
+  @media screen and (width <=1250px) {
+    .login-left {
+      display: none;
+    }
+  }
+
+  @media screen and (width <=600px) {
+    .login-form {
+      width: 97% !important;
+    }
+  }
+  </style>
+  ```
+
+### 3. Pinia 共享数据
+
+> `Pinia` 是 Vue 的专属状态管理库，它允许你跨组件或页面共享状态。
+
+- 安装`pinia`
+
+  ```bash
+  pnpm i pinia
+  ```
+- 创建 store 仓库入口文件
+
+  ```js
+  // src/store/index.ts
+  import { createPinia } from "pinia";
+  // 创建store仓库
+  const pinia = createPinia();
+  // 对外暴露仓库
+  export default pinia;
+  ```
+- 引入并使用 pinia
+
+  ```js
+  // main.js
+  // 引入仓库
+  import pinia from "./store/index.ts";
+  // 使用store仓库
+  app.use(pinia);
+  ```
+
+- 创建用户仓库模块
+
+  ```js
+  // store/modules/user.ts
+  // 用户相关仓库
+  import { defineStore } from "pinia";
+  // 引入接口
+  import { login } from "@/api/user";
+  // 引入数据类型
+  import type { loginForm } from "@/api/user/type";
+  // 创建用户仓库
+  const useUserStore = defineStore("User", {
+    // 存储数据的地方
+    state: () => {
+      return {
+        token: localStorage.getItem("TOKEN") || "",
+      };
+    },
+    // 异步/逻辑的地方
+    actions: {
+      // 用户登录的方法
+      async userLogin(data: loginForm) {
+        const result: any = await login(data);
+        if (result.code == 200) {
+          this.token = result.data.token;
+          localStorage.setItem("TOKEN", result.data.token);
+          return "OK";
+        } else {
+          return Promise.reject(new Error(result.data.message));
         }
-      }
+      },
+    },
+  });
+  // 默认导出
+  export default useUserStore;
+  ```
 
-      @media screen and (width <=600px) {
-        .login-form {
-          width: 97% !important;
-        }
-      }
-      </style>
-      ```
+- 登录页引用用户仓库
 
-### 4.3 创建用户 store 仓库
+  ```js
+  // 引入用户store仓库
+  import useUserStore from "@/store/modules/user";
+  let userStore = useUserStore();
 
-1. 安装`pinia`
-
-   ```
-   pnpm i pinia
-   ```
-
-2. 引入并使用 pinia
-
-   ```js
-   // main.js
-   // 引入仓库
-   import pinia from "./store/index.ts";
-   // 使用store仓库
-   app.use(pinia);
-   ```
-
-3. 创建 store 仓库入口文件
-
-   ```js
-   // src/store/index.ts
-   import { createPinia } from "pinia";
-   // 创建store仓库
-   const pinia = createPinia();
-   // 对外暴露仓库
-   export default pinia;
-   ```
-
-4. 创建用户仓库模块
-
-   ```js
-   // store/modules/user.ts
-   // 用户相关仓库
-   import { defineStore } from "pinia";
-   // 引入接口
-   import { login } from "@/api/user";
-   // 引入数据类型
-   import type { loginForm } from "@/api/user/type";
-   // 创建用户仓库
-   const useUserStore = defineStore("User", {
-     // 存储数据的地方
-     state: () => {
-       return {
-         token: localStorage.getItem("TOKEN") || "",
-       };
-     },
-     // 异步/逻辑的地方
-     actions: {
-       // 用户登录的方法
-       async userLogin(data: loginForm) {
-         const result: any = await login(data);
-         if (result.code == 200) {
-           this.token = result.data.token;
-           localStorage.setItem("TOKEN", result.data.token);
-           return "OK";
-         } else {
-           return Promise.reject(new Error(result.data.message));
-         }
-       },
-     },
-   });
-   // 默认导出
-   export default useUserStore;
-   ```
-
-5. 登录页引用用户仓库
-
-   ```js
-   // 引入用户store仓库
-   import useUserStore from "@/store/modules/user";
-   let userStore = useUserStore();
+  const login = () => {
    // 使用userStore中的方法
-   userStore.userLogin();
-   ```
+   userStore
+     .userLogin()
+     .then((res) => {
+       // 登录成功逻辑
+       ...
+     })
+     .catch((err) => {
+       // 登录失败逻辑
+       ...
+     });
+   }
 
-### 4.4 首页布局
+  ```
+> 项目工具类 `util.ts`
+::: details 点击查看
+```ts
+// util.ts
+
+// 本地存储相关
+export const storage = {
+  // 存储数据
+  setItem(key: string, value: any): void {
+    if (typeof value === "object") {
+      localStorage.setItem(key, JSON.stringify(value));
+    } else {
+      localStorage.setItem(key, value as string);
+    }
+  },
+
+  // 获取数据
+  getItem<T>(key: string): T | null {
+    const value = localStorage.getItem(key);
+    if (value) {
+      try {
+        return JSON.parse(value) as T;
+      } catch (e) {
+        return value as T;
+      }
+    }
+    return null;
+  },
+
+  // 删除数据
+  removeItem(key: string): void {
+    localStorage.removeItem(key);
+  },
+
+  // 清空所有本地存储
+  clear(): void {
+    localStorage.clear();
+  },
+};
+
+// 日期格式化
+export const formatDate = (
+  date: Date | string | number,
+  format: string = "YYYY-MM-DD HH:mm:ss",
+): string => {
+  const d = new Date(date);
+  const map: { [key: string]: string | number } = {
+    YYYY: d.getFullYear(),
+    MM: (d.getMonth() + 1).toString().padStart(2, "0"),
+    DD: d.getDate().toString().padStart(2, "0"),
+    HH: d.getHours().toString().padStart(2, "0"),
+    mm: d.getMinutes().toString().padStart(2, "0"),
+    ss: d.getSeconds().toString().padStart(2, "0"),
+  };
+
+  return format.replace(/YYYY|MM|DD|HH|mm|ss/g, (matched) => map[matched]);
+};
+
+// 深拷贝对象
+export const deepClone = <T>(obj: T): T => {
+  return JSON.parse(JSON.stringify(obj));
+};
+
+// 获取 URL 参数
+export const getQueryParam = (param: string): string | null => {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+};
+
+// 防抖函数
+export const debounce = (func: Function, wait: number): Function => {
+  let timeout: number | null = null;
+  return function (...args: any[]) {
+    if (timeout) clearTimeout(timeout);
+    timeout = window.setTimeout(() => func(...args), wait);
+  };
+};
+
+// 节流函数
+export const throttle = (func: Function, wait: number): Function => {
+  let lastTime = 0;
+  return function (...args: any[]) {
+    const now = new Date().getTime();
+    if (now - lastTime >= wait) {
+      lastTime = now;
+      func(...args);
+    }
+  };
+};
+
+// 判断是否是有效的邮箱
+export const isValidEmail = (email: string): boolean => {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return regex.test(email);
+};
+
+// 判断是否是有效的手机号
+export const isValidPhone = (phone: string): boolean => {
+  const regex = /^1[3-9]\d{9}$/;
+  return regex.test(phone);
+};
+```
+:::
+
+## 二、首页模块
+
+### 1. 首页布局
 
 > 效果图（兼容移动端）
 
@@ -502,7 +617,7 @@ outline: deep
    </style>
    ```
 
-### 4.5 递归渲染菜单
+### 2. 递归渲染菜单
 
 1. 核心菜单组件
 
@@ -590,7 +705,7 @@ outline: deep
    </el-icon>
    ```
 
-### 4.6 路由出口
+### 3. 路由出口
 
 - 定义二级路由出口
 
@@ -622,7 +737,7 @@ outline: deep
   </style>
   ```
 
-### 4.7 顶部 tabbar 搭建
+### 4. 顶部 tabbar 搭建
 
 1. 左侧面包屑动态导航
 
@@ -761,7 +876,7 @@ outline: deep
    </style>
    ```
 
-### 4.8 刷新及全屏业务的实现
+### 5. 刷新及全屏功能
 
 1. 定义 state 变量
 
@@ -838,7 +953,7 @@ outline: deep
    };
    ```
 
-### 4.9 获取用户信息
+### 6. 获取用户信息
 
 1. 用户仓库引入接口
 
@@ -892,7 +1007,7 @@ outline: deep
    <span class="name">{{ userStore.username }}</span>
    ```
 
-### 4.10 退出登录
+### 7. 退出登录
 
 1. 重置仓库用户信息
 
@@ -941,7 +1056,9 @@ outline: deep
    };
    ```
 
-### 4.11 进度条
+## 三、体验优化
+
+### 1. 进度条
 
 1. 安装 nprogress
 
@@ -979,7 +1096,7 @@ outline: deep
    import "./router/permission.ts";
    ```
 
-### 4.12 路由鉴权
+### 2. 路由鉴权
 
 1. 核心功能实现
 

@@ -63,12 +63,13 @@ export default defineConfig({
 
 **TypeScript 编译配置**
 
-```
+```json
 // tsconfig.json
 {
   "compilerOptions": {
     "baseUrl": "./", // 解析非相对模块的基地址，默认是当前目录
-    "paths": { //路径映射，相对于baseUrl
+    "paths": {
+      //路径映射，相对于baseUrl
       "@/*": ["src/*"]
     }
   }
@@ -91,11 +92,11 @@ export default defineConfig({
 
 - **测试环境（testing）**
 
-  测试同事干活的环境啦，一般会由测试同事自己来部署，然后在此环境进行测试
+  测试同事干活的环境啦，一般会由测试同事自己来部署，然后在此环境进行测试。
 
 - **生产环境（production）**
 
-  生产环境是指正式提供对外服务的，一般会关掉错误报告，打开错误日志。(正式提供给客户使用的环境。)
+  生产环境是指正式提供对外服务的环境，一般会关掉错误报告，打开错误日志。
 
 ::: warning
 一般情况下，一个环境一般对应一台服务器，不过也有的公司开发与测试环境是一台服务器！！！
@@ -111,29 +112,33 @@ export default defineConfig({
 
 > 文件内容
 
-```js
+::: code-group
+
+```js [development]
 # 变量必须以 VITE_ 为前缀才能暴露给外部读取
 NODE_ENV = 'development'
 VITE_APP_TITLE = '试剂管理系统运营平台'
 VITE_APP_BASE_API = '/dev-api'
 ```
 
-```js
-NODE_ENV = "production";
-VITE_APP_TITLE = "试剂管理系统运营平台";
-VITE_APP_BASE_API = "/prod-api";
-```
-
-```js
+```js [test]
 # 变量必须以 VITE_ 为前缀才能暴露给外部读取
 NODE_ENV = 'test'
 VITE_APP_TITLE = '试剂管理系统运营平台'
 VITE_APP_BASE_API = '/test-api'
 ```
 
+```js [production]
+NODE_ENV = "production";
+VITE_APP_TITLE = "试剂管理系统运营平台";
+VITE_APP_BASE_API = "/prod-api";
+```
+
+:::
+
 - `package.json`配置运行命令
 
-```js
+```js{3,4}
  "scripts": {
     "dev": "vite --open",
     "build:test": "vue-tsc && vite build --mode test",
@@ -143,7 +148,7 @@ VITE_APP_BASE_API = '/test-api'
 ```
 
 ::: tip
-通过`import.meta.env`获取环境变量
+可以通过`import.meta.env`获取环境变量的值
 :::
 
 ### 4. svg 图标配置
@@ -175,7 +180,7 @@ export default () => {
     plugins: [
       // 创建 SVG 图标插件实例
       createSvgIconsPlugin({
-        // 指定图标目录，[path.resolve(process.cwd(), 'src/assets/icons')] 用于动态获取图标绝对路径
+        // 指定图标目录，用于动态获取图标绝对路径
         iconDirs: [path.resolve(process.cwd(), "src/assets/icons")],
         // 定义符号 ID 格式，'icon-[dir]-[name]' 使用目录和文件名作为 ID
         symbolId: "icon-[dir]-[name]",
@@ -185,7 +190,7 @@ export default () => {
 };
 ```
 
-- `main.js`入口文件导入
+- `main.ts`引入 svg 注册脚本
 
 ```js
 import "virtual:svg-icons-register";
@@ -235,7 +240,14 @@ defineProps({
 <style scoped></style>
 ```
 
-- 注册`components`文件夹中的全部组件
+- 在`main.ts`中单独注册`SvgIcon`组件（不推荐）:crying_cat_face:
+
+```ts
+import SvgIcon from "@/components/SvgIcon.vue";
+app.component("SvgIcon", SvgIcon);
+```
+
+- 全局注册`SvgIcon`组件（推荐）:heart_eyes_cat:
 
 > 在`src`文件夹`components`目录下创建一个`index.ts`文件
 
@@ -257,7 +269,7 @@ export default (app: App) => {
 };
 ```
 
-- 在`main.js`入口文件安装自定义插件
+- 在`main.ts`入口文件安装自定义插件
 
 ```js
 import gloablComponent from "@/components/index";
@@ -291,7 +303,7 @@ npm install sass sass-loader --save
 
 ```css
 /* src/styles/index.scss */
-@import "./reset.scss";
+@use "./reset.scss";
 ```
 
 ::: details reset.scss
@@ -433,22 +445,22 @@ export default defineConfig((config) => {
       preprocessorOptions: {
         scss: {
           javascriptEnabled: true,
-          additionalData: '@import "./src/styles/variable.scss";',
+          additionalData: `@use "@/styles/variable.scss" as *;`, // sass新版本引入的方式
         },
       },
     },
 }
 ```
 
-::: warning
-`@import "./src/styles/variable.less";`后面的`;`不要忘记，不然会报错!
-:::
-
 配置完毕你会发现 scss 提供这些全局变量可以在组件样式中使用了
 
 ```scss
 $base-color: red;
 ```
+
+::: danger
+`Sass`弃用警告：`@import` 规则已弃用，将在 Dart Sass 3.0.0 中删除，需要使用`@use`代替。
+:::
 
 ## 二、请求配置
 
@@ -476,18 +488,16 @@ export default defineConfig(({ command }) => {
     plugins: [
       vue(),
       viteMockServe({
-        localEnabled: command === "serve", // 保证开发阶段使用mock接口
+        enable: command === "serve", // 保证开发阶段使用mock接口，新版本使用enable
       }),
     ],
   };
 });
 ```
 
-- 创建 mock 文件夹
+- 创建 mock 文件夹及配置文件
 
-在根目录创建 mock 文件夹，去创建我们需要 mock 数据与接口。
-
-在 mock 文件夹内部创建一个`user.ts`文件
+> 在 mock 文件夹内部创建一个`user.ts`文件
 
 ```js
 //用户信息数据
@@ -588,11 +598,12 @@ axios({
 
 ::: info
 Axios 是一个基于 Promise 的 HTTP 客户端，可以用于浏览器和 node.js 中。
+
 - **跨平台**：既可以在浏览器环境中使用，也可以在 Node.js 服务器端使用。
 - **基于 Promise**：所有请求都是基于 Promise 实现的，这意味着可以使用 .then 方法处理成功的响应，使用 .catch 方法处理错误，同时也支持 async/await 语法。
 - **拦截请求和响应**：可以设置请求拦截器和响应拦截器，这在需要对请求或响应进行全局处理时非常有用，比如添加认证信息、格式化请求数据或响应数据等。
 - **自动转换 JSON 数据**：发送请求时会自动将 JavaScript 对象转换为 JSON 格式，接收到 JSON 响应时也会自动解析成 JavaScript 对象。
-:::
+  :::
 
 在根目录下创建 utils/request.ts
 
@@ -648,53 +659,53 @@ export default request;
 在开发项目的时候，接口可能很多需要统一管理。在 src 目录下去创建 api 文件夹去统一管理项目的接口。
 
 ```js
-//统一管理咱们项目用户相关的接口
-import request from '@/utils/request'
+//统一管理用户相关的接口
+import request from "@/utils/request";
+// 导入接口类型
+import type { LoginParamsType } from "./type";
 
-import type {
-
- loginFormData,
-
- loginResponseData,
-
- userInfoReponseData,
-
-} from './type'
-
-//项目用户相关的请求地址
-
+// 枚举接口地址
 enum API {
-
- LOGIN_URL = '/admin/acl/index/login',
-
- USERINFO_URL = '/admin/acl/index/info',
-
- LOGOUT_URL = '/admin/acl/index/logout',
-
+  LOGIN_URL = "/api/user/login",
+  USERINFO_URL = "/api/user/info",
+  LOGOUT_URL = "/api/user/logout",
 }
-//登录接口
-export const reqLogin = (data: loginFormData) =>
- request.post<any, loginResponseData>(API.LOGIN_URL, data)
-//获取用户信息
+// 登录接口
+export const reqLogin = (data: LoginParamsType) =>
+  request({
+    url: API.LOGIN_URL,
+    method: "post",
+    data,
+  });
 
+// 获取用户信息
 export const reqUserInfo = () =>
+  request({
+    url: API.USERINFO_URL,
+    method: "get",
+  });
+```
 
- request.get<any, userInfoReponseData>(API.USERINFO_URL)
-
-//退出登录
-
-export const reqLogout = () => request.post<any, any>(API.LOGOUT_URL)
+```ts
+// type.ts
+// 登录接口参数类型
+export interface LoginParamsType {
+  username: string;
+  password: string;
+}
 ```
 
 ### 扩展
 
-- 贾成豪老师代码仓库地址:
-  https://gitee.com/jch1011/vue3_admin_template-bj1.git
+- [贾老师代码仓库地址](https://gitee.com/jch1011/vue3_admin_template-bj1.git)
 
-- 服务器域名:http://sph-api.atguigu.cn
+- 接口服务器地址：
+```bash
+http://sph-api.atguigu.cn
+```
 
 - swagger 文档:
 
-http://139.198.104.58:8209/swagger-ui.html
+  - [文档一](http://139.198.104.58:8209/swagger-ui.html)
 
-http://139.198.104.58:8212/swagger-ui.html#/
+  - [文档二](http://139.198.104.58:8212/swagger-ui.html#/)

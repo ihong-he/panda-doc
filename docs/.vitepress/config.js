@@ -122,9 +122,9 @@ export default defineConfig({
           text: '试剂管理系统',
           collapsed: true,
           items: [
-            { text: '一、搭建项目', link: '/project/ggzx/index1' },
+            { text: '一、创建项目', link: '/project/ggzx/index1' },
             { text: '二、基础配置', link: '/project/ggzx/index2' },
-            { text: '三、后台模板', link: '/project/ggzx/index3' },
+            { text: '三、页面搭建', link: '/project/ggzx/index3' },
             { text: '四、综合配置', link: '/project/ggzx/index4' },
           ]
         }
