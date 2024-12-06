@@ -276,6 +276,7 @@ outline: [1, 3]
   ```bash
   pnpm i pinia
   ```
+
 - 创建 store 仓库入口文件
 
   ```js
@@ -286,6 +287,7 @@ outline: [1, 3]
   // 对外暴露仓库
   export default pinia;
   ```
+
 - 引入并使用 pinia
 
   ```js
@@ -355,8 +357,11 @@ outline: [1, 3]
    }
 
   ```
+
 > 项目工具类 `util.ts`
+
 ::: details 点击查看
+
 ```ts
 // util.ts
 
@@ -398,7 +403,7 @@ export const storage = {
 // 日期格式化
 export const formatDate = (
   date: Date | string | number,
-  format: string = "YYYY-MM-DD HH:mm:ss",
+  format: string = "YYYY-MM-DD HH:mm:ss"
 ): string => {
   const d = new Date(date);
   const map: { [key: string]: string | number } = {
@@ -457,218 +462,240 @@ export const isValidPhone = (phone: string): boolean => {
   return regex.test(phone);
 };
 ```
+
 :::
+
+### 4. 表单校验
+
+```vue
+<script setup lang="ts">
+const rules = reactive<FormRules<RuleForm>>({
+  username: [
+    { required: true, message: "请输入账号", trigger: "blur" },
+    { min: 5, max: 10, message: "请输入5到10位的字符", trigger: "blur" },
+  ],
+  password: [
+    {
+      required: true,
+      message: "请输入密码",
+      trigger: "blur",
+    },
+    // 自定义校验规则
+    {
+      validator: (rule, value, callback) => {
+        if (value.length < 6) {
+          callback(new Error("密码长度不能小于6位"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "change",
+    },
+  ],
+});
+
+/**
+ * 提交表单函数
+ * @param {FormInstance | undefined} formEl - 表单实例，用于执行表单验证
+ */
+const submitForm = async (formEl: FormInstance | undefined) => {
+  // 检查表单实例是否存在
+  if (!formEl) return;
+
+  // 执行表单验证
+  await formEl.validate((valid, fields) => {
+    // 验证通过
+    if (valid) {
+      console.log("submit!");
+      // 调用接口登录
+      ...
+    } else {
+      // 验证失败，输出错误信息
+      console.log("error submit!", fields);
+    }
+  });
+};
+</script>
+```
 
 ## 二、首页模块
 
 ### 1. 首页布局
 
-> 效果图（兼容移动端）
+> 效果图
 
 ![An image](/item/rms-home.png)
 
-1. 全部代码
-   ::: details 点击查看
+1. 静态模板
 
-   ```vue
-   <template>
-     <el-container>
-       <!-- 左侧菜单 -->
-       <el-aside :style="{ width: layoutStore.fold ? '65px' : '210px' }">
-         <!-- 展示菜单 -->
-         <div class="logo">
-           <img :src="SetTitle.logo" alt="" />
-           <p v-if="!layoutStore.fold" class="title">{{ SetTitle.title }}</p>
-         </div>
-         <!-- 滚动组件 -->
-         <el-scrollbar class="scrollbar">
-           <!-- 菜单组件-->
-           <el-menu
-             :default-active="$route.path"
-             background-color="#001529"
-             text-color="white"
-             :collapse="layoutStore.fold"
-             :collapse-transition="false"
-           >
-             <!--根据路由动态生成菜单-->
-             <Menu :menulist="userStore.menuRouters"></Menu>
-           </el-menu>
-         </el-scrollbar>
-       </el-aside>
-       <el-container>
-         <!-- 顶部导航 -->
-         <el-header>
-           <!-- layout组件的顶部导航tabbar -->
-           <Tabbar></Tabbar>
-         </el-header>
-         <!-- 内容展示区域 -->
-         <el-main>
-           <Main></Main>
-         </el-main>
-         <el-footer v-show="layoutStore.showFooter">
-           <Footer></Footer>
-         </el-footer>
-       </el-container>
-     </el-container>
-     <!-- 设置抽屉组件 -->
-     <Draw></Draw>
-   </template>
+```vue
+<template>
+  <div class="common-layout">
+    <el-container style="height: 100vh">
+      <!-- 左侧菜单 -->
+      <el-aside width="210px">
+        <!-- logo展示 -->
+        <Logo></Logo>
+        <!-- 菜单展示 -->
+        <el-scrollbar class="scrollbar">
+          <el-menu>
+            <el-menu-item index="1">
+              <el-icon><icon-menu /></el-icon>
+              <span>首页</span>
+            </el-menu-item>
+            <el-menu-item index="2">大屏</el-menu-item>
+            <el-sub-menu index="3">
+              <template #title>
+                <el-icon><location /></el-icon>
+                <span>权限管理</span>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="1-1">用户管理</el-menu-item>
+                <el-menu-item index="1-2">角色管理</el-menu-item>
+              </el-menu-item-group>
+            </el-sub-menu>
+          </el-menu>
+        </el-scrollbar>
+      </el-aside>
+      <el-container>
+        <!-- 顶部导航 -->
+        <el-header>Header</el-header>
+        <!-- 内容区域 -->
+        <el-main>
+          <p>Main</p>
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
 
-   <script setup lang="ts">
-   import { onMounted } from "vue";
-   //获取路由对象
-   import { useRoute } from "vue-router";
-   import SetTitle from "./setting.ts";
-   //引入菜单组件
-   import Menu from "./menu/index.vue";
-   //右侧内容展示区域
-   import Main from "./main/index.vue";
-   // 引入tabbar
-   import Tabbar from "./tabbar/index.vue";
-   // 引入Drawer组件
-   import Draw from "./draw/index.vue";
-   // 引入footer组件
-   import Footer from "./footer/index.vue";
-   //获取用户相关的小仓库
-   import useUserStore from "@/store/modules/user";
-   import useLayoutStore from "@/store/modules/setting.ts";
-   // 是否折叠菜单栏
-   let layoutStore = useLayoutStore();
+<script setup lang="ts">
+import Logo from "./logo/index.vue";
+import {
+  Document,
+  Menu as IconMenu,
+  Location,
+  Setting,
+} from "@element-plus/icons-vue";
+</script>
 
-   let userStore = useUserStore();
-
-   //获取路由对象
-   let $route = useRoute();
-
-   onMounted(() => {
-     // 监听窗口大小变化
-     window.addEventListener("resize", () => {
-       const w = document.documentElement.clientWidth;
-       // const h = document.documentElement.clientHeight;
-       // console.log('页面大小发生了变化', `宽度：${w}`, `高度：${h}`);
-       if (w <= 750) {
-         layoutStore.fold = true;
-       } else {
-         layoutStore.fold = false;
-       }
-     });
-   });
-   </script>
-
-   <script lang="ts">
-   export default {
-     name: "Layout",
-   };
-   </script>
-
-   <style scoped lang="scss">
-   .el-container {
-     width: 100%;
-     height: 100%;
-
-     .el-aside {
-       height: 100vh;
-       background-color: #001529;
-       color: #fff;
-       transition: width 0.3s;
-
-       .scrollbar {
-         width: 100%;
-         height: calc(100vh - 50px);
-       }
-
-       .el-menu {
-         border-right: none;
-       }
-     }
-
-     .logo {
-       height: 50px;
-       display: flex;
-       justify-content: center;
-       align-items: center;
-
-       img {
-         width: 32px;
-       }
-
-       .title {
-         margin-left: 10px;
-         font-size: 20px;
-       }
-     }
-
-     .el-container {
-       border-left: 1px solid #e4e7ed;
-
-       .el-header {
-         border-bottom: 1px solid #e4e7ed;
-       }
-     }
-
-     .el-main {
-       background-color: #f2f3f5;
-     }
-     .el-footer {
-       height: unset;
-       padding: 0;
-     }
-   }
-   </style>
-   ```
+<style scoped lang="scss">
+.el-aside {
+  .scrollbar {
+    height: calc(100% - 50px);
+  }
+}
+</style>
+```
 
 ### 2. 递归渲染菜单
 
-1. 核心菜单组件
+- 创建菜单路由仓库
 
-   ```vue
-   <template>
-     <div>
-       <template v-for="item in menulist" :key="item.path">
-         <!-- 没有子路由 -->
-         <template v-if="!item.children">
-           <el-menu-item v-if="!item.meta.hidden" :index="item.path">
-             <template #title>
-               <span>{{ item.meta.title }}</span>
-             </template>
-           </el-menu-item>
-         </template>
-         <!-- 有且只有一个子路由 -->
-         <template v-else-if="item.children && item.children.length == 1">
-           <el-menu-item
-             v-if="!item.meta.hidden"
-             :index="item.children[0].path"
-           >
-             <template #title>
-               <span>{{ item.children[0].meta.title }}</span>
-             </template>
-           </el-menu-item>
-         </template>
-         <!-- 有多个子路由 -->
-         <template v-else>
-           <el-sub-menu v-if="!item.meta.hidden" :index="item.path">
-             <template #title>
-               <span>{{ item.meta.title }}</span>
-             </template>
-             <Menu :menulist="item.children"></Menu>
-           </el-sub-menu>
-         </template>
-       </template>
-     </div>
-   </template>
-   <script setup lang="ts">
-   defineProps(["menulist"]);
-   </script>
-   <script lang="ts">
-   export default {
-     // 引入递归组件名
-     name: "Menu",
-   };
-   </script>
-   <style scoped></style>
-   ```
+```ts{5,12}
+// src/store/modules/user.ts
+import type { LoginParamsType } from "@/api/user/types";
+import { reqLogin, reqUserInfo } from "@/api/user";
+import { storage } from "@/utils/util.ts";
+import { constRouter } from "@/router/routers";
 
-2. 路由示例
+export const useUserStore = defineStore("user", {
+  state: () => {
+    return {
+      token: storage.getItem("token") || "",
+      userInfo: {},
+      menuRouter: constRouter, // 菜单路由
+    };
+  },
+});
+```
+- layout组件引入
+
+```vue{10-12}
+<template>
+  <div class="common-layout">
+    <el-container style="height: 100vh">
+      <!-- 左侧菜单 -->
+      <el-aside width="210px">
+        <!-- logo展示 -->
+        <Logo></Logo>
+        <!-- 菜单展示 -->
+        <el-scrollbar class="scrollbar">
+          <el-menu>
+            <Menu :menuList="userStore.menuRouter"></Menu>
+          </el-menu>
+        </el-scrollbar>
+      </el-aside>
+      ...
+    </el-container>
+  </div>
+</template>
+
+<script setup lang="ts">
+import Logo from "./logo/index.vue";
+import Menu from "./menu/index.vue"; // [!code ++]
+import { useUserStore } from "@/store/modules/user"; // [!code ++]
+
+const userStore = useUserStore(); // [!code ++]
+</script>
+
+<style scoped lang="scss">
+...
+</style>
+
+```
+
+- 动态菜单组件
+
+```vue
+<!-- 菜单子路由 menu/index.vue-->
+<template>
+  <div>
+    <template v-for="item in menulist" :key="item.path">
+      <!-- 没有子路由 -->
+      <template v-if="!item.children">
+        <el-menu-item v-if="!item.meta.hidden" :index="item.path">
+          <template #title>
+            <span>{{ item.meta.title }}</span>
+          </template>
+        </el-menu-item>
+      </template>
+      <!-- 有且只有一个子路由 -->
+      <template v-else-if="item.children && item.children.length == 1">
+        <el-menu-item v-if="!item.meta.hidden" :index="item.children[0].path">
+          <template #title>
+            <span>{{ item.children[0].meta.title }}</span>
+          </template>
+        </el-menu-item>
+      </template>
+      <!-- 有多个子路由 -->
+      <template v-else>
+        <el-sub-menu v-if="!item.meta.hidden" :index="item.path">
+          <template #title>
+            <span>{{ item.meta.title }}</span>
+          </template>
+          <Menu :menulist="item.children"></Menu>
+        </el-sub-menu>
+      </template>
+    </template>
+  </div>
+</template>
+<script setup lang="ts">
+import { Location } from "@element-plus/icons-vue";
+// 导入 defineOptions 函数，用于定义组件的选项
+import { defineOptions } from "vue";
+
+// 使用 defineOptions 函数
+defineOptions({
+  // 递归组件需要设置组件的名称
+  name: "Menu", // [!code warning]
+});
+defineProps(["menuList"]);
+</script>
+<style scoped></style>
+```
+
+- 路由示例
 
    ```js
    // 登录
@@ -683,7 +710,7 @@ export const isValidPhone = (phone: string): boolean => {
    children: [] // 子路由
    ```
 
-3. 全局注册菜单图标
+- 全局注册菜单图标
 
    `Object.entries()` 是用于返回一个给定对象自身可枚举属性的键值对
 
@@ -697,17 +724,21 @@ export const isValidPhone = (phone: string): boolean => {
    }
    ```
 
-4. 使用菜单图标
+- 使用菜单图标
 
    ```vue
    <el-icon>
-   <component :is="item.meta.icon"></component>
+      <!-- 动态组件 -->
+      <component :is="item.meta.icon"></component>
    </el-icon>
    ```
+::: danger
+由于`element-plus`提供的全部图标组件注册为全局组件，需要避免新增加的组件和全局的图标组件名称相同，比如`Menu`、`User`，否则会导致图标无法显示或者页面加载不出来。
+:::
 
 ### 3. 路由出口
 
-- 定义二级路由出口
+> 定义二级路由出口和[动画效果](https://cn.vuejs.org/guide/built-ins/transition.html)
 
   ```vue
   // src/views/layout/main/index.vue

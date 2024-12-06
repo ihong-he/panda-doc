@@ -133,7 +133,7 @@ export default defineConfig({
     // 层级
     sidebarDepth: 3,
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/fhguo/panda-doc' }
+      { icon: 'github', link: 'https://github.com/ihong-he/panda-doc' }
     ]
   }
 })
