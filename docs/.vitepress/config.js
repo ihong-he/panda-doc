@@ -125,7 +125,7 @@ export default defineConfig({
             { text: '一、创建项目', link: '/project/ggzx/index1' },
             { text: '二、基础配置', link: '/project/ggzx/index2' },
             { text: '三、页面搭建', link: '/project/ggzx/index3' },
-            { text: '四、综合配置', link: '/project/ggzx/index4' },
+            { text: '四、页面配置', link: '/project/ggzx/index4' },
           ]
         }
       ]

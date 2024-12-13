@@ -609,7 +609,8 @@ export const useUserStore = defineStore("user", {
   },
 });
 ```
-- layout组件引入
+
+- layout 组件引入
 
 ```vue{10-12}
 <template>
@@ -697,80 +698,81 @@ defineProps(["menuList"]);
 
 - 路由示例
 
-   ```js
-   // 登录
-   path: "/login",
-   component: () => import("@/views/login/index.vue"),
-   name: "login", // 命名路由
-   meta: {
-     title: "登录",
-     hidden: true, // 是否显示在左侧菜单
-     icon: "House", // 菜单图标
-   },
-   children: [] // 子路由
-   ```
+  ```js
+  // 登录
+  path: "/login",
+  component: () => import("@/views/login/index.vue"),
+  name: "login", // 命名路由
+  meta: {
+    title: "登录",
+    hidden: true, // 是否显示在左侧菜单
+    icon: "House", // 菜单图标
+  },
+  children: [] // 子路由
+  ```
 
 - 全局注册菜单图标
 
-   `Object.entries()` 是用于返回一个给定对象自身可枚举属性的键值对
+  `Object.entries()` 是用于返回一个给定对象自身可枚举属性的键值对
 
-   ```js
-   // src/components/index.ts
-   // 引入element-plus提供的全部图标组件
-   import * as ElementPlusIconsVue from "@element-plus/icons-vue";
-   // 将element-plus提供的全部图标组件注册为全局组件
-   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-     app.component(key, component);
-   }
-   ```
+  ```js
+  // src/components/index.ts
+  // 引入element-plus提供的全部图标组件
+  import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+  // 将element-plus提供的全部图标组件注册为全局组件
+  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component);
+  }
+  ```
 
 - 使用菜单图标
 
-   ```vue
-   <el-icon>
-      <!-- 动态组件 -->
-      <component :is="item.meta.icon"></component>
-   </el-icon>
-   ```
-::: danger
-由于`element-plus`提供的全部图标组件注册为全局组件，需要避免新增加的组件和全局的图标组件名称相同，比如`Menu`、`User`，否则会导致图标无法显示或者页面加载不出来。
-:::
+  ```vue
+  <el-icon>
+     <!-- 动态组件 -->
+     <component :is="item.meta.icon"></component>
+  </el-icon>
+  ```
+
+  ::: danger
+  由于`element-plus`提供的全部图标组件注册为全局组件，需要避免新增加的组件和全局的图标组件名称相同，比如`Menu`、`User`，否则会导致图标无法显示或者页面加载不出来。
+  :::
 
 ### 3. 路由出口
 
 > 定义二级路由出口和[动画效果](https://cn.vuejs.org/guide/built-ins/transition.html)
 
-  ```vue
-  // src/views/layout/main/index.vue
-  <template>
-    <!-- 路由组件出口的位置 -->
-    <router-view v-slot="{ Component }">
-      <transition name="fade">
-        <!-- 渲染layout一级路由组件的子路由 -->
-        <component :is="Component" />
-      </transition>
-    </router-view>
-  </template>
-  <script setup lang="ts"></script>
-  <style scoped>
-  /* 动画效果 */
-  .fade-enter-from {
-    opacity: 0;
-    transform: scale(0);
-  }
-  .fade-enter-active {
-    transition: all 0.3s;
-  }
-  .fade-enter-to {
-    opacity: 1;
-    transform: scale(1);
-  }
-  </style>
-  ```
+```vue
+// src/views/layout/main/index.vue
+<template>
+  <!-- 路由组件出口的位置 -->
+  <router-view v-slot="{ Component }">
+    <transition name="fade">
+      <!-- 渲染layout一级路由组件的子路由 -->
+      <component :is="Component" />
+    </transition>
+  </router-view>
+</template>
+<script setup lang="ts"></script>
+<style scoped>
+/* 动画效果 */
+.fade-enter-from {
+  opacity: 0;
+  transform: scale(0);
+}
+.fade-enter-active {
+  transition: all 0.3s;
+}
+.fade-enter-to {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>
+```
 
 ### 4. 顶部 tabbar 搭建
 
-1. 左侧面包屑动态导航
+ - 左侧面包屑动态导航
 
    ```vue
    <template>
@@ -822,7 +824,7 @@ defineProps(["menuList"]);
    </style>
    ```
 
-2. 右侧设置选项
+- 右侧设置选项
 
    ```vue
    <template>
@@ -854,7 +856,7 @@ defineProps(["menuList"]);
    <style scoped lang="scss"></style>
    ```
 
-3. 组件化
+- 组件化
 
    ```vue
    // src/views/layout/tabbar/index.vue
@@ -909,7 +911,7 @@ defineProps(["menuList"]);
 
 ### 5. 刷新及全屏功能
 
-1. 定义 state 变量
+- 定义 state 变量
 
    ```js
    // src/store/modules/setting.ts
@@ -919,9 +921,15 @@ defineProps(["menuList"]);
          refresh: false, // 控制刷新效果
        };
      },
+    actions: {
+      // 设置刷新
+      setRefresh() {
+        this.refresh = !this.refresh;
+      },
+  },
    ```
 
-2. 刷新功能实现
+- 刷新功能实现
 
    ```vue
    // src/views/layout/main/index.vue
@@ -954,20 +962,22 @@ defineProps(["menuList"]);
    </script>
    ```
 
-3. 触发刷新操作
+- 触发刷新操作
 
-   ```vue
-   <el-button circle icon="Refresh" @click="updateRefresh"></el-button>
+   ```vue{8}
+   <template>
+      <el-button circle icon="Refresh" @click="updateRefresh"></el-button>
+   </template>
    <script setup lang="ts">
    import useLayoutStore from "@/store/modules/setting";
    let layoutStore = useLayoutStore();
    const updateRefresh = () => {
-     layoutStore.refresh = !layoutStore.refresh;
+     layoutStore.setRefresh();
    };
    </script>
    ```
 
-4. 全屏实现
+- 全屏实现
 
    ```js
    // 点击全屏按钮事件
@@ -986,7 +996,7 @@ defineProps(["menuList"]);
 
 ### 6. 获取用户信息
 
-1. 用户仓库引入接口
+- 用户仓库引入接口
 
    ```js
    // src/store/modules/user.ts
@@ -1013,7 +1023,7 @@ defineProps(["menuList"]);
    }
    ```
 
-2. 添加请求拦截器
+- 添加请求拦截器
 
    ```js
    // src/utils/request.ts
@@ -1021,13 +1031,14 @@ defineProps(["menuList"]);
      const userStore = useUserStore();
      console.log(userStore.token);
      if (userStore.token) {
+       // 设置请求头
        config.headers.token = userStore.token;
      }
      return config;
    });
    ```
 
-3. 渲染用户信息
+- 渲染用户信息
 
    ```js
    // 引入用户仓库数据
@@ -1040,7 +1051,7 @@ defineProps(["menuList"]);
 
 ### 7. 退出登录
 
-1. 重置仓库用户信息
+- 重置仓库用户信息
 
    ```js
    // src/store/modules/user.ts
@@ -1054,7 +1065,7 @@ defineProps(["menuList"]);
    },
    ```
 
-2. 触发退出登录操作
+- 触发退出登录操作
 
    ```ts
    import { useRoute } from "vue-router";
@@ -1070,7 +1081,7 @@ defineProps(["menuList"]);
    };
    ```
 
-3. 登录页处理
+- 登录页处理
 
    ```js
    import { useRouter, useRoute } from "vue-router";
@@ -1089,7 +1100,9 @@ defineProps(["menuList"]);
 
 ## 三、体验优化
 
-### 1. 进度条
+### 1. 加载进度条
+
+> [nprogress](https://www.npmjs.com/package/nprogress) 是前端轻量级 web 进度条插件
 
 1. 安装 nprogress
 
@@ -1103,24 +1116,25 @@ defineProps(["menuList"]);
    // src/router/permission.ts
    // 路由鉴权
    import router from "./index.ts";
-   // 引入进度条
+   // 引入进度条插件及样式
    import nprogress from "nprogress";
    import "nprogress/nprogress.css";
+   // 去除进度条小圆圈
+   nprogress.configure({ showSpinner: false });
    // 全局前置守卫
    router.beforeEach((to, from, next) => {
-     // to and from are both route objects. must call `next`.
-     console.log(to, from);
+     // 进度条开始
      nprogress.start();
      next();
    });
    // 全局后置钩子
    router.afterEach(() => {
-     // to and from are both route objects.
+     // 进度条结束
      nprogress.done();
    });
    ```
 
-3. 导入入口文件
+3. 导入到入口文件
 
    ```js
    // 引入路由鉴权文件
@@ -1129,56 +1143,82 @@ defineProps(["menuList"]);
 
 ### 2. 路由鉴权
 
-1. 核心功能实现
+> 对用户请求的权限进行判断，如果用户没有权限，则不能访问该页面
+
+- route 新增权限字段`requiresAuth`
+
+```js{9}
+export const constRouter = [
+  {
+    path: "/login",
+    component: () => import("@/views/login/index.vue"),
+    name: "login", // 命名路由
+    meta: {
+      title: "登录页",
+      show: false,
+      requiresAuth: false, // 是否需要权限验证
+  },
+  ...
+]
+```
+
+- 路由守卫进行权限判断
 
    ```js
-   // src/router/permission.ts
-   // 导入用户仓库获取token
-   import useUserStore from "@/store/modules/user.ts";
-   import pinia from "@/store/index.ts";
-   import { ElNotification } from "element-plus";
-   // 去除小圆圈
-   nprogress.configure({ showSpinner: false });
-   const userStore = useUserStore(pinia);
-   const username = userStore.username;
+   import router from "./index";
+   import { useUserStore } from "@/store/modules/user";
 
-   // 全局前置守卫
+   // 路由全局前置守卫
    router.beforeEach((to, from, next) => {
-       // 获取token 判断用户是否登录
-     const token = userStore.token;
-     console.log(token);
-     if (token) {
-       if (to.path == "/login") {
-         next("/");
-       } else {
-         // 是否有用户信息
-         if (username) {
-           // 有就放行
-           next();
-         } else {
-           // 获取用户信息
-           userStore
-             .getUser()
-             .then(() => {
-               next();
-             })
-             .catch((err) => {
-               // token过期 退出登录
-               ElNotification({
-                 type: "error",
-                 message: err,
-               });
-               userStore.userLogout();
-               next("/login");
-             });
-         }
-       }
-     } else {
-       if (to.path == "/login") {
-         next();
-       } else {
-         next({ path: "/login", query: { redirect: to.path } });
-       }
-     }
-   }
+    // 在组件外部使用pinia必须保证store有初始化，否则会报错
+    const userStore = useUserStore();
+    // 设置页面标题
+    if (to.meta.title) {
+      document.title = ("试剂管理系统-" + to.meta.title) as string;
+    }
+    const isAuthenticated = userStore.token;
+    // 如果目标路由是登录页
+    if (to.path === "/login") {
+      next(); // 如果是登录页，直接放行
+    } else {
+      // 如果目标路由需要鉴权
+      if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (!isAuthenticated) {
+          // 如果没有认证，跳转到登录页
+          next({ path: "/login", query: { redirect: to.path } });
+        } else {
+          next(); // 认证通过，继续路由导航
+        }
+      } else {
+        next(); // 不需要鉴权的页面，继续路由导航
+      }
+    }
+    nprogress.start();
+   });
    ```
+
+### 3. 未登录处理
+
+> 未登录状态，点击登录按钮，跳转到登录页，登录成功后，再跳转到之前访问的路由
+
+```vue
+<!-- src/views/layout/tabbar/operate/index.vue -->
+<template>
+  <div class="operate-container">
+    <!-- 已登录 -->
+    <el-dropdown trigger="click" v-if="userStore.token">
+      ...
+    </el-dropdown>
+    <!-- 未登录 -->
+    <el-button
+      type="primary"
+      style="margin-left: 15px"
+      plain
+      v-else
+      @click="router.push('/login')"
+      >登录</el-button
+    >
+  </div>
+</template>
+
+```
