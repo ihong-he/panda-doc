@@ -126,6 +126,8 @@ export default defineConfig({
             { text: '二、基础配置', link: '/project/ggzx/index2' },
             { text: '三、页面搭建', link: '/project/ggzx/index3' },
             { text: '四、页面配置', link: '/project/ggzx/index4' },
+            { text: '五、权限控制', link: '/project/ggzx/index5' },
+            { text: '六、大屏开发', link: '/project/ggzx/index6' },
           ]
         }
       ]

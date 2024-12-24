@@ -377,11 +377,13 @@ export const useStore = defineStore('main', {
 
 这样 pinia 关于主题设置的配置信息将会被持久保存到浏览器的 localStorage 中。
 
-## 二、暗黑主题
+## 二、主题及颜色设置
+
+### 1、暗黑模式
 
 > 此方案基于 [elementPlus](https://element-plus.org/zh-CN/guide/dark-mode.html) 和 css 变量实现暗黑和明亮主题切换效果
 
-1. 下载`@vueuse/core`，该包会在 HTML 添加`.dark`类名
+- 下载`@vueuse/core`，该包会在 HTML 添加`.dark`类名
 
 ```
 
@@ -389,7 +391,7 @@ pnpm i @vueuse/core
 
 ````
 
-2. 新建`dark.scss`文件
+- 新建`dark.scss`文件
 
 ```css
 /* 定义根作用域下的变量 */
@@ -412,54 +414,323 @@ pnpm i @vueuse/core
 }
 ````
 
-3. 导入到 main.js 入口文件
+- 导入到 main.js 入口文件
 
-   ```js
-   // elementPlus css变量
-   import "element-plus/theme-chalk/dark/css-vars.css";
-   // 自定义变量文件
-   import "@/styles/dark.scss";
-   ```
+  ```js
+  // elementPlus css变量
+  import "element-plus/theme-chalk/dark/css-vars.css";
+  // 自定义变量文件
+  import "@/styles/dark.scss";
+  ```
 
-4. 使用设置的 css 变量
+- 使用设置的 css 变量
 
-   ```css
-   .card {
-     background-color: var(--theme-background);
-   }
-   ```
+  ```css
+  .card {
+    background-color: var(--theme-background);
+  }
+  ```
 
-5. 触发事件
+- 触发事件
 
-   ```vue
-   <template>
-     <el-switch
-       v-model="layoutStore.isDark"
-       inline-prompt
-       @change="changeDark"
-       :active-icon="Sunny"
-       :inactive-icon="Moon"
-     />
-   </template>
-   <script setup lang="ts">
-   import useLayoutStore from "@/store/modules/setting.ts";
-   import { Sunny, Moon } from "@element-plus/icons-vue";
-   import { useDark, useToggle } from "@vueuse/core";
-   const layoutStore = useLayoutStore();
-   //switch开关的chang事件进行暗黑模式的切换
-   const isDark = useDark();
-   const changeDark = useToggle(isDark);
-   </script>
-   ```
+  ```vue
+  <template>
+    <el-switch
+      v-model="layoutStore.isDark"
+      inline-prompt
+      @change="changeDark"
+      :active-icon="Sunny"
+      :inactive-icon="Moon"
+    />
+  </template>
+  <script setup lang="ts">
+  import useLayoutStore from "@/store/modules/setting.ts";
+  import { Sunny, Moon } from "@element-plus/icons-vue";
+  import { useDark, useToggle } from "@vueuse/core";
+  const layoutStore = useLayoutStore();
+  //switch开关的chang事件进行暗黑模式的切换
+  const isDark = useDark();
+  const changeDark = useToggle(isDark);
+  </script>
+  ```
 
-6. 使用 pina 共享状态及持久化存储
+- 使用 pina 共享状态及持久化存储
 
-   ```js
-   state: () => {
-     return {
-       isDark:
-         // 控制暗黑主题
-         localStorage.getItem("vueuse-color-scheme") == "dark" ? true : false, 
-     };
-   };
-   ```
+  ```js
+  state: () => {
+    return {
+      isDark:
+        // 控制暗黑主题
+        localStorage.getItem("vueuse-color-scheme") == "dark" ? true : false,
+    };
+  };
+  ```
+
+### 2、颜色设置
+
+> 使用 [elementPlus](https://element-plus.org/zh-CN/guide/theming.html#%E9%80%9A%E8%BF%87-css-%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE) 官方提供的通过 js 控制 css 变量来设置主题色
+
+- store 仓库设置颜色变量
+
+```js
+// src/store/modules/setting.ts
+// 设置相关仓库
+import { defineStore } from "pinia";
+
+export const useSettingStore = defineStore("setting", {
+  state: () => ({
+    // 主题色
+    color: "#409EFF",
+  }),
+});
+```
+
+- 监听颜色变化变化，并设置 css 变量
+
+```vue
+<template>
+  <div class="theme-item">
+    <div>主题颜色</div>
+    <el-color-picker
+      v-model="colorVal"
+      :predefine="predefineColors"
+      @change="changeColor"
+    />
+  </div>
+</template>
+<script setup>
+// 引入颜色处理函数
+import { getLightColor, getDarkColor } from "@/utils/color";
+
+// 定义颜色选择器的颜色值
+const colorVal = ref(settingStore.color);
+// 监听颜色变化
+const changeColor = (val) => {
+  console.log(val);
+  settingStore.color = val;
+  // const el = document.documentElement;
+  // // 设置 css 变量
+  // el.style.setProperty('--el-color-primary', settingStore.color)
+
+  if (!val) {
+    val = "#409EFF";
+    ElMessage({
+      type: "success",
+      message: `主题颜色已重置为 ${val}`,
+    });
+  }
+  // 计算主题颜色变化
+  document.documentElement.style.setProperty("--el-color-primary", val);
+  document.documentElement.style.setProperty(
+    "--el-color-primary-dark-2",
+    isDark.value ? `${getLightColor(val, 0.2)}` : `${getDarkColor(val, 0.3)}`
+  );
+  for (let i = 1; i <= 9; i++) {
+    const primaryColor = isDark.value
+      ? `${getDarkColor(val, i / 10)}`
+      : `${getLightColor(val, i / 10)}`;
+    document.documentElement.style.setProperty(
+      `--el-color-primary-light-${i}`,
+      primaryColor
+    );
+  }
+};
+</script>
+```
+
+- 定义颜色处理函数
+
+```js
+// src/utils/color.ts
+import { ElMessage } from "element-plus";
+
+/**
+ * @description hex颜色转rgb颜色
+ * @param {String} str 颜色值字符串
+ * @returns {String} 返回处理后的颜色值
+ */
+export function hexToRgb(str: any) {
+  let hexs: any = "";
+  let reg = /^\#?[0-9A-Fa-f]{6}$/;
+  if (!reg.test(str)) return ElMessage.warning("输入错误的hex");
+  str = str.replace("#", "");
+  hexs = str.match(/../g);
+  for (let i = 0; i < 3; i++) hexs[i] = parseInt(hexs[i], 16);
+  return hexs;
+}
+
+/**
+ * @description rgb颜色转Hex颜色
+ * @param {*} r 代表红色
+ * @param {*} g 代表绿色
+ * @param {*} b 代表蓝色
+ * @returns {String} 返回处理后的颜色值
+ */
+export function rgbToHex(r: any, g: any, b: any) {
+  let reg = /^\d{1,3}$/;
+  if (!reg.test(r) || !reg.test(g) || !reg.test(b))
+    return ElMessage.warning("输入错误的rgb颜色值");
+  let hexs = [r.toString(16), g.toString(16), b.toString(16)];
+  for (let i = 0; i < 3; i++) if (hexs[i].length == 1) hexs[i] = `0${hexs[i]}`;
+  return `#${hexs.join("")}`;
+}
+/**
+ * @description 加深颜色值
+ * @param {String} color 颜色值字符串
+ * @param {Number} level 加深的程度，限0-1之间
+ * @returns {String} 返回处理后的颜色值
+ */
+export function getDarkColor(color: string, level: number) {
+  let reg = /^\#?[0-9A-Fa-f]{6}$/;
+  if (!reg.test(color)) return ElMessage.warning("输入错误的hex颜色值");
+  let rgb = hexToRgb(color);
+  for (let i = 0; i < 3; i++)
+    rgb[i] = Math.round(20.5 * level + rgb[i] * (1 - level));
+  return rgbToHex(rgb[0], rgb[1], rgb[2]);
+}
+
+/**
+ * @description 变浅颜色值
+ * @param {String} color 颜色值字符串
+ * @param {Number} level 加深的程度，限0-1之间
+ * @returns {String} 返回处理后的颜色值
+ */
+export function getLightColor(color: string, level: number) {
+  let reg = /^\#?[0-9A-Fa-f]{6}$/;
+  if (!reg.test(color)) return ElMessage.warning("输入错误的hex颜色值");
+  let rgb = hexToRgb(color);
+  for (let i = 0; i < 3; i++)
+    rgb[i] = Math.round(255 * level + rgb[i] * (1 - level));
+  return rgbToHex(rgb[0], rgb[1], rgb[2]);
+}
+```
+
+- 使用`hooks`封装逻辑
+
+```js
+// 封装主题颜色切换相关的业务代码
+import { ElMessage } from "element-plus";
+import { useDark, useToggle } from "@vueuse/core";
+import { getLightColor, getDarkColor } from "@/utils/color";
+import { useSettingStore } from "@/store/modules/setting";
+
+//switch开关的chang事件进行暗黑模式的切换
+const isDark = useDark();
+export function changePrimary(val) {
+  useSettingStore().color = val;
+  if (!val) {
+    val = "#409EFF";
+    ElMessage({
+      type: "success",
+      message: `主题颜色已重置为 ${val}`,
+    });
+  }
+  // 计算主题颜色变化
+  document.documentElement.style.setProperty("--el-color-primary", val);
+  document.documentElement.style.setProperty(
+    "--el-color-primary-dark-2",
+    isDark.value ? `${getLightColor(val, 0.2)}` : `${getDarkColor(val, 0.3)}`
+  );
+  for (let i = 1; i <= 9; i++) {
+    const primaryColor = isDark.value
+      ? `${getDarkColor(val, i / 10)}`
+      : `${getLightColor(val, i / 10)}`;
+    document.documentElement.style.setProperty(
+      `--el-color-primary-light-${i}`,
+      primaryColor
+    );
+  }
+
+  return {
+    changePrimary,
+  };
+}
+```
+
+- 在`App.vue`中引入逻辑
+
+```vue
+<script setup>
+import { useSettingStore } from "@/store/modules/setting";
+import { changePrimary } from "@/hooks/useColor";
+
+// 渲染主题色
+changePrimary(useSettingStore().color);
+</script>
+```
+
+## 三、替换真实接口
+
+> 将本地的 MOOK 接口替换为服务器上的真实接口
+
+- `.env.development`设置接口
+
+```bash
+# 变量必须以 VITE_ 为前缀才能暴露给外部读取
+NODE_ENV = 'development'
+VITE_APP_TITLE = '试剂管理系统运营平台'
+VITE_APP_BASE_API = '/api'
+VITE_SERVER = 'http://sph-api.atguigu.cn'
+```
+
+- `vite.config.ts`配置跨域
+
+```js
+import { defineConfig, loadEnv } from "vite";
+
+export default defineConfig(({ command, mode }) => {
+  // 加载环境变量
+  let env = loadEnv(mode, process.cwd());
+  return {
+    // 代理跨域
+    server: {
+      proxy: {
+        [env.VITE_APP_BASE_API]: {
+          // 接口地址
+          target: env.VITE_SERVER,
+          // 是否跨域
+          changeOrigin: true,
+          // 路径重写
+          rewrite: (path) => path.replace(/^\/api/, ""),
+        },
+      },
+    },
+  };
+});
+```
+
+- 接口替换及响应结果修改
+
+```ts
+// 枚举接口地址
+// src/api/user/index.ts
+enum API {
+  LOGIN_URL = "/api/user/login", // [!code --]
+  USERINFO_URL = "/api/user/info", // [!code --]
+  LOGOUT_URL = "/api/user/logout", // [!code --]
+  LOGIN_URL = "/admin/acl/index/login", // [!code ++]
+  USERINFO_URL = "/admin/acl/index/info", // [!code ++]
+  LOGOUT_URL = "/admin/acl/index/logout", // [!code ++]
+}
+```
+
+```ts
+// src/store/modules/user.ts
+async login(data: LoginParamsType) {
+      const res: any = await reqLogin(data);
+      if (res.code === 200) {
+        this.token = res.data.token; // [!code --]
+        this.token = res.data; // [!code ++]
+        // 持久化存储
+        storage.setItem("token", res.data.token); // [!code --]
+        storage.setItem("token", res.data); // [!code ++]
+        // localStorage.setItem("token", res.data.token);
+        // 返回成功响应
+        return Promise.resolve(res);
+      } else {
+        // 登录失败，返回错误信息
+        return Promise.reject(res.data.message); // [!code --]
+        return Promise.reject(res.data); // [!code ++]
+      }
+    },
+```
