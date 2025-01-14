@@ -110,6 +110,8 @@ export default defineConfig({
           text: '项目',
           collapsed: true,
           items: [
+            { text: '博欣信息管理系统', link: '/interview/project/ims' },
+            { text: '试剂管理系统', link: '/interview/project/reagent' },
             { text: '行政诉讼E监督', link: '/interview/project/e-supervise' },
             { text: 'APEC', link: '/interview/project/apec' },
             { text: '浙江解纷码', link: '/interview/project/jfm' },
