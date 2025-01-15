@@ -99,7 +99,8 @@ export default defineConfig({
           text: 'Interview',
           collapsed: true,
           items: [
-            { text: '题一', link: '/interview/index1' },
+            { text: 'HTML&CSS', link: '/interview/index1' },
+            { text: 'JavaScript', link: '/interview/index6' },
             { text: '题二', link: '/interview/index2' },
             { text: '题三', link: '/interview/index3' },
             { text: '题四', link: '/interview/index4' },
