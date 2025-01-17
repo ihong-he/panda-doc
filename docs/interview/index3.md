@@ -4,8 +4,41 @@ outline: deep
 
 ## 一、Vue
 
+### 1、对MVVM的理解
 
-### 1、vue常用的指令有哪些
+`MVVM`是`Model-View-ViewModel`缩写，也就是把MVC中的Controller演变成ViewModel。Model层代表数据模型，View代表UI组件，ViewModel是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
+
+### 2、双向绑定的原理
+
+在Vue 2中，主要是通过`Object.defineProperty()`实现双向绑定。
+![An image](/img/vue1.png)
+
+- 对`data`中的数据属性进行遍历，使用`Object.defineProperty()`重新定义属性。它可以设置`get`和`set`函数，`get`在读取属性值时调用，`set`在修改属性值时调用。在`set`函数触发时，通知依赖更新。同时通过`Dep`收集依赖，`get`时收集，`set`时通知更新视图。
+
+在Vue 3中，使用`Proxy`实现双向绑定。`Proxy`可以定义基本操作的自定义行为。在`get`操作中收集依赖，`set`操作中更新数据并且触发视图更新。`Proxy`能代理整个对象，动态添加的新属性也能是响应式的，性能和灵活性上较`Object.defineProperty()`有提升。
+
+### 3、Vue3和Vue2的区别
+
+以下是 Vue3 和 Vue2 的主要区别：
+- **响应式系统**：
+  - Vue2 使用 `Object.defineProperty` 对数据属性进行劫持，新增属性需使用 `Vue.set` 或 `this.$set` 才能实现响应式。
+  - Vue3 采用 `Proxy` 实现响应式，可代理整个对象，动态添加新属性也自动为响应式。
+- **组件 API**：
+  - Vue2 主要使用 `Options API`，将组件的逻辑按选项分类（如 `data`、`methods`、`computed` 等）放在一个对象中。
+  - Vue3 除 `Options API` 外，还提供 `Composition API`，可将逻辑按功能组织，通过 `setup` 函数实现，更利于代码复用和维护。
+- **性能**：
+  - Vue2 对静态节点和动态节点更新无区分，性能稍逊一筹。
+  - Vue3 通过静态标记等优化，能更高效地更新，可跳过静态节点更新，性能更好。
+- **全局 API**：
+  - Vue2 有多个全局 API，如 `Vue.use`、`Vue.component` 等，会影响全局状态。
+  - Vue3 引入应用实例 `app`，使用 `app.use`、`app.component` 等，更模块化，减少全局状态干扰。
+- **Fragment 支持**：
+  - Vue2 组件必须有一个根元素。
+  - Vue3 支持 `Fragment`，允许组件有多个根元素，可直接写多个元素而无需包裹元素。
+- **Teleport 组件**：
+  - Vue3 新增 `Teleport` 组件，可将组件内容传送到 DOM 其他位置，Vue2 没有。
+
+### 4、vue常用的指令
 
 Vue.js提供了一些常用的指令（Directives），用于操作DOM、数据绑定以及控制应用程序的行为。以下是一些常见的Vue指令以及示例：
 
@@ -30,123 +63,178 @@ Vue.js提供了一些常用的指令（Directives），用于操作DOM、数据�
 
 这些是Vue.js中一些常用的指令。每个指令都有不同的用途，可根据需要选择使用。指令使Vue应用程序更具交互性和动态性，能够根据数据的变化来更新页面内容。
 
-### 2、vue实现双向绑定的原理是什么
+### 5、v-if和v-show的区别
 
-Vue是通过数据劫持（Object.defineProperty）结合发布-订阅模式（Observer和Watcher）来实现响应式数据/双向绑定的。以下是Vue双向绑定的工作原理：
-
-![An image](/img/vue1.png)
-
-1. **数据劫持**：
-   - Vue会遍历数据对象的每个属性，通过`Object.defineProperty`方法为每个属性添加`getter`和`setter`方法。
-   - 当访问数据属性时，`getter`方法会被触发，用于收集依赖，将观察者（Watcher）添加到订阅者列表中。
-   - 当修改数据属性时，`setter`方法会被触发，通知订阅者更新视图。
-
-2. **Observer（观察者）**：
-   - Observer负责监听数据对象，当数据发生变化时，通知订阅者进行更新。
-   - Observer可以递归地监听嵌套对象的属性，确保整个数据对象都被劫持。
-
-3. **Watcher（订阅者）**：
-   - Watcher订阅数据的变化，每个Watcher实例与一个表达式（通常是模板中的表达式）相关联。
-   - 当数据变化时，Watcher负责更新视图。
-
-4. **Dep（依赖管理器）**：
-   - Dep用于管理Watcher，每个数据属性都有一个对应的Dep实例。
-   - 当数据属性被访问时，Watcher被添加到Dep的订阅者列表中。
-   - 当数据属性被修改时，Dep通知订阅者（Watcher）进行更新。
-
-5. **虚拟DOM**：
-   - Vue使用虚拟DOM来提高性能。当数据发生变化时，Vue首先将变化应用到虚拟DOM上，然后通过比对虚拟DOM和实际DOM的差异，最小化DOM操作，从而提高性能。
-
-通过上述机制，Vue实现了数据变化自动同步到视图，实现了双向绑定。当数据属性发生变化时，会触发setter，setter通知对应的Dep，Dep通知订阅了该数据属性变化的所有Watcher进行视图更新。这样就实现了数据和视图之间的双向绑定，使得应用程序的状态和界面保持同步。
-
-### 3、v-if和v-show的区别
-
-`v-if` 和 `v-show` 是 Vue.js 中用于控制元素显示和隐藏的两个指令，它们之间的主要区别在于：
-
-1. **编译时判断 vs. 运行时判断**：
-   - `v-if`：元素是否被渲染（包括子元素）是在编译阶段进行判断的。如果条件为假，元素及其子元素都不会被渲染到DOM中。
-   - `v-show`：元素始终会被渲染到DOM中，但是它的 CSS `display` 属性会在运行时进行切换。如果条件为假，元素的 `display` 属性会被设置为 `none`，元素仍然存在于DOM中，只是不可见。
+1. **渲染方式**：
+   - `v-if` 是**按需渲染**，条件为 `false` 时，DOM 元素不会存在于页面中。
+   - `v-show` 是**显示/隐藏**，通过修改元素的 `display` 样式（`display: none`）来控制可见性，元素始终存在于 DOM 中。
 
 2. **性能**：
-   - `v-if`：适用于在不需要显示的情况下完全删除元素，可以减少 DOM 节点数量，适用于切换频率较低的情况。
-   - `v-show`：适用于频繁切换显示和隐藏的元素，因为它不会造成元素的重新渲染，但元素始终存在于DOM中。
+   - `v-if` 适用于**条件变化频率较低**的场景，因为每次切换都会销毁和重新创建 DOM。
+   - `v-show` 适用于**需要频繁切换显示状态**的场景，因为切换只涉及样式操作。
 
-3. **初始化开销**：
-   - `v-if`：在条件为真时，初始化元素及其子元素的开销较大，因为它们需要在DOM中创建。
-   - `v-show`：在初始化时，元素及其子元素都会被渲染到DOM中，但它们的 `display` 属性可能被设置为 `none`，因此初始化开销相对较小。
+3. **使用场景**：
+   - `v-if`：适合动态加载或初始状态为 `false` 的组件。
+   - `v-show`：适合需要频繁显示和隐藏的组件。
 
-4. **适用场景**： 
-   - 使用 `v-if` 当你需要在条件满足时完全添加或删除元素，或者在条件切换频率较低的情况下。
-   - 使用 `v-show` 当你需要频繁切换元素的可见性而不想造成大量的 DOM 重新渲染，或者在元素的初始状态是可见的情况下。
-
-总之，选择使用 `v-if` 还是 `v-show` 取决于具体的需求和性能考虑。如果需要频繁切换可见性并且元素的渲染开销较小，可以考虑使用 `v-show`。如果在条件不满足时希望彻底删除元素，或者条件切换频率较低，可以使用 `v-if`。
+**Vue 3 补充**：  
+Vue 3 中，`v-if` 和 `v-show` 的基本行为没有改变，但性能更佳，尤其在模板编译和响应式渲染的优化上。
 
 ### 4、data为什么是一个函数
 
-在Vue.js中，`data` 选项为函数的原因是为了确保每个组件实例都有自己的数据副本，而不是共享同一个数据对象。
+在 Vue 2 中，组件的 `data` 必须是一个函数，而在根实例中可以是一个对象。原因如下：  
 
-当 `data` 是一个对象时，所有组件实例将共享同一个数据对象，这可能会导致意外的数据修改和不可预测的行为。通过将 `data` 定义为函数，每次创建组件实例时都会调用该函数返回一个新的数据对象，从而确保数据的独立性和组件的可预测性。
+1. **组件复用时的独立性**：  
+   如果 `data` 是一个对象，所有组件实例将共享这一个对象，导致数据互相影响。  
+   使用函数返回对象，确保每个组件实例都有独立的 `data` 副本，避免互相干扰。  
+
+   ```javascript
+   data() {
+       return {
+           message: "Hello, Vue!"
+       };
+   }
+   ```
+
+2. **根实例不需要复用**：  
+   根实例只创建一次，因此 `data` 可以直接是一个对象，不存在数据共享问题。  
+
 
 ### 5、vue生命周期有哪些
 
-Vue.js组件的生命周期是一系列特定的阶段，它们代表了组件从创建到销毁的整个过程。Vue.js的生命周期包括以下阶段：
+**Vue 2 的生命周期函数：**
 
-1. **创建阶段（Creation）**：
-   - `beforeCreate`: 组件实例被创建之前，此时组件的选项（如`data`、`methods`）还未初始化。
-   - `created`: 组件实例已经被创建，可以访问`data`、`methods`等选项，但DOM元素尚未被挂载。
+1. **创建阶段**：
+   - `beforeCreate`：实例初始化之后，数据观察和事件配置尚未完成。
+   - `created`：实例已创建完成，数据已响应式处理，但未挂载 DOM。
 
-2. **挂载阶段（Mounting）**：
-   - `beforeMount`: 在模板编译之后，但在DOM元素挂载之前被调用。
-   - `mounted`: 组件已经挂载到DOM上，此时可以访问DOM元素。通常在这个阶段进行异步操作和数据获取。
+2. **挂载阶段**：
+   - `beforeMount`：模板编译完成，尚未挂载到 DOM。
+   - `mounted`：实例已挂载到 DOM，DOM 可被访问。
 
-3. **更新阶段（Updating）**：
-   - `beforeUpdate`: 数据发生变化，但DOM尚未更新，此时可对数据进行处理。
-   - `updated`: 数据已经更新，DOM已经重新渲染，此时可以执行DOM操作。
+3. **更新阶段**（数据变化触发）：
+   - `beforeUpdate`：数据更新时调用，DOM 尚未更新。
+   - `updated`：数据更新后调用，DOM 已同步更新。
 
-4. **销毁阶段（Destruction）**：
-   - `beforeDestroy`: 在组件销毁之前调用，可以执行一些清理工作。
-   - `destroyed`: 组件已经销毁，所有事件监听和定时器都已经被移除。
+4. **销毁阶段**：
+   - `beforeDestroy`：实例销毁前调用，仍可访问实例。
+   - `destroyed`：实例已销毁，所有事件监听和响应数据均被清理。
 
-5. **错误处理阶段（Error Handling）**（Vue 2.x中的错误处理）：
-   - `errorCaptured`: 当子组件的一个错误被捕获时触发，用于处理子组件中出现的错误。
+---
 
-这些生命周期钩子允许你在不同的阶段执行代码，以满足组件的需求。例如，在`created`中初始化数据，`mounted`中进行DOM操作，`beforeDestroy`中清理资源等。了解这些生命周期可以帮助你更好地管理和优化Vue组件。
+**Vue 3 的生命周期函数**：
 
-- 拓展：[vue3生命周期](/note/vue3#组合式api-生命周期函数)
+Vue 3 中生命周期函数与 Vue 2 基本一致，但提供了基于 **组合式 API** 的钩子函数替代选项，例如：  
+- `onBeforeMount()` 对应 `beforeMount`
+- `onMounted()` 对应 `mounted`
+- `onBeforeUpdate()` 对应 `beforeUpdate`
+- `onUpdated()` 对应 `updated`
+- `onBeforeUnmount()` 对应 `beforeDestroy`
+- `onUnmounted()` 对应 `destroyed`
+
+**Vue 3 新增**：  
+- `onRenderTracked` 和 `onRenderTriggered`：调试响应式数据依赖时使用。  
+- `onErrorCaptured`：用于捕获子组件的错误。  
+
+每个生命周期都有明确的作用，可以根据实际需求选择合适的钩子函数进行操作。
 
 ### 6、vue中组件之间是如何通信的
 
-在Vue中，组件之间可以通过以下方式进行通信：
+**1. 父子组件通信：**
 
-1. **Props（父子组件通信）**：
-   - 父组件通过属性向子组件传递数据。
-   - 子组件通过props接收父组件传递的数据。
-   - 这是一种单向数据流，父组件向子组件传递数据。
+- **父传子**：通过 `props` 向子组件传递数据。  
+  ```vue
+  <!-- 父组件 -->
+  <ChildComponent :message="parentMessage" />
+  <!-- 子组件 -->
+  props: ['message']
+  ```
+- **子传父**：通过事件 `$emit` 通知父组件，父组件通过监听事件接收数据。  
+  ```vue
+  <!-- 子组件 -->
+  this.$emit('eventName', data)
+  <!-- 父组件 -->
+  <ChildComponent @eventName="handleEvent" />
+  ```
 
-2. **自定义事件（子父组件通信）**：
-   - 子组件可以通过`$emit`方法触发自定义事件，传递数据给父组件。
-   - 父组件可以使用`v-on`或`@`监听子组件触发的事件，并在事件处理程序中获取数据。
-   - 这是一种从子组件到父组件的通信方式。
+---
 
-3. **Vuex（中央状态管理）**：
-   - Vuex是Vue的官方状态管理库，用于管理应用中的共享状态。
-   - 组件可以通过dispatch触发action，修改全局的状态。
-   - 其他组件可以通过getter获取全局状态。
-   - 适用于大型应用或需要多个组件之间共享状态的情况。
+**2. 非父子组件通信：**
 
-4. **事件总线（非父子组件通信）**：
-   - 通过创建一个事件总线实例，组件可以通过事件总线进行通信。
-   - 一个组件可以触发事件，而其他组件可以监听这些事件并做出响应。
+- **事件总线 (Event Bus)**：使用一个空的 Vue 实例作为事件中心。  
+  ```javascript
+  // 创建事件总线
+  const EventBus = new Vue();
+  // 组件A
+  EventBus.$emit('eventName', data);
+  // 组件B
+  EventBus.$on('eventName', (data) => { ... });
+  ```
+  **注意**：在 Vue 3 中已不推荐这种方式。
 
-选择通信方式取决于组件之间的关系和需求。一般来说，应该尽量避免直接修改父组件的数据，而是通过props和自定义事件来实现数据的传递和响应。当需要跨越多个组件的通信或全局状态管理时，考虑使用Vuex。
+- **状态管理工具（如 Vuex 或 Pinia）**：管理全局状态，适合复杂项目。  
+  - Vuex 示例：
+    ```javascript
+    // 存储数据
+    this.$store.commit('mutationName', payload);
+    // 访问数据
+    this.$store.state.propertyName;
+    ```
 
-- 拓展：[Vue3事件通信](/project/ggzx/index1#一、vue3组件通信)
+---
+
+**3. 跨层级组件通信：**
+
+- **`provide` 和 `inject`**：
+  - 父级组件提供数据，子孙组件注入数据，适合层级较深的场景。
+  ```javascript
+  // 父组件
+  provide: { key: value }
+  // 子组件
+  inject: ['key']
+  ```
+
+---
+
+**4. 全局事件或全局状态：**
+
+- **Vue.prototype** (Vue 2)：挂载方法或数据到 Vue 的原型。
+- **`mitt` (Vue 3 推荐)**：轻量事件总线库。
+
+---
+
+**Vue 3 补充**：
+
+- **组合式 API + `ref` 和 `reactive`**：通过共享响应式数据实现通信。
+  ```javascript
+  import { ref } from 'vue';
+  const sharedData = ref('value');
+  export default sharedData;
+  ```  
+
+根据实际场景选择合适的通信方式，注重性能和可维护性。
 
 ### 7、v-for中key值的作用
 
-`v-for` 中的 `key` 属性的作用是帮助 Vue 跟踪每个节点的变化，从而更高效地更新虚拟 DOM。
+在 `v-for` 中使用 `key` 的作用主要是帮助 Vue 跟踪每个节点的身份，优化虚拟 DOM 的重渲染过程。
 
-通过使用key给每个节点做一个唯一标识，Diff算法就可以正确识别此节点，找到正确的位置插入新的节点。如果没有 `key`，有可能会出现数据混乱的情况。
+ **作用**：
+1. **性能优化**：  
+   Vue 使用 `key` 来标识每个元素，当数据变化时，Vue 能够通过 `key` 精确地识别哪个元素被更改、插入或移除，从而减少不必要的 DOM 操作，提高渲染性能。
+
+2. **避免重用元素**：  
+   如果没有 `key`，Vue 默认会通过索引来标识每个元素。这样可能会导致元素的状态（如输入框的值）在位置变化时被错误地复用，出现不一致的现象。
+
+**例子**：
+```vue
+<!-- 正确用法 -->
+<ul>
+  <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+</ul>
+```
+- 在上面的例子中，`item.id` 作为 `key` 帮助 Vue 更精确地识别每个列表项。
+
+**总结**：`key` 有助于提高渲染效率，并确保元素状态的正确性。
 
 
 ### 8、Computed 和 Watch 的区别
@@ -261,41 +349,6 @@ computed: {
 ```
 
 这样做可以更有效地筛选数据，并确保只有满足条件的数据被渲染，避免了不必要的渲染和遍历。
-
-### 11、简单谈谈你对vue3.0的理解
-
-1. vue3运行速度比vue2快，配合Vite代码编译速度非常快
-2. vue3使用`vue-create`或者`vite`创建项目，而vue2使用`vue-cli`
-3. 数据双向绑定从`Object.defineProperty`变成了`new Proxy`，不再使用`$set`和`this`了     [ˈprɒksi]
-4. 写法上由选项式API变为组合式API，同时兼容选项式API
-5. vue3生命周期函数没有`beforecreate`和`created`了，改为`setup`了，其他的生命周期函数在vue2的基础上加了一个on的前缀
-6. Vue3可以更好的支持`TypeScript`
-
-在 Vue 3 中，组合式 API 基本上都会配合 `<script setup>` 语法在单文件组件中使用。下面是一个使用组合式 API 的组件示例：
-
-```js
-<script setup>
-import { ref, onMounted } from 'vue'
-
-// 响应式状态
-const count = ref(0)
-
-// 更改状态、触发更新的函数
-function increment() {
-  count.value++
-}
-
-// 生命周期钩子
-onMounted(() => {
-  console.log(`计数器初始值为 ${count.value}。`)
-})
-</script>
-
-<template>
-  <button @click="increment">点击了：{{ count }} 次</button>
-</template>
-
-```
 
 ## 二、VueRouter&Vuex
 

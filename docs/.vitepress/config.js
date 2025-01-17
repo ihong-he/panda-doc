@@ -101,8 +101,8 @@ export default defineConfig({
           items: [
             { text: 'HTML&CSS', link: '/interview/index1' },
             { text: 'JavaScript', link: '/interview/index6' },
-            { text: '题二', link: '/interview/index2' },
-            { text: '题三', link: '/interview/index3' },
+            { text: 'ES6&HTTP', link: '/interview/index2' },
+            { text: 'Vue', link: '/interview/index3' },
             { text: '题四', link: '/interview/index4' },
             { text: '题五', link: '/interview/index5' },
           ]
