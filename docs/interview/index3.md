@@ -80,7 +80,7 @@ Vue.js提供了一些常用的指令（Directives），用于操作DOM、数据�
 **Vue 3 补充**：  
 Vue 3 中，`v-if` 和 `v-show` 的基本行为没有改变，但性能更佳，尤其在模板编译和响应式渲染的优化上。
 
-### 4、data为什么是一个函数
+### 6、data为什么是一个函数
 
 在 Vue 2 中，组件的 `data` 必须是一个函数，而在根实例中可以是一个对象。原因如下：  
 
@@ -100,7 +100,7 @@ Vue 3 中，`v-if` 和 `v-show` 的基本行为没有改变，但性能更佳，
    根实例只创建一次，因此 `data` 可以直接是一个对象，不存在数据共享问题。  
 
 
-### 5、vue生命周期有哪些
+### 7、生命周期
 
 **Vue 2 的生命周期函数：**
 
@@ -138,7 +138,7 @@ Vue 3 中生命周期函数与 Vue 2 基本一致，但提供了基于 **组合�
 
 每个生命周期都有明确的作用，可以根据实际需求选择合适的钩子函数进行操作。
 
-### 6、vue中组件之间是如何通信的
+### 8、组件通信
 
 **1. 父子组件通信：**
 
@@ -214,7 +214,7 @@ Vue 3 中生命周期函数与 Vue 2 基本一致，但提供了基于 **组合�
 
 根据实际场景选择合适的通信方式，注重性能和可维护性。
 
-### 7、v-for中key值的作用
+### 9、v-for中key值的作用
 
 在 `v-for` 中使用 `key` 的作用主要是帮助 Vue 跟踪每个节点的身份，优化虚拟 DOM 的重渲染过程。
 
@@ -237,518 +237,325 @@ Vue 3 中生命周期函数与 Vue 2 基本一致，但提供了基于 **组合�
 **总结**：`key` 有助于提高渲染效率，并确保元素状态的正确性。
 
 
-### 8、Computed 和 Watch 的区别
+### 10、Computed VS Watch
 
-`computed`和`watch`是Vue.js中用于响应数据变化的两种不同方式，它们的主要区别如下：
+**区别总结**：
 
-**Computed（计算属性）**：
+1. **用途**：  
+   - **Computed（计算属性）**：用于基于已有数据计算出新的值，适合涉及复杂逻辑的值，且具备**缓存**功能。  
+   - **Watch（侦听器）**：用于**监听某个数据的变化**，适合执行一些**副作用操作**（如异步请求、手动 DOM 操作等）。  
 
-1. **自动追踪依赖**：`computed`属性会自动追踪其依赖的响应式数据，只有依赖数据发生变化时，计算属性才会重新计算。
+2. **触发时机**：  
+   - **Computed**：依赖的数据发生变化时，会自动重新计算，但只在被访问时触发计算。  
+   - **Watch**：数据变化时立即执行回调函数。  
 
-2. **缓存**：计算属性的结果会被缓存起来，只有当依赖发生变化时才会重新计算，多次访问同一计算属性不会重复计算，这有助于提高性能。
+3. **是否有缓存**：  
+   - **Computed**：有缓存，只有依赖数据发生变化时才重新计算，性能更优。  
+   - **Watch**：没有缓存，每次数据变化都会触发回调。  
 
-3. **声明式**：计算属性以声明式的方式定义，类似于普通的对象属性，而不是方法。
+4. **写法**：
+   - **Computed**：只需定义计算逻辑，适合返回一个值。  
+   - **Watch**：需要显式定义回调函数，可以执行复杂操作。  
 
-4. **用于派生数据**：通常用于派生或计算基于已有数据的属性，例如计算总价、过滤数据等。
+---
 
-**Watch（监听）**：
+**代码示例**：
 
-1. **手动设置监听**：`watch`属性允许你手动设置要监听的数据，并在数据变化时执行自定义的回调函数。
+**Computed**：  
+```javascript
+computed: {
+  fullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
+}
+```
 
-2. **无缓存**：`watch`没有缓存机制，每次数据变化都会触发回调函数执行。
+**Watch**：  
+```javascript
+watch: {
+  firstName(newVal, oldVal) {
+    console.log('firstName changed:', newVal);
+    this.fetchData(newVal); // 执行副作用操作
+  }
+}
+```
 
-3. **适用于副作用操作**：常用于需要执行副作用操作的情况，例如异步操作、数据持久化、动画等。
+---
 
-4. **更灵活**：相对于计算属性，`watch`更灵活，因为你可以在回调函数中执行任何操作，不仅限于返回一个计算结果。
+**Vue 3 补充**：
 
-在选择使用`computed`还是`watch`时，取决于你的需求和具体场景。如果你需要派生数据、自动追踪依赖并且有缓存需求，通常会选择`computed`。如果需要监听数据变化执行自定义操作或需要更灵活的控制，可以选择`watch`。有时，你可能会同时使用两者，以满足不同的需求。
+- Vue 3 中的 `ref` 和 `reactive` 配合 `computed` 和 `watch` 使用。  
+- 新增了 **`watchEffect`**，可以自动收集依赖并立即执行回调，适合更简单的场景。  
 
-### 9、Mixin是什么
+**`watchEffect` 示例**：  
+```javascript
+import { ref, watchEffect } from 'vue';
 
-`Mixin`（混入）是一种在Vue.js中用于共享组件选项的技术。它允许你定义可复用的组件选项，然后将这些选项混入到多个组件中，以实现代码重用和组件配置的共享。
+const count = ref(0);
+watchEffect(() => {
+  console.log(`Count is: ${count.value}`);
+});
+```
 
-当一个组件使用了 mixin，它会合并 mixin 中的选项到自身的选项中，从而扩展了组件的功能。如果 mixin 和组件本身具有相同的选项，组件选项会覆盖 mixin 的选项。
+### 11、对 `keep-alive` 的理解
 
-使用Mixin的优点包括：
+**`keep-alive` 简要总结**：
 
-1. **代码重用**：Mixin 允许你将常用的功能和逻辑抽象为可复用的组件选项，减少了重复编写相似代码的工作。
+1. **功能**：  
+   - `keep-alive` 是 Vue 提供的内置组件，用于**缓存**组件状态和 DOM，防止组件在切换过程中反复销毁和重建，提升性能。  
 
-2. **组件配置共享**：多个组件可以共享相同的配置和行为，从而保持一致性。
+2. **使用场景**：  
+   - 适用于**多视图切换**（如路由组件）或需要保留组件状态的场景。  
+   - 比如：分页表单、标签页切换等。  
 
-3. **灵活性**：Mixin 可以在不同的组件中组合使用，使你可以根据需要自由组合不同的功能。
+3. **主要属性**：  
+   - **`include`**：字符串或正则，指定哪些组件需要被缓存。  
+   - **`exclude`**：字符串或正则，指定哪些组件不需要被缓存。  
+   - **`max`**：数字，限制缓存组件的最大数量，超出后会根据 LRU（最近最少使用）策略移除。  
 
-4. **可维护性**：将相似的功能提取到 Mixin 中，使代码更易于维护和更新。
+4. **生命周期**：  
+   - **`activated`**：组件被激活时触发。  
+   - **`deactivated`**：组件被移出缓存时触发。  
+   - 与 `mounted` 和 `destroyed` 配合使用，管理逻辑更加灵活。  
 
-Mixin 的使用示例：
+---
+
+**代码示例**：
+
+```vue
+<template>
+  <keep-alive include="ComponentA" max="5">
+    <router-view></router-view>
+  </keep-alive>
+</template>
+```
+
+---
+
+**注意事项**：  
+- `keep-alive` 只能缓存**动态组件**或**路由组件**。
+- 不适用于每次都需要重新加载的场景，比如实时更新的数据展示。
+
+---
+
+### 12、`nextTick` 的作用
+
+1. **主要功能**：  
+   - `Vue.nextTick` 或组件实例的 `$nextTick` 用于在**下次 DOM 更新完成后**执行指定的回调函数。  
+
+2. **使用场景**：  
+   - 在数据变化后立即获取更新后的 DOM（因为 Vue 的 DOM 更新是异步的）。  
+   - 解决数据变化后需要基于最新 DOM 状态执行操作的问题。  
+
+3. **核心原理**：  
+   - `nextTick` 将回调延迟到**下一个事件循环**，确保在 DOM 更新完成后再执行。  
+
+---
+
+**代码示例**：
 
 ```javascript
-// 定义一个名为 myMixin 的 mixin
-const myMixin = {
+export default {
   data() {
-    return {
-      count: 0
-    }
+    return { count: 0 };
   },
   methods: {
     increment() {
-      this.count++
+      this.count++;
+      this.$nextTick(() => {
+        // 在这里 DOM 已更新，可以安全获取最新的 DOM 状态
+        console.log(this.$refs.counter.textContent);
+      });
     }
   }
-}
-
-// 在组件中使用 mixin
-export default {
-  mixins: [myMixin],
-  created() {
-    this.increment()
-  }
-}
+};
 ```
-
-在上述示例中，`myMixin` 包含了 `data` 和 `methods` 选项，然后将它混入了一个组件中。这个组件继承了 `myMixin` 的 `count` 数据和 `increment` 方法。
-
-需要注意的是，如果 mixin 和组件本身具有相同的选项，组件选项会覆盖 mixin 的选项。如果有冲突，组件选项将具有更高的优先级。
-
-总之，Mixin 是一种强大的代码复用和组件配置共享机制，可帮助开发者更有效地组织和管理Vue.js应用程序中的代码。
-
-### 10、v-if和v-for为什么不建议一起使用
-
-在 Vue 中，`v-if` 和 `v-for` 可以一起使用，但需要注意一些潜在的问题和注意事项，因为它们在模板中的交互可能会导致一些意外的结果或性能问题。
-
-主要的问题是：当你同时在同一个元素上使用 `v-if` 和 `v-for` 时，`v-for` 的优先级高于 `v-if`。这意味着 `v-for` 会在 `v-if` 之前执行，这可能导致不必要的渲染或遍历。在某些情况下，这可能会影响性能。
-
-考虑以下示例：
 
 ```vue
-<ul>
-  <li v-for="item in items" v-if="item.isActive">
-    {{ item.text }}
-  </li>
-</ul>
+<template>
+  <div ref="counter">{{ count }}</div>
+  <button @click="increment">Increment</button>
+</template>
 ```
 
-在这个示例中，`v-for` 会对数组 `items` 进行遍历，但在遍历之后，`v-if` 才会检查 `item.isActive` 的条件。这意味着即使 `item.isActive` 为 `false`，`v-for` 也会渲染 `<li>` 元素，然后通过 `v-if` 将其隐藏。
+---
+**Vue 3 补充**：  
+- 在 Vue 3 中，`nextTick` 直接从 Vue 导入使用，无需依赖组件实例：  
+  ```javascript
+  import { nextTick } from 'vue';
 
-为了解决这个问题，可以考虑使用计算属性或过滤器来筛选数据，而不是在模板中同时使用 `v-for` 和 `v-if`。这将确保只有满足条件的数据会被渲染，提高了性能和代码的可读性。
+  nextTick(() => {
+    console.log('DOM updated!');
+  });
+  ```
 
-示例：
-
-```vue
-<ul>
-  <li v-for="item in filteredItems">
-    {{ item.text }}
-  </li>
-</ul>
-
-// 在组件中定义计算属性 filteredItems
-computed: {
-  filteredItems() {
-    return this.items.filter(item => item.isActive);
-  }
-}
-```
-
-这样做可以更有效地筛选数据，并确保只有满足条件的数据被渲染，避免了不必要的渲染和遍历。
 
 ## 二、VueRouter&Vuex
 
 ### 1、路由传递参数的方式
 
-在Vue.js的路由中，你可以使用多种方法传递参数给路由，并在目标路由组件中获取这些参数。以下是传递参数和获取参数的方法：
+1. **路径参数（Path Params）**：
+   - **描述**：通过 URL 中的路径部分传递参数，通常用于动态路由匹配。  
+   - **使用方式**：在路由配置中使用 `:param` 占位符，访问时通过 URL 传递参数。  
+   
+   **例子**：
+   ```javascript
+   const routes = [
+     { path: '/user/:id', component: User }
+   ];
+   ```
 
-**传递参数的方法**：
+   访问时：  
+   ```javascript
+   <router-link to="/user/123">Go to User 123</router-link>
+   ```
+   
+   获取参数：  
+   ```javascript
+   this.$route.params.id;  // '123'
+   ```
 
-1. **路由动态参数（Dynamic Route Parameters）**：
-   - 在路由配置中使用占位符来定义路由参数，例如：`/user/:userId`。
-   - 在路由链接或编程式导航时，通过`params`属性传递参数。
-   - 示例：
-     ```html
-     <router-link :to="{ name: 'user', params: { userId: 123 }}">User</router-link>
-     ```
-     或
-     
-     ```javascript
-     this.$router.push({ name: 'user', params: { userId: 123 }})
-     ```
+2. **查询参数（Query Params）**：
+   - **描述**：通过 URL 的查询字符串传递参数，适用于非强制性参数。  
+   - **使用方式**：通过 `?key=value` 的形式传递参数。  
+   
+   **例子**：
+   ```javascript
+   const routes = [
+     { path: '/search', component: Search }
+   ];
+   ```
 
-2. **查询参数（Query Parameters）**：
-   - 在URL中使用查询参数传递数据，例如：`/user?userId=123`。
-   - 通过`query`属性传递参数。
-   - 示例：
-     ```html
-     <router-link :to="{ name: 'user', query: { userId: 123 }}">User</router-link>
-     ```
-     或  
+   访问时：  
+   ```javascript
+   <router-link to="/search?query=vue">Search</router-link>
+   ```
 
-     ```javascript
-     this.$router.push({ name: 'user', query: { userId: 123 }})
-     ```
+   获取参数：  
+   ```javascript
+   this.$route.query.query;  // 'vue'
+   ```
 
-3. **路由元信息（Route Meta Fields）**：
-   - 在路由配置中使用`meta`字段来定义元信息，然后将数据存储在元信息中，供路由组件访问。
-   - 示例：
-     ```javascript
-     // 路由配置
-     { path: '/user', component: User, meta: { userId: 123 } }
-     ```
+3. **路由元数据（Route Meta）**：
+   - **描述**：通过路由配置中的 `meta` 字段传递额外信息，通常用于存储非 URL 相关的参数。  
+   - **使用方式**：通过 `meta` 字段在路由定义时传递参数。  
+   
+   **例子**：
+   ```javascript
+   const routes = [
+     { path: '/profile', component: Profile, meta: { requiresAuth: true } }
+   ];
+   ```
 
-**获取参数的方法**：
+   获取参数：  
+   ```javascript
+   this.$route.meta.requiresAuth;  // true
+   ```
 
-1. **通过`$route`对象获取路由参数**：
-   - 在路由组件中，你可以通过`this.$route.params`来访问路由参数。
-   - 示例：
-     ```javascript
-     // 在路由组件中获取路由参数
-     const userId = this.$route.params.userId
-     ```
+4. **props 传递（通过组件的 props）**：
+   - **描述**：将路由参数作为 `props` 传递给组件，适用于在组件中直接获取路由参数而不依赖于 `this.$route`。  
+   - **使用方式**：在路由配置中设置 `props: true`，即可将路径参数作为组件的 props。  
+   
+   **例子**：
+   ```javascript
+   const routes = [
+     { path: '/user/:id', component: User, props: true }
+   ];
+   ```
 
-2. **通过`$route`对象获取查询参数**：
-   - 如果你使用了查询参数，可以通过`this.$route.query`来访问查询参数。
-   - 示例：
-     ```javascript
-     // 在路由组件中获取查询参数
-     const userId = this.$route.query.userId
-     ```
+   获取参数：  
+   ```javascript
+   props: ['id']
+   ```
 
-3. **通过`$route`对象获取路由元信息**：
-   - 如果参数存储在路由元信息中，你可以通过`this.$route.meta`来访问元信息中的参数。
-   - 示例：
-     ```javascript
-     // 在路由组件中获取路由元信息中的参数
-     const userId = this.$route.meta.userId
-     ```
+---
 
-这些方法允许你在Vue路由中传递和获取参数，具体的选择取决于你的应用程序的需求和设计。路由参数通常用于表示资源的标识符，查询参数通常用于过滤、排序或其他操作，而路由元信息通常用于存储与路由相关的数据。
+**Vue 3 补充**：
+- Vue 3 中的路由传递参数方式与 Vue 2 基本相同。  
+- 但 Vue 3 路由组件支持 **Composition API**，可以通过 `useRoute()` 钩子函数获取当前路由信息：  
+  ```javascript
+  import { useRoute } from 'vue-router';
+
+  const route = useRoute();
+  console.log(route.params.id);
+  ```
 
 ### 2、路由守卫有哪些
 
-Vue Router提供了一系列的路由守卫，用于在导航过程中控制路由的行为。这些路由守卫包括以下几种：
+1. **全局守卫**：
+   - **`beforeEach`**：在路由切换前触发，适用于全局认证、权限校验等。
+   - **`afterEach`**：在路由切换后触发，通常用于日志记录等副作用操作。
 
-1. **全局前置守卫（Global Before Guards）**：
-   - `beforeEach(to, from, next)`：在每次路由跳转前调用，用于全局的导航守卫。
-   - `beforeResolve(to, from, next)`：在导航被确认之前，同时在所有组件被解析之后调用。
+   **例子**：
+   ```javascript
+   router.beforeEach((to, from, next) => {
+     // 例如：检查用户是否登录
+     if (to.meta.requiresAuth && !isLoggedIn) {
+       next('/login');
+     } else {
+       next();
+     }
+   });
 
-2. **路由独享守卫（Per-Route Guard）**：
-   - `beforeEnter(to, from, next)`：在单个路由配置中定义的守卫，仅适用于该路由。
+   router.afterEach((to, from) => {
+     console.log(`Navigated from ${from.path} to ${to.path}`);
+   });
+   ```
 
-3. **组件内守卫（In-Component Guard）**：
-   - `beforeRouteEnter(to, from, next)`：在路由进入该组件前调用，不能访问`this`上下文，但可以通过`next`回调访问组件实例。
-   - `beforeRouteUpdate(to, from, next)`：在当前路由改变，但该组件被复用时调用，也不能访问`this`上下文。
-   - `beforeRouteLeave(to, from, next)`：在路由离开该组件时调用，用于阻止离开或确认是否离开。
+2. **路由独享守卫**：
+   - **`beforeEnter`**：在进入某个特定路由时触发，可以用于路由级别的权限控制或数据预加载等。
 
-这些路由守卫的作用包括：
+3. **组件内守卫**：
+   - **`beforeRouteEnter`**：进入组件之前触发，不能访问 `this`，但是可以通过回调函数访问组件实例。
+   - **`beforeRouteUpdate`**：在当前路由修改时触发，适用于同一路由下的参数变化。
+   - **`beforeRouteLeave`**：离开组件时触发，可以用于阻止离开或保存数据。
 
-- **全局前置守卫**用于全局的导航守卫，可以用于验证用户身份、权限等。
-- **路由独享守卫**用于单个路由配置中，可以用于特定路由的验证。
-- **组件内守卫**用于在组件内部进行特定路由的验证，例如在进入组件前验证数据加载。
+---
 
-通过使用这些路由守卫，你可以实现诸如身份验证、权限控制、数据加载、页面跳转等各种导航控制逻辑，以满足应用程序的需求。每个守卫都有其特定的用途和时机，允许你对路由的各个方面进行精细的控制。
+**Vue 3 补充**：
+- Vue 3 中的路由守卫与 Vue 2 基本相同，但配合 **Composition API** 使用时，可以通过 `useRouter()` 和 `useRoute()` 钩子访问路由对象，从而处理路由相关操作。
 
-### 3、hash和history模式的区别
-
-Vue Router支持两种路由模式：Hash 模式（Hash Mode）和 History 模式（History Mode）。它们之间的主要区别在于 URL 的显示方式和对浏览器的兼容性。
+### 3、hash VS history
 
 1. **Hash 模式**：
-   - URL 格式：`http://example.com/#/your-route`
-   - 使用 `#` 符号来分隔基础 URL 和路由路径。
-   - 在不支持 HTML5 History API 的老旧浏览器中也能正常工作，因为路由信息存储在 URL 的哈希部分，不会导致页面刷新。
-   - 好处是兼容性好，可以在大多数环境中使用。
-   - 缺点是 URL 显示不够友好，且带有 `#` 符号。
+   - **原理**：通过 URL 中的 `#` 符号来模拟不同的页面路径，浏览器不会重新加载页面。URL 形式为 `http://example.com/#/path`。
+   - **特点**：
+     - 不会触发页面刷新，性能较好。
+     - 由于 `#` 后的内容不被发送到服务器，适合静态文件托管。
+     - 对 SEO 支持较差，不利于搜索引擎优化。
+   - **适用场景**：不需要服务器配置的单页面应用，适合快速开发和小型项目。
 
 2. **History 模式**：
-   - URL 格式：`http://example.com/your-route`
-   - 使用 HTML5 History API，不带 `#` 符号。
-   - URL 显示更友好，更类似传统网站的 URL。
-   - 需要服务器端配置以支持在路由路径上的刷新，否则会导致404错误。
-   - 不支持HTML5 History API的老浏览器可能无法正常工作。
+   - **原理**：使用 HTML5 的 History API，通过 `pushState` 和 `replaceState` 来改变浏览器历史记录，URL 形式为 `http://example.com/path`。
+   - **特点**：
+     - URL 更加干净和自然，不包含 `#`。
+     - 支持更好的 SEO，因为 URL 是常规的路径。
+     - 需要服务器支持，如果刷新时直接访问 URL，服务器需要返回正确的 HTML 文件（一般配置重定向）。
+   - **适用场景**：需要更好 SEO 或者在支持服务器端渲染的应用中使用。
 
-选择使用哪种路由模式取决于项目的需求和对浏览器兼容性的要求。如果需要在老浏览器中使用或不想进行服务器配置，可以选择 Hash 模式。如果希望URL更友好，并且可以在支持HTML5 History API的环境中工作，可以选择 History 模式。
+---
+**总结**：
 
-在Vue Router中，你可以使用以下方式来配置路由模式：
+- **Hash 模式**：依赖 `#`，无需后端配置，适合静态资源托管。
+- **History 模式**：依赖 HTML5 History API，更干净的 URL，需要服务器支持。
 
-```javascript
-const router = new VueRouter({
-  mode: 'history', // 使用History模式
-  routes: [...]
-})
-```
 
-或者使用 Hash 模式：
+### 4、Vuex是什么？
 
-```javascript
-const router = new VueRouter({
-  mode: 'hash', // 使用Hash模式
-  routes: [...]
-})
-```
+Vuex 是 Vue.js 的**状态管理模式**，用于集中管理和维护组件之间共享的状态。它的核心思想是通过一个全局的 **store（仓库）** 来管理应用的所有状态，并遵循单向数据流。
 
-无论你选择哪种模式，Vue Router都会提供相应的路由功能来管理你的应用程序的导航。
+**核心概念：**
 
-### 4、$router和$route的区别
+1. **State**: 用于存储共享的状态。
+2. **Getter**: 类似于计算属性，用于派生状态。
+3. **Mutation**: 唯一可以直接更改状态的方法，必须是同步的。
+4. **Action**: 用于提交 Mutation，可以包含异步操作。
+5. **Module**: 将 store 分成多个模块，提高可维护性。
 
-在 Vue Router 中，`$router` 和 `$route` 都是与路由相关的属性，但它们有不同的作用和用法：
+**Vue 3 的替代方案：**
 
-1. **$router**：
-   - `$router` 是 Vue Router 的路由实例，它提供了导航和路由跳转的方法。
-   - 通过 `$router`，你可以访问诸如 `push`、`replace`、`go` 等方法，用于在不同路由之间进行导航。
-   - `$router` 还提供了路由信息，包括当前的路由路径、参数、查询参数等。
-   - 通常在组件中通过 `this.$router` 来访问路由实例。
+在 Vue 3 中，推荐使用 **Pinia** 作为状态管理工具，它是 Vuex 的更轻量和现代化的替代品，但 Vuex 4 依然兼容 Vue 3。
 
-示例：
-```javascript
-// 在组件中使用 $router
-methods: {
-  goToAboutPage() {
-    this.$router.push('/about');
-  }
-}
-```
+简单总结：Vuex 是 Vue 应用的“全局状态管理工具”，解决了组件间状态共享和复杂场景下的状态管理问题。
 
-2. **$route**：
-   - `$route` 是当前活动路由的路由信息对象，它包含了当前路由的各种属性，如路径、参数、查询参数、哈希值等。
-   - 通过 `$route`，你可以访问当前路由的信息，以便在组件中根据路由信息进行逻辑处理。
-   - `$route` 是只读的，不能用于导航，只用于获取当前路由的信息。
-   - 通常在组件中通过 `this.$route` 来访问当前路由信息。
-
-示例：
-```javascript
-// 在组件中使用 $route
-computed: {
-  currentRouteInfo() {
-    return this.$route.path; // 获取当前路由的路径
-  }
-}
-```
-
-总结：
-- `$router` 是路由实例，用于路由导航和跳转。
-- `$route` 是当前活动路由的信息对象，用于获取当前路由的各种属性。
-### 5、Vuex是什么？
-
-Vuex是一个用于Vue.js应用程序的状态管理库，它用于管理和共享应用程序中的数据状态。Vuex的主要目的是解决Vue组件之间共享数据、状态管理和通信的复杂性，特别是在大型单页应用中。
-
-Vuex的核心概念包括：
-
-1. **State（状态）**：应用程序中的数据状态，以对象的形式存储。所有需要共享的数据都存储在state中。
-
-2. **Mutation（变更）**：用于修改状态的方法，通常是同步的。Mutations是唯一允许修改state的地方。
-
-3. **Action（动作）**：用于触发异步操作和提交Mutations，它们可以包含业务逻辑、数据获取等操作。
-
-4. **Getter（获取器）**：用于从state中派生数据，可以像计算属性一样使用。
-
-5. **Module（模块）**：用于将store拆分成多个模块，每个模块可以拥有自己的state、mutations、actions等。
-
-要修改状态，你通常会使用mutations或actions，具体取决于操作的同步或异步性质。下面是如何使用mutations和actions来修改状态的示例：
-
-**使用mutations修改状态**：
-
-```javascript
-// 定义mutation
-const mutations = {
-  increment(state) {
-    state.count++;
-  },
-  decrement(state) {
-    state.count--;
-  }
-};
-
-// 在组件中提交mutation
-this.$store.commit('increment');
-```
-
-**使用actions修改状态**：
-
-```javascript
-// 定义action
-const actions = {
-  async fetchData({ commit }) {
-    try {
-      const response = await fetchDataFromServer();
-      commit('setData', response.data);
-    } catch (error) {
-      commit('setError', error.message);
-    }
-  }
-};
-
-// 在组件中分发action
-this.$store.dispatch('fetchData');
-```
-
-在上述示例中，mutations用于同步操作，而actions用于处理异步操作。通过提交mutation或分发action，你可以修改Vuex中的状态数据。
-
-- 拓展：[pinia用法](/project/ggzx/index1#_1-8-pinia)
-
-## 三、微信小程序
-
-### 1、简述一下微信小程序的文件类型
-
-微信小程序包含多种类型的文件，每种文件类型在小程序的开发和运行过程中有不同的用途和限制。以下是微信小程序的主要文件类型：
-
-1. **JSON 文件**：
-   - `.json` 文件用于配置小程序的全局配置信息，如页面路径、窗口设置、导航栏样式等。
-   - `app.json` 是小程序的全局配置文件，每个小程序至少有一个。
-   - 页面配置文件（如`page.json`）可以单独配置某个页面的特定属性。
-
-2. **WXML 文件**：
-   - `.wxml` 文件用于编写小程序的页面结构，类似于HTML。
-   - WXML 支持数据绑定、条件渲染、列表渲染等功能。
-
-3. **WXSS 文件**：
-   - `.wxss` 文件用于编写小程序的页面样式，类似于CSS。
-   - WXSS 支持类似 CSS 的选择器和属性，但也有一些微信小程序特定的样式语法。
-
-4. **JS 文件**：
-   - `.js` 文件用于编写小程序的逻辑层代码，包括页面的交互逻辑、数据处理等。
-   - 小程序中的 JavaScript 代码遵循 CommonJS 规范，可以使用 `require()` 导入模块。
-
-5. **WXS 文件**：
-   - `.wxs` 文件是小程序的模块脚本文件，用于处理一些复杂的逻辑和计算，类似于 JavaScript。
-   - WXS 代码在运行时独立于页面的事件处理函数运行，可以提高性能。
-
-
-小程序的文件类型和规范可以根据开发需要逐一了解和使用。不同文件类型有不同的用途和约束，开发者需要遵守微信小程序的文件命名规则和目录结构要求。
-
-### 2、小程序的生命周期函数
-
-微信小程序有一系列生命周期函数，它们用于管理小程序的生命周期事件，允许开发者在不同阶段执行特定的逻辑。以下是主要的小程序生命周期函数：
-
-- `onLoad()` 页面加载时触发。一个页面只会调用一次，可以在 onLoad 的参数中获取打开当前页面路径中的参数
-- `onShow()` 页面显示/切入前台时触发。
-- `onReady()` 页面初次渲染完成时触发。一个页面只会调用一次，代表页面已经准备妥当，可以和视图层进行交互
-- `onHide()` 页面隐藏/切入后台时触发。 如 navigateTo 或底部 tab 切换到其他页面，小程序切入后台等
-- `onUnload()` 页面卸载时触发。如 redirectTo 或 navigateBack 到其他页面时
-
-### 3、列举微信小程序常用组件和api函数
-以下是微信小程序中常用的5个组件和5个API函数：
-
-常用组件：
-
-1. **`<view>` 组件**：
-   - `<view>` 组件用于创建一个视图容器，可以包含其他组件和文本。
-   - 它类似于HTML中的 `<div>`，用于布局和样式控制。
-
-2. **`<text>` 组件**：
-   - `<text>` 组件用于显示文本内容，支持文本样式设置。
-   - 可以用于显示静态文本或动态文本内容。
-
-3. **`<button>` 组件**：
-   - `<button>` 组件用于创建按钮，用户可以点击来触发事件。
-   - 可以通过绑定事件监听器实现按钮的交互功能。
-
-4. **`<image>` 组件**：
-   - `<image>` 组件用于显示图片，支持本地图片和网络图片。
-   - 可以用于显示头像、图标、广告等图片内容。
-
-5. **`<input>` 组件**：
-   - `<input>` 组件用于创建输入框，允许用户输入文本。
-   - 可以通过监听输入事件来获取用户输入的内容。
-
-常用API函数：
-
-1. **`wx.navigateTo`**：
-   - `wx.navigateTo` 用于页面跳转，将页面入栈到页面栈中。
-   - 可以用于实现页面之间的导航。
-
-2. **`wx.request`**：
-   - `wx.request` 用于发送网络请求，支持GET、POST等HTTP请求方式。
-   - 可以用于获取远程数据，如接口数据或JSON数据。
-
-3. **`wx.showToast`**：
-   - `wx.showToast` 用于显示轻量级的提示框，如成功提示、错误提示等。
-   - 可以用于给用户反馈信息。
-
-4. **`wx.getStorageSync`**：
-   - `wx.getStorageSync` 用于同步获取本地缓存的数据。
-   - 可以用于存储和读取小程序的本地数据。
-
-5. **`wx.getLocation`**：
-   - `wx.getLocation` 用于获取用户的地理位置信息。
-   - 可以用于实现位置相关的功能，如地图、附近的店铺等。
-
-这些组件和API函数是微信小程序开发中经常使用的一些基本元素，用于构建小程序界面和实现功能。开发者可以根据具体的需求和场景来选择合适的组件和API函数。
-
-### 4、小程序页面间有哪些传递数据的方法?
-
-- 使用全局变量实现数据传递
-
-在 app.js 文件中定义全局变量 `globalData`， 将需要存储的信息存放在里面
-
-```js
-// app.js
-App({
-     // 全局变量
-  globalData: {
-    userInfo: null
-  }
-})
-```
-> 使用的时候，直接使用 getApp() 拿到存储的信息
-
-- 传参
-
-使用 `wx.navigateTo` 与 `wx.redirectTo` 的时候，可以将部分数据放在 url 里面，并在新页面 onLoad 的时候初始化
-
-```js
-// Navigate
-wx.navigateTo({
-  url: '../pageD/pageD?name=raymond&gender=male',
-})
-
-// Redirect
-wx.redirectTo({
-  url: '../pageD/pageD?name=raymond&gender=male',
-})
-
-// pageB.js
-...
-Page({
-  onLoad: function(option){
-    console.log(option.name + 'is' + option.gender)
-    this.setData({
-      option: option
-    })
-  }
-})
-```
-> 需要注意的问题：wx.navigateTo 和 wx.redirectTo 不允许跳转到 tab 所包含的页面，onLoad 只执行一次
-
-- 使用本地缓存
-
-### 5、如何优化首次加载小程序的速度？
-
-1. 包体积优化
-
-- 分包加载（优先采用，大幅降低主包体积）。
-- 图片优化（1.使用tinypng压缩图片素材； 2.服务器端支持，可采用webp格式）。
-- 组件化开发（易维护）。
-- 减少文件个数及冗余数据。
-
-
-
-2. 请求优化
-
-- 关键数据尽早请求(onLoad()阶段请求,次要数据可以通过事件触发再请求)；整合请求数据，降低请求次数。
-- 采用cdn缓存静态的接口数据（如判断用户登录状态，未登录则请求缓存接口数据），cdn稳定且就近访问速度快（针对加载总时长波动大）。
-缓存请求的接口数据。
-
-
-
-3. 首次渲染优化
-
-- 图片懒加载（节省带宽）。
-- setData优化（不要一次性设置过多的数据等）。
-- DOM渲染优化（减少DOM节点）
-
-### 6、拓展
-
-- 详见 [小程序面试题](/interview/index5#三、小程序面试题)
-
-
-
-
-
-
-
+- 拓展：[pinia用法](/project/ggzx/index3.html#_3-pinia-共享数据)
