@@ -4,7 +4,7 @@ outline: deep
 
 ## 一、综合
 
-### 1、前端性能优化的方式
+### 1、前端性能优化
 
 前端性能优化的方式可以从以下几个方面进行归纳：
 
@@ -44,6 +44,45 @@ outline: deep
 ---
 
 总结：前端性能优化是多方面的，需要结合项目特点和目标用户环境综合考虑，重点提升资源加载速度、页面渲染性能和用户操作流畅度。
+
+### 2、Promise
+
+**Promise** 是 JavaScript 中用于处理异步操作的一种对象，代表一个异步操作的最终完成（或失败）及其结果值。
+
+**Promise 的状态：**
+
+1. **Pending（待定）：** 初始状态，操作尚未完成。
+2. **Fulfilled（已完成）：** 操作成功完成，并返回了一个结果值。
+3. **Rejected（已失败）：** 操作失败，并返回了一个原因。
+
+**Promise 的特点：**
+
+- **不可逆性：** 一旦状态从 Pending 转为 Fulfilled 或 Rejected，就不能再次改变。
+- **链式调用：** 可以通过 `.then()` 和 `.catch()` 方法处理异步操作的结果或异常。
+- **避免回调地狱：** Promise 通过链式结构更好地管理嵌套的异步调用。
+
+**示例代码：**
+```javascript
+const promise = new Promise((resolve, reject) => {
+  const success = true; // 模拟操作结果
+  if (success) {
+    resolve("操作成功");
+  } else {
+    reject("操作失败");
+  }
+});
+
+promise
+  .then((result) => {
+    console.log(result); // 输出：操作成功
+  })
+  .catch((error) => {
+    console.error(error); // 如果失败，输出错误信息
+  });
+```
+
+**总结：**  
+Promise 是一种优雅的异步编程解决方案，能够更好地处理异步逻辑和错误，避免嵌套繁杂的回调结构。
 
 ## 二、手写代码
 
@@ -293,7 +332,7 @@ console.log(flattenedArray); // 输出 [1, 2, 3, 4, 5, 6]
 
 ---
 
-#### **防抖函数（Debounce）**
+#### **防抖函数**
 防抖函数在事件触发后，只有在指定的时间间隔内没有再次触发，才会执行函数。
 
 ```javascript
@@ -314,7 +353,7 @@ window.addEventListener('resize', log);
 
 ---
 
-#### **节流函数（Throttle）**
+#### **节流函数**
 节流函数在指定的时间间隔内，只允许执行一次函数。
 
 **使用定时器**
@@ -542,3 +581,34 @@ console.log(a, b); // 输出：3, 5
 **推荐方法**
 - **使用数组解构** 是最直观且安全的现代方法。
 - **加减法** 和 **异或** 适合对性能要求高的场景，但需注意溢出问题。
+
+### 10、1到100求和
+
+以下是使用 JavaScript 实现 1 到 100 求和的代码：
+
+```javascript
+// 方法一：使用循环
+let sum = 0;
+for (let i = 1; i <= 100; i++) {
+  sum += i;
+}
+console.log("1到100的和（循环）:", sum);
+
+// 方法二：使用递归求和
+function sumRecursive(n) {
+  if (n === 1) {
+    return 1; // 递归终止条件
+  }
+  return n + sumRecursive(n - 1); // 递归调用
+}
+
+// 测试递归方法
+const result = sumRecursive(100);
+console.log("1到100的和（递归）:", result);
+
+```
+
+**输出结果：**  
+
+`5050`
+

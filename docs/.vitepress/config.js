@@ -105,7 +105,7 @@ export default defineConfig({
             { text: 'Vue', link: '/interview/index3' },
             { text: '小程序及大屏', link: '/interview/index7' },
             { text: '综合&手写代码', link: '/interview/index4' },
-            { text: '题五', link: '/interview/index5' },
+            { text: '项目相关', link: '/interview/index5' },
           ]
         },
         {
