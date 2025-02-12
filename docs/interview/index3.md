@@ -6,21 +6,21 @@ outline: deep
 
 ### 1、对MVVM的理解
 
-`MVVM`是`Model-View-ViewModel`缩写，也就是把MVC中的Controller演变成ViewModel。Model层代表数据模型，View代表UI组件，ViewModel是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
+`MVVM`是`Model-View-ViewModel`缩写，也就是把`MVC`中的`Controller`演变成`ViewModel`。`Model`层代表数据模型，`View`代表UI组件，`ViewModel`是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
 
 ### 2、双向绑定的原理
 
 在Vue 2中，主要是通过`Object.defineProperty()`实现双向绑定。
 ![An image](/img/vue1.png)
 
-- 对`data`中的数据属性进行遍历，使用`Object.defineProperty()`重新定义属性。它可以设置`get`和`set`函数，`get`在读取属性值时调用，`set`在修改属性值时调用。在`set`函数触发时，通知依赖更新。同时通过`Dep`收集依赖，`get`时收集，`set`时通知更新视图。
+- 在Vue 2中会对`data`中的数据属性进行遍历，使用`Object.defineProperty()`重新定义属性。它可以设置`get`和`set`函数，`get`在读取属性值时调用，`set`在修改属性值时调用。在`set`函数触发时，通知依赖更新。同时通过`Dep`收集依赖，`get`时收集，`set`时通知更新视图。
 
 在Vue 3中，使用`Proxy`实现双向绑定。`Proxy`可以定义基本操作的自定义行为。在`get`操作中收集依赖，`set`操作中更新数据并且触发视图更新。`Proxy`能代理整个对象，动态添加的新属性也能是响应式的，性能和灵活性上较`Object.defineProperty()`有提升。
 
 ### 3、Vue3和Vue2的区别
 
 以下是 Vue3 和 Vue2 的主要区别：
-- **响应式系统**：
+- **响应式原理**：
   - Vue2 使用 `Object.defineProperty` 对数据属性进行劫持，新增属性需使用 `Vue.set` 或 `this.$set` 才能实现响应式。
   - Vue3 采用 `Proxy` 实现响应式，可代理整个对象，动态添加新属性也自动为响应式。
 - **组件 API**：
@@ -38,7 +38,7 @@ outline: deep
 - **Teleport 组件**：
   - Vue3 新增 `Teleport` 组件，可将组件内容传送到 DOM 其他位置，Vue2 没有。
 
-### 4、vue常用的指令
+### 4、Vue常用的指令
 
 Vue.js提供了一些常用的指令（Directives），用于操作DOM、数据绑定以及控制应用程序的行为。以下是一些常见的Vue指令以及示例：
 
@@ -63,7 +63,7 @@ Vue.js提供了一些常用的指令（Directives），用于操作DOM、数据�
 
 这些是Vue.js中一些常用的指令。每个指令都有不同的用途，可根据需要选择使用。指令使Vue应用程序更具交互性和动态性，能够根据数据的变化来更新页面内容。
 
-### 5、v-if和v-show的区别
+### 5、v-if VS v-show
 
 1. **渲染方式**：
    - `v-if` 是**按需渲染**，条件为 `false` 时，DOM 元素不会存在于页面中。
