@@ -10,12 +10,14 @@ outline: deep
 
 ### 2、双向绑定的原理
 
-在Vue 2中，主要是通过`Object.defineProperty()`实现双向绑定。
+在Vue 2中，实现双向绑定的核心原理是 数据劫持（Object.defineProperty）+ 观察者模式。
 ![An image](/img/vue1.png)
 
-- 在Vue 2中会对`data`中的数据属性进行遍历，使用`Object.defineProperty()`重新定义属性。它可以设置`get`和`set`函数，`get`在读取属性值时调用，`set`在修改属性值时调用。在`set`函数触发时，通知依赖更新。同时通过`Dep`收集依赖，`get`时收集，`set`时通知更新视图。
+- 在Vue 2中会对`data`中的数据属性进行遍历，使用`Object.defineProperty()`重新定义属性。它可以设置`get`和`set`函数，`get`在读取属性值时调用，`set`在修改属性值时调用。
 
-在Vue 3中，使用`Proxy`实现双向绑定。`Proxy`可以定义基本操作的自定义行为。在`get`操作中收集依赖，`set`操作中更新数据并且触发视图更新。`Proxy`能代理整个对象，动态添加的新属性也能是响应式的，性能和灵活性上较`Object.defineProperty()`有提升。
+  在`set`函数触发时，通知依赖更新。同时通过`Dep`收集依赖，`get`时收集，`set`时通知更新视图。
+
+- 在Vue 3中，使用`Proxy`实现双向绑定。`Proxy`可以定义基本操作的自定义行为。在`get`操作中收集依赖，`set`操作中更新数据并且触发视图更新。`Proxy`能代理整个对象，动态添加的新属性也能是响应式的，性能和灵活性上较`Object.defineProperty()`有提升。
 
 ### 3、Vue3和Vue2的区别
 
@@ -24,8 +26,8 @@ outline: deep
   - Vue2 使用 `Object.defineProperty` 对数据属性进行劫持，新增属性需使用 `Vue.set` 或 `this.$set` 才能实现响应式。
   - Vue3 采用 `Proxy` 实现响应式，可代理整个对象，动态添加新属性也自动为响应式。
 - **组件 API**：
-  - Vue2 主要使用 `Options API`，将组件的逻辑按选项分类（如 `data`、`methods`、`computed` 等）放在一个对象中。
-  - Vue3 除 `Options API` 外，还提供 `Composition API`，可将逻辑按功能组织，通过 `setup` 函数实现，更利于代码复用和维护。
+  - Vue2 主要使用 选项式（Options API）API，将组件的逻辑按选项分类（如 `data`、`methods`、`computed` 等）放在一个对象中。
+  - Vue3 除 选项式（Options API） API外，还提供 组合式（omposition API）API，可将逻辑按功能组织，通过 `setup` 函数实现，更利于代码复用和维护。
 - **性能**：
   - Vue2 对静态节点和动态节点更新无区分，性能稍逊一筹。
   - Vue3 通过静态标记等优化，能更高效地更新，可跳过静态节点更新，性能更好。
@@ -85,8 +87,8 @@ Vue 3 中，`v-if` 和 `v-show` 的基本行为没有改变，但性能更佳，
 在 Vue 2 中，组件的 `data` 必须是一个函数，而在根实例中可以是一个对象。原因如下：  
 
 1. **组件复用时的独立性**：  
-   如果 `data` 是一个对象，所有组件实例将共享这一个对象，导致数据互相影响。  
-   使用函数返回对象，确保每个组件实例都有独立的 `data` 副本，避免互相干扰。  
+   如果 `data` 是一个对象，所有组件实例将共享这一个对象，导致数据之间互相影响。  
+   使用函数返回对象，可以确保每个组件实例都有独立的 `data` 副本，避免互相干扰。  
 
    ```javascript
    data() {
@@ -216,7 +218,7 @@ Vue 3 中生命周期函数与 Vue 2 基本一致，但提供了基于 **组合�
 
 ### 9、v-for中key值的作用
 
-在 `v-for` 中使用 `key` 的作用主要是帮助 Vue 跟踪每个节点的身份，优化虚拟 DOM 的重渲染过程。
+在 `v-for` 中使用 `key` 的作用主要是帮助 Vue 跟踪每个节点的身份，优化虚拟 DOM 的渲染过程。
 
  **作用**：
 1. **性能优化**：  
