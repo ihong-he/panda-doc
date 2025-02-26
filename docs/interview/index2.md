@@ -1,294 +1,406 @@
 ---
 outline: deep
 ---
+## 目录表
+[[toc]]
 
-## 一、ES6
+## 一、JavaScript 基础
 
+### 1、JS数据类型
 
-### 1、ES6新特性
+JavaScript 有七种基本数据类型：
 
-ECMAScript 2015（ES6）是 JavaScript 的一个重要版本，引入了许多新特性和语言改进，以增强 JavaScript 的功能和可读性。以下是 ES6 中的一些主要新特性：
+1. **Number**：用于整数和浮点数。
+2. **String**：用于表示文本数据，即字符串。
+3. **Boolean**：仅有两个值`true`和`false`，用于逻辑运算。
+4. **Undefined**：当声明一个变量但未赋值时，默认值为`undefined`。
+5. **Null**：只有一个值`null`，表示无或空值。
+6. **Symbol**（ES6 新增）：表示独一无二的值，通常用作对象属性的键。
+7. **BigInt**（ES11 新增）：用于安全地存储和操作大整数。
 
-1. **let 和 const 声明**：引入了块级作用域的 `let` 和 `const`，取代了 `var`，提供更好的变量作用域控制。
+此外，还有**Object**类型，它是一种引用类型，用于存储复杂的数据结构如对象、数组、函数等。这些是构成 JavaScript 语言基础的所有数据类型。
 
-2. **箭头函数**：引入了箭头函数 `() => {}`，简化了函数的声明和上下文绑定。
+### 2、如何检测数据类型
 
-3. **模板字符串**：通过反引号 ` `` ` 以及 `${}` 语法，使字符串拼接更加方便，支持多行字符串。
+在 JavaScript 中，您可以使用不同的方法来检测数据类型。以下是一些常用的方法：
 
-4. **解构赋值**：允许从对象或数组中提取值并赋给变量，提高了代码的可读性。
-
-5. **展开运算符**：通过 `...` 运算符，可以将数组、对象等展开成单独的元素。
-
-6. **模块化**：引入了 `import` 和 `export`，使得模块化编程更加规范和可维护。
-
-7. **Promise**：引入了 `Promise` 对象，用于更容易地进行异步操作的管理和处理。
-
-8. **新的集合类型**：引入了 `Map`、`Set` 等新的集合类型，提供了更多的数据结构选项。
-
-9. **Symbol**：引入了符号（Symbol）数据类型，用于创建对象唯一的属性键。
-
-这些新特性丰富了 JavaScript 的功能，提高了代码的可读性和可维护性，使得 JavaScript 在各种应用中更加强大和灵活。 ES6 是 JavaScript 发展历程中的一大进步，也为后续版本的 ECMAScript 奠定了基础。
-
-### 2、let、const 和 var
-
-在JavaScript中，`let`、`const`和`var`是用来声明变量的关键字，它们有以下区别：
-
-1. `var`：在ES5及之前的版本中，`var`是声明变量的主要方式。它具有函数作用域，可以被重复声明，而且在变量声明之前就可以访问到（变量提升）。
-
-2. `let`：在ES6中引入了`let`关键字，它提供了块级作用域的变量声明。这意味着使用`let`声明的变量只在其被声明的代码块（例如，大括号`{}`内）内可见。而且，`let`声明的变量不允许被重复声明，但可以修改其值。
-
-3. `const`：`const`也是在ES6中引入的，它用于声明常量，即一旦赋值就不能再被修改的变量。与`let`一样，`const`也具有块级作用域。
-
-在现代 JavaScript 中，推荐使用 `let` 和 `const` 来声明变量，以提供更好的作用域控制和代码可维护性。使用 `const` 来声明不会被修改的变量，以确保代码的不变性。
-
-### 3、箭头函数 VS 普通函数
-
-箭头函数和普通函数在语法和行为上有几个重要的区别：
-
-1. **语法简洁性：** 箭头函数的语法更为简洁，通常只需要一个表达式即可完成函数体，而不需要使用 `return` 关键字。例如：
+1. **typeof 操作符**：`typeof` 操作符用于检测变量或值的数据类型，并返回一个表示数据类型的字符串。
 
    ```javascript
-   // 普通函数
-   function add(a, b) {
-       return a + b;
-   }
-
-   // 箭头函数
-   const add = (a, b) => a + b;
+   typeof 5; // 返回 "number"
+   typeof "Hello"; // 返回 "string"
+   typeof true; // 返回 "boolean"
+   typeof undefined; // 返回 "undefined"
+   typeof null; // 返回 "object"（注意这是一个历史遗留问题，null被错误地认为是"object"）
+   typeof {}; // 返回 "object"
+   typeof []; // 返回 "object"（数组也被错误地认为是"object"）
+   typeof function () {}; // 返回 "function"
    ```
 
-2. **`this` 的绑定：** 箭头函数没有自己的 `this`，它会捕获外层函数的 `this` 值。而普通函数的 `this` 值是在运行时动态确定的，取决于函数的调用方式（比如通过 `call`、`apply` 或者作为对象的方法调用等）。
+   `typeof` 对于大多数数据类型都有效，但对于对象和数组来说，它只会返回 "object"。要进一步检测对象的具体类型，需要使用其他方法。
 
-3. **不能作为构造函数：** 箭头函数不能被用作构造函数，不能通过 `new` 关键字来调用。
+2. **Array.isArray()**：用于检测一个值是否为数组。
 
-4. **没有 `arguments` 对象：** 箭头函数没有自己的 `arguments` 对象，但可以访问外层函数的 `arguments` 对象。
-
-总的来说，箭头函数更适合用于简单的、短小的函数，尤其是在需要绑定外部 `this` 上下文时。而普通函数则更为灵活，适用于更多的场景。
-
-### 4、ES6新增方法
-
-见  [技术-ES6](../note/js-high#_2、字符串扩展)
-
-### 5、模块化 VS CommonJS
-
-1. **语法风格**
-   - **ES6模块化**：使用`import`和`export`关键字。例如，在一个ES6模块文件`math.js`中，可以这样导出一个函数：
-     ```javascript
-     export function add(a, b) {
-       return a + b;
-     }
-     ```
-     然后在另一个文件中使用`import`引入：
-     ```javascript
-     import { add } from './math.js';
-     console.log(add(1, 2));
-     ```
-   - **CommonJS规范**：主要使用`require()`函数来引入模块，使用`module.exports`或`exports`来导出模块。例如，在`math.js`文件中：
-     ```javascript
-     function add(a, b) {
-       return a + b;
-     }
-     module.exports = {
-       add: add
-     };
-     ```
-     在另一个文件中引入：
-
-     ```javascript
-     const math = require('./math.js');
-     console.log(math.add(1, 2));
-     ```
-2. **加载时机**
-   - **ES6模块化**：是静态的，在编译时就能确定模块的依赖关系，并且`import`命令会被提升到模块的顶部，首先执行。
-   - **CommonJS规范**：是动态加载的，模块是在运行时加载，`require()`可以放在代码的任何位置，只有在执行到`require()`语句时才会加载对应的模块。
-
-4. **浏览器支持情况**
-   - **ES6模块化**：现代浏览器原生支持ES6模块，但是在一些旧版本浏览器中需要使用工具（如Babel等）进行转译才能使用。例如，可以在HTML文件中使用`type="module"`属性来加载ES6模块：
-     ```html
-     <script type="module">
-       import { add } from './math.js';
-       console.log(add(1, 2));
-     </script>
-     ```
-   - **CommonJS规范**：主要用于服务器端的Node.js环境，浏览器端一般不能直接使用。
-
-## 二、HTTP
-
-### 1、GET请求 VS POST请求
-
-GET和POST是HTTP协议中两种常用的请求方法，它们的主要区别如下：
-
-1. **请求目的**：
-   - **GET**：用于请求数据，从服务器获取信息，通常用于查询操作。
-   - **POST**：用于提交数据，向服务器发送数据，通常用于表单提交或上传文件。
-
-2. **数据传输方式**：
-   - **GET**：数据通过URL传递，参数附加在URL后面，格式为`?key=value&key2=value2`，有长度限制（一般为2048个字符）。
-   - **POST**：数据通过请求体（body）传递，没有长度限制，适合传输大量数据。
-
-3. **安全性**：
-   - **GET**：数据直接暴露在URL中，不适合传递敏感信息。
-   - **POST**：数据不会显示在URL中，相对更安全，但并非完全安全（可以通过加密如HTTPS来提高安全性）。
-
-4. **幂等性**：
-   - **GET**：GET请求是幂等的，即多次请求相同的资源，结果是相同的，不会改变服务器状态。
-   - **POST**：POST请求不是幂等的，每次请求可能都会导致服务器状态的变化（如数据的增加、更新等）。
-
-总结来说，GET适合获取数据，POST适合提交数据，POST相对于GET更适合处理敏感信息和大数据量。
-
-### 2、HTTP VS HTTPS
-
-HTTP和HTTPS的主要区别如下：
-
-1. **安全性**：
-   - **HTTP**（超文本传输协议）：是无加密的协议，数据在传输过程中是明文的，容易被中间人攻击或窃听。
-   - **HTTPS**（安全超文本传输协议）：在HTTP的基础上加入了SSL/TLS协议进行加密，确保数据传输的安全性，防止被窃听和篡改。
-
-2. **端口号**：
-   - **HTTP**：默认使用端口 80。
-   - **HTTPS**：默认使用端口 443。
-
-3. **身份验证**：
-   - **HTTP**：没有身份验证机制，无法验证服务器的真实性。
-   - **HTTPS**：通过SSL证书验证服务器的身份，避免伪造网站。
-
-4. **性能**：
-   - **HTTP**：由于没有加密和解密操作，相对较快。
-   - **HTTPS**：需要进行加密和解密操作，因此相对较慢，但随着硬件性能的提升，速度差距已经不明显。
-
-总结：HTTPS通过加密和身份验证提高了数据传输的安全性，是保护用户隐私和防止信息泄露的必要手段，现如今已成为互联网应用的标准。
-
-
-### 3、HTTP常用的状态码
-
-HTTP状态码通常由服务器返回给客户端，以指示请求的成功、失败或其他情况。以下是一些常用的HTTP状态码：
-
-2. **2xx (成功状态码)**:
-   - 200 OK：请求成功，服务器已成功处理请求。
-
-3. **3xx (重定向状态码)**:
-   - 301 Moved Permanently：资源已永久移动到新位置，客户端应更新链接。
-   - 302 Found：资源临时移动到新位置，客户端应继续使用原始链接。
-
-4. **4xx (客户端错误状态码)**:
-   - 401 Unauthorized：需要身份验证或授权，通常需要提供凭证。
-   - 403 Forbidden：服务器拒绝了请求，通常是因为权限问题。
-   - 404 Not Found：请求的资源不存在。
-
-5. **5xx (服务器错误状态码)**:
-   - 500 Internal Server Error：服务器遇到意外错误。
-   - 502 Bad Gateway：服务器充当网关或代理时，从上游服务器接收到无效响应。
-
-
-### 4、URL有哪些组成部分
-
-URL（统一资源定位符）由以下几个部分组成：
-
-1. **协议（Scheme）**：指定访问资源所使用的协议，常见的有`http`、`https`、`ftp`等。例如：`http://`、`https://`。
-   
-2. **主机名（Host）**：指定资源所在的服务器地址，可以是域名或IP地址。例如：`www.example.com`。
-   
-3. **端口号（Port）**（可选）：指定服务器的端口，若省略则使用默认端口（HTTP为80，HTTPS为443）。例如：`:8080`。
-
-4. **路径（Path）**：指定资源在服务器上的具体位置。例如：`/path/to/resource`。
-
-5. **查询参数（Query）**（可选）：用于传递额外的数据，通常以`?`开始，多个参数用`&`分隔。例如：`?key=value&name=test`。
-
-6. **锚点（Fragment）**（可选）：指定页面内的某个位置，通常以`#`开始。例如：`#section1`。
-
-- 例子：
-```
-https://www.example.com:8080/path/to/resource?key=value#section1
-```
-
-- 协议：`https`
-- 主机名：`www.example.com`
-- 端口号：`8080`
-- 路径：`/path/to/resource`
-- 查询参数：`key=value`
-- 锚点：`#section1`
-
-### 5、跨域问题解决
-
-跨域问题通常是指浏览器的同源策略（Same-Origin Policy）限制了不同源（协议、域名、端口）之间的资源共享。常见的跨域解决方案有以下几种：
-
-1. **CORS（跨源资源共享）：** 这是最常用的解决跨域问题的方法。通过在服务器端配置响应头，允许特定的源（域名、协议、端口）访问资源。服务器可以设置如下响应头来启用CORS：
-
-   ```http
-   Access-Control-Allow-Origin: http://example.com
+   ```javascript
+   Array.isArray([]); // 返回 true
+   Array.isArray({}); // 返回 false
    ```
 
-   这将允许来自`http://example.com`域的请求访问资源。你还可以配置其他CORS头，如允许的HTTP方法、允许的自定义标头等。
+   这是专门用于检测数组的方法。
 
-2. **JSONP（JSON with Padding）：** JSONP是一种通过动态创建`<script>`元素从其他域请求数据的技术。它只适用于GET请求，并且需要服务器支持JSONP回调函数。
+3. **instanceof 操作符**：`instanceof` 操作符用于检测对象是否是特定构造函数的实例。
 
-3. **代理服务器：** 你可以在同一域中设置一个代理服务器，用于转发来自不同域的请求。前端代码请求代理服务器，代理服务器再将请求发送到目标服务器，并将响应返回给前端。这种方法可以绕过浏览器的跨域限制，但需要额外的服务器资源。
+   ```javascript
+   let d = new Date();
+   d instanceof Date; // 返回 true，d是Date对象的实例
+   ```
 
-   在vue项目中，找到 `vue.config.js` 文件，添加以下配置来设置代理服务器：
-   
+   `instanceof` 主要用于检测自定义的构造函数和实例之间的关系。
+
+这些方法可以根据您的需求来选择使用，根据不同情况来确定数据类型是很重要的，特别是在处理不同类型的数据时。
+
+### 3、null vs undefined
+
+`null`和`undefined`在 JavaScript 中都是表示“无”的值，但它们之间有一些关键的区别：
+
+1. **含义与用途**：
+
+   - `undefined`：表示一个变量已声明但尚未赋值，或者对象属性不存在时的默认值。它意味着“未定义”，通常用于指示变量或属性还没有被赋予有效的值。
+   - `null`：表示一个变量指向的对象为空（即没有对象），或者有意地将一个变量设置为“空”或“无”。它代表的是“无值”或“空值”。
+
+2. **类型差异**：
+
+   - 使用`typeof`操作符检查时，`undefined`的结果是`"undefined"`，而`null`的结果却是`"object"`。这是一个历史遗留问题，实际上`null`被认为是一个原始值。
+
+3. **赋值意图**：
+   - 当你使用`null`时，通常是明确地指出这个变量不引用任何对象，是一种有意识的空值设定。
+   - `undefined`则更多时候是由 JavaScript 引擎自动分配的，表明某物尚未被赋予特定值。
+
+简单来说，如果你想要表达“这里应该有一个值，但现在没有”，你可以选择`null`。而`undefined`则更常用于描述“这里本应有一个值，但它尚未被设置或不可用”。理解这两者的区别有助于编写更加精确和清晰的代码。
+
+### 4、数组基本方法
+
+JavaScript 中数组有许多常用的方法，这些方法用于操作和处理数组的元素。以下是一些常见的数组方法，以及每个方法的示例：
+
+1. **`push()` 方法**：向数组末尾添加一个或多个元素，并返回新的数组长度。
+
+2. **`pop()` 方法**：移除数组最后一个元素，并返回移除的元素。
+
+3. **`unshift()` 方法**：向数组开头添加一个或多个元素，并返回新的数组长度。
+
+4. **`shift()` 方法**：移除数组的第一个元素，并返回移除的元素。
+
+5. **`concat()` 方法**：合并两个或多个数组，返回一个新的数组，不会改变原始数组。
+
+6. **`join()` 方法**：将数组的所有元素组成一个字符串，并使用指定的分隔符分隔元素。
+
+7. **`slice()` 方法**：从数组中提取指定范围的元素，并返回一个新的数组，不会改变原始数组。
+
+   ```javascript
+   var fruits = ["apple", "banana", "cherry", "orange", "kiwi"];
+   var slicedFruits = fruits.slice(1, 4);
+   console.log(slicedFruits); // ['banana', 'cherry', 'orange']
+   ```
+
+8. **`indexOf()` 方法**：返回数组中第一个匹配元素的索引，如果未找到匹配元素则返回 -1。
+
+
+### 5、数组遍历方法
+
+JavaScript 数组有多种方法用于遍历数组中的元素。以下是一些常用的数组遍历方法：
+
+1. **`forEach()` 方法**：遍历数组的每一个元素，并对每个元素执行指定的回调函数，没有返回值。
+
+2. **`map()` 方法**：遍历数组的每一个元素，并调用指定的函数，最终返回一个新的数组。
+
+   ```javascript
+   var numbers = [1, 2, 3, 4, 5];
+   var doubled = numbers.map(function (number) {
+     return number * 2;
+   });
+   console.log(doubled); // [2, 4, 6, 8, 10]
+   ```
+
+3. **`filter()` 方法**：用于过滤数组的元素，返回一个符合指定条件的新数组，不会改变原始数组。
+
+4. **`reduce()` 方法**：对数组的元素累加应用一个函数，返回一个累加的结果。
+
+   ```javascript
+   var numbers = [1, 2, 3, 4, 5];
+   var sum = numbers.reduce(function (accumulator, currentNumber) {
+     return accumulator + currentNumber;
+   }, 0); // 初始值为 0
+   console.log(sum); // 15
+   ```
+
+5. **`some()` 方法**：检查数组中是否至少有一个元素满足指定条件，如果有则返回 `true`，否则返回 `false`。
+
+6. **`every()` 方法**：检查数组中是否所有元素都满足指定条件，如果是则返回 `true`，否则返回 `false`。
+
+### 6、字符串方法
+
+JavaScript 字符串具有许多内置方法，用于处理和操作字符串。以下是一些常用的字符串方法：
+
+1. **`length` 属性**：返回字符串的长度。
+
+2. **`charAt()` 方法**：返回指定索引位置的字符。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.charAt(0)); // 'H'
+   ```
+
+3. **`charCodeAt()` 方法**：返回指定索引位置字符的 Unicode 编码。
+
+4. **`substring()` 方法**：返回字符串的子字符串，指定起始索引和结束索引。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.substring(0, 5)); // 'Hello'
+   ```
+
+5. **`slice()` 方法**：返回字符串的子字符串，指定起始索引和可选的结束索引。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.slice(0, 5)); // 'Hello'
+   ```
+
+6. **`indexOf()` 方法**：返回字符串中第一次出现指定子字符串的索引，如果未找到则返回 -1。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.indexOf("World")); // 7
+   ```
+
+7. **`lastIndexOf()` 方法**：返回字符串中最后一次出现指定子字符串的索引，如果未找到则返回 -1。
+
+8. **`replace()` 方法**：替换字符串中的指定子字符串为新的字符串。
+
+   ```javascript
+   var str = "Hello, World!";
+   var newStr = str.replace("World", "Universe");
+   console.log(newStr); // 'Hello, Universe!'
+   ```
+
+9. **`toLowerCase()` 和 `toUpperCase()` 方法**：将字符串转换为小写或大写。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.toLowerCase()); // 'hello, world!'
+   console.log(str.toUpperCase()); // 'HELLO, WORLD!'
+   ```
+
+10. **`trim()` 方法**：去除字符串两端的空白字符。
+
+    ```javascript
+    var str = "   Hello, World!   ";
+    var trimmedStr = str.trim();
+    console.log(trimmedStr); // 'Hello, World!'
+    ```
+
+11. **`split()` 方法**：将字符串分割为数组，使用指定的分隔符。
+
+    ```javascript
+    var str = "apple,banana,cherry";
+    var fruits = str.split(",");
+    console.log(fruits); // ['apple', 'banana', 'cherry']
+    ```
+
+
+这些是一些常用的字符串方法，它们允许您对字符串进行各种操作，如查找、替换、拆分、转换大小写等。根据您的需求选择适当的方法。
+
+### 7、闭包函数
+
+闭包是指有权访问另一个函数作用域中变量的函数。
+
+- **原理**：在一个函数内部定义另一个函数，内部函数可以访问外部函数的变量。当外部函数执行完毕后，其内部变量本应该被销毁，但因为内部函数仍然引用这些变量，所以这些变量不会被垃圾回收机制回收，从而形成了闭包。
+- **作用**：可以用来保留变量的状态或者实现数据隐藏和封装，例如在JavaScript中模拟私有变量。比如：
 ```javascript
-module.exports = {
-  devServer: {
-    proxy: {
-      '/api': {
-        target: 'http://your-api-domain.com',  // 指定你的后端API服务器地址
-        changeOrigin: true,  // 允许跨域
-        pathRewrite: {
-          '^/api': ''  // 如果你的API地址不是以 '/api' 开头，可以使用这个选项重写请求路径
-        }
-      }
-    }
-  }
-};
+function outerFunction() {
+    let count = 0;
+    return function innerFunction() {
+        count++;
+        return count;
+    };
+}
+let counter = outerFunction();
+console.log(counter()); // 1
+console.log(counter()); // 2
+```
+在这个例子中，`innerFunction`就是一个闭包，它可以访问`outerFunction`中的`count`变量，并且这个变量在多次调用`counter`函数时能够一直保存状态。
+
+### 8、原型、原型链
+
+在JavaScript中，原型（Prototype）和原型链（Prototype Chain）是实现继承的核心机制。
+
+- **原型和原型链**：每个JavaScript对象都有一个内部属性 `[[Prototype]]`，通常称为**原型**，指向它的原型对象。这个原型对象本身也是一个对象，因此也有自己的原型。通过这种方式，对象之间形成了一个链式结构，即**原型链**。
+
+- **原型链的查找机制**：当访问一个对象的属性时，如果该对象自身没有这个属性，JavaScript引擎会沿着原型链向上查找，直到找到目标属性或到达原型链的末端（`null`）。这种机制允许对象共享属性和方法，节省内存消耗并提高代码复用性。
+
+例如：
+
+```javascript
+let obj = {};
+console.log(obj.toString()); // 使用了从Object.prototype继承的方法toString
 ```
 
-在这个配置中，`'/api'` 是你在前端请求的接口路径，`'http://your-api-domain.com'` 是你的后端API服务器地址。你可以根据自己的需要进行相应的修改。
+在这个例子中，`obj`对象本身没有定义`toString`方法，但它可以通过原型链访问到`Object.prototype`上的`toString`方法。
 
-### 6、从输入URL到看到页面发生的全过程
 
-从输入URL到看到页面的全过程简要如下：
+### 9、new 操作符
 
-1. **输入URL**：用户在浏览器地址栏输入URL（如`https://www.example.com`）。
+在 JavaScript 中，`new` 操作符用于创建对象的实例。当使用 `new` 操作符创建一个对象实例时，它执行以下步骤：
 
-2. **DNS解析**：浏览器通过DNS解析域名（如`www.example.com`）为IP地址（如`192.0.2.1`）。
+1. 创建一个空对象：首先，`new` 操作符会创建一个新的空对象，这个对象将成为最终的实例。
 
-3. **建立TCP连接**：浏览器与服务器通过TCP协议建立连接，通常是通过三次握手（SYN、SYN-ACK、ACK）。
+2. 设置对象的原型：新创建的空对象会被设置一个原型，它用于继承构造函数的属性和方法。
 
-4. **发送HTTP请求**：浏览器通过已建立的TCP连接向服务器发送HTTP请求（GET、POST等），请求资源（如HTML页面）。
+3. 执行构造函数：`new` 操作符会调用构造函数，并将新创建的空对象绑定到构造函数内部的 `this` 上。
 
-5. **服务器处理请求**：服务器接收到请求，处理后返回响应数据（如HTML、CSS、JS文件等）。
+4. 返回新对象：如果构造函数没有显式返回一个对象，则 `new` 操作符会自动返回新创建的对象。
 
-6. **浏览器接收响应**：浏览器接收到服务器的HTTP响应，解析HTML、CSS、JS等资源。
+下面是一个使用 `new` 操作符创建对象实例的示例：
 
-7. **页面渲染**：
-   - **HTML解析**：浏览器根据HTML结构构建DOM（Document Object Model）树。
-   - **CSS解析**：浏览器解析CSS，构建CSSOM（CSS Object Model）树。
-   - **JavaScript解析**：浏览器执行JS代码，可能修改DOM或CSSOM。
+```javascript
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
 
-8. **页面展示**：浏览器通过渲染引擎将DOM树和CSSOM树合成渲染树，绘制页面并展示给用户。
+// 使用 new 操作符创建一个 Person 的实例
+const person1 = new Person("Alice", 30);
 
-9. **资源加载**：如果HTML中有外部资源（如图片、字体、视频等），浏览器会继续发起请求加载这些资源。
+console.log(person1.name); // 输出 "Alice"
+console.log(person1.age); // 输出 30
+```
 
-10. **页面交互**：用户可以与页面交互，浏览器会根据用户的操作（如点击、滚动）动态更新页面。
 
-整个过程包含网络请求、数据传输、资源解析和渲染，最终呈现出用户所看到的页面。
+### 10、对 this 的理解
 
-### 7、对 WebSocket 的理解
+在 JavaScript 中，`this` 是一个特殊关键字，它代表当前执行上下文中的对象。`this` 的值取决于它在哪里被使用，通常有以下几种情况：
 
-**WebSocket**是一种网络通信协议，提供了全双工、持久化的通信连接，允许客户端和服务器之间进行实时双向数据传输。与传统的HTTP请求-响应模式不同，WebSocket连接在建立后保持打开状态，允许双向实时通信，适用于需要频繁更新的应用场景，如在线聊天、实时通知、股票行情等。
+1. **全局上下文中的 `this`：** 在全局作用域中，`this` 指向全局对象，通常是浏览器环境中的 `window` 对象。
 
-**主要特点：**
+2. **函数内部的 `this`：** 在函数内部，`this` 取决于函数的调用方式。以下是一些常见情况：
 
-1. **全双工通信**：客户端和服务器可以同时发送和接收数据。
-2. **持久化连接**：连接建立后不会关闭，可以持续传输数据，避免频繁建立和关闭连接的开销。
-3. **低延迟**：数据传输延迟较低，适合实时性要求高的应用。
-4. **节省资源**：由于保持长连接，减少了频繁的HTTP请求和响应，提高了效率。
+   - **作为普通函数调用：** 如果函数是作为普通函数调用的，`this` 将指向全局对象（浏览器环境中通常是 `window`）。
+   - **作为对象方法调用：** 如果函数作为对象的方法调用，`this` 将指向调用该方法的对象。
+   - **使用构造函数：** 如果函数作为构造函数使用（使用 `new` 关键字），`this` 将指向新创建的对象。
+   - **使用 `call` 或 `apply` 方法：** 可以使用 `call` 或 `apply` 方法来显式指定函数内部的 `this` 值。
 
-**使用场景：**
+3. **箭头函数中的 `this`：** 箭头函数没有自己的 `this`，它会继承外部函数的 `this` 值。这使得箭头函数在回调函数等情况下非常有用，因为它们不会改变 `this` 的指向。
 
-- 实时聊天应用
-- 大屏实时数据
-- 实时股票和天气更新
-- 实时通知和推送
+### 11、防抖和节流
 
-WebSocket通常通过`ws://`（非加密）或`wss://`（加密）协议进行连接。
+防抖（Debouncing）和节流（Throttling）都是用于控制事件触发频率的技术，通常在 Web 前端开发中用来提高性能和用户体验。
+
+1. 防抖（Debouncing）：
+
+   - 防抖是在事件被触发后，会等待一段时间（例如 100ms），如果在这段时间内没有再次触发事件，那么才会执行事件处理函数；如果在这段时间内事件又被触发，则重新开始计时。
+   - 主要用于防止短时间内多次触发的事件导致过多的资源消耗，例如输入框输入时的搜索功能，只有在用户停止输入一段时间后才触发搜索请求。
+
+   JavaScript 中的一个简单防抖函数示例：
+
+   ```javascript
+   function debounce(func, delay) {
+     let timer;
+     return function () {
+       clearTimeout(timer);
+       timer = setTimeout(() => {
+         func.apply(this, arguments);
+       }, delay);
+     };
+   }
+   ```
+
+2. 节流（Throttling）：
+
+   - 节流是在一段时间内只允许执行一次事件处理函数，即使事件在这段时间内被触发多次，也只会执行一次事件处理函数。
+   - 与防抖不同，节流不会重新开始计时，而是固定间隔执行事件处理函数。
+   - 主要用于频繁触发的事件，以控制事件处理函数的执行频率，例如滚动事件，每隔一定时间触发一次滚动事件处理函数，而不是每次滚动都触发。
+
+   JavaScript 中的一个简单节流函数示例：
+
+   ```javascript
+   function throttle(func, delay) {
+     let timer;
+     return function () {
+       if (!timer) {
+         timer = setTimeout(() => {
+           func.apply(this, arguments);
+           timer = null;
+         }, delay);
+       }
+     };
+   }
+   ```
+
+需要注意的是，防抖和节流的具体实现方式可以根据具体的需求和场景进行调整和扩展。选择合适的技术来控制事件触发频率可以提高网页性能，减少不必要的资源消耗。
+
+### 12、0.1+0.2 ! == 0.3？
+
+1. **原因分析**
+   - 在计算机中，十进制的小数（如0.1和0.2）会被转换为二进制来进行计算。0.1的二进制表示是一个无限循环小数，0.2也是。
+   - 当计算机对这两个二进制小数进行相加时，会产生舍入误差。相加后的结果的二进制再转换回十进制就不是精确的0.3，而是`0.30000000000000004`。
+2. **解决方法**
+   - 在JavaScript等编程语言中，如果要比较浮点数是否相等，可以设置一个误差范围。例如：
+   ```javascript
+   function approximatelyEqual(a, b, tolerance = 0.00001) {
+       return Math.abs(a - b) < tolerance;
+   }
+   console.log(approximatelyEqual(0.1 + 0.2, 0.00001)); 
+   ```
+   - 这样就可以在一定程度上解决浮点数比较的问题。这种误差是由于计算机底层存储和计算浮点数的机制导致的，几乎所有编程语言都会遇到这个问题。
+
+### 13、Ts 和 Js 有哪些区别
+
+1. **类型系统**
+   - **JavaScript（Js）**：是一种动态类型语言。这意味着变量的类型在运行时才确定，并且可以在运行过程中改变类型。例如：
+   ```javascript
+   let variable = 1;
+   variable = "string";
+   ```
+   - **TypeScript（Ts）**：是JavaScript的超集，具有静态类型系统。在代码编写阶段就需要确定变量、函数参数、返回值等的类型。例如：
+   ```typescript
+   let variable: number = 1;
+   variable = "string"; // 会报错，因为类型不匹配
+   ```
+   - 静态类型系统有助于在开发阶段发现更多错误，提高代码的健壮性和可维护性。
+2. **编译过程**
+   - **Js**：可以直接在浏览器或Node.js环境中运行，不需要额外的编译步骤。
+   - **Ts**：需要先编译成JavaScript才能运行。编译器会检查类型错误并将Ts代码转换为兼容的Js代码。例如，使用`tsc`（TypeScript编译器）命令来编译`.ts`文件：
+   ```
+   tsc yourFile.ts
+   ```
+3. **语言特性和语法糖**
+   - **Ts**：提供了一些JavaScript中没有的语法特性，如接口（interface）、枚举（enum）、泛型（generic）等。
+   - 接口用于定义对象的形状，例如：
+   ```typescript
+   interface Person {
+       name: string;
+       age: number;
+   }
+   let person: Person = {
+       name: "John",
+       age: 30
+   };
+   ```
+   - 枚举用于定义一组命名常量，例如：
+   ```typescript
+   enum Color {
+       Red,
+       Green,
+       Blue
+   }
+   let myColor: Color = Color.Green;
+   ```
+   - 泛型可以创建可复用的代码，适用于多种类型，例如：
+   ```typescript
+   function identity<T>(arg: T): T {
+       return arg;
+   }
+   let result = identity<string>("string value");
+   ```
+4. **开发工具支持**
+   - **Ts**：由于其静态类型系统，集成开发环境（IDE）可以提供更好的代码自动补全、导航和错误检查功能。而JavaScript在这方面相对较弱。

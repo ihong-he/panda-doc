@@ -100,12 +100,12 @@ export default defineConfig({
           collapsed: true,
           items: [
             { text: 'HTML&CSS', link: '/interview/index1' },
-            { text: 'JavaScript', link: '/interview/index6' },
-            { text: 'ES6&HTTP', link: '/interview/index2' },
-            { text: 'Vue', link: '/interview/index3' },
-            { text: '小程序及大屏', link: '/interview/index7' },
-            { text: '综合&手写代码', link: '/interview/index4' },
-            { text: '项目相关', link: '/interview/index5' },
+            { text: 'JavaScript', link: '/interview/index2' },
+            { text: 'ES6&HTTP', link: '/interview/index3' },
+            { text: 'Vue', link: '/interview/index4' },
+            { text: '小程序及大屏', link: '/interview/index5' },
+            { text: '综合&手写代码', link: '/interview/index6' },
+            { text: '项目相关', link: '/interview/index7' },
           ]
         },
         {
