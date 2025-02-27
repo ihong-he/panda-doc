@@ -1,12 +1,13 @@
 ---
 outline: deep
 ---
-
+## 目录表
+[[toc]]
 ## 一、Vue
 
 ### 1、对MVVM的理解
 
-`MVVM`是`Model-View-ViewModel`缩写，也就是把`MVC`中的`Controller`演变成`ViewModel`。`Model`层代表数据模型，`View`代表UI组件，`ViewModel`是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
+`MVVM`是`Model-View-ViewModel`缩写，也就是把`MVC`中的`Controller`演变成`ViewModel`。`Model`层代表数据模型，`View`代表UI组件，`ViewModel`是View和Model层的桥梁，viewModel层并自动将绑定的数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
 
 ### 2、双向绑定的原理
 
@@ -304,7 +305,7 @@ watchEffect(() => {
 **`keep-alive` 简要总结**：
 
 1. **功能**：  
-   - `keep-alive` 是 Vue 提供的内置组件，用于**缓存**组件状态和 DOM，防止组件在切换过程中反复销毁和重建，提升性能。  
+   - `keep-alive` 是 Vue 提供的内置组件，用于**缓存**组件状态，防止组件在切换过程中反复销毁和重建，提升性能。  
 
 2. **使用场景**：  
    - 适用于**多视图切换**（如路由组件）或需要保留组件状态的场景。  
@@ -343,7 +344,7 @@ watchEffect(() => {
 ### 12、`nextTick` 的作用
 
 1. **主要功能**：  
-   - `Vue.nextTick` 或组件实例的 `$nextTick` 用于在**下次 DOM 更新完成后**执行指定的回调函数。  
+   - `Vue.nextTick` 或组件实例的 `$nextTick` 用于在**下次 DOM 更新完成后**立即执行指定的回调函数。  
 
 2. **使用场景**：  
    - 在数据变化后立即获取更新后的 DOM（因为 Vue 的 DOM 更新是异步的）。  
@@ -551,7 +552,7 @@ Vuex 是 Vue.js 的**状态管理模式**，用于集中管理和维护组件之
 1. **State**: 用于存储共享的状态。
 2. **Getter**: 类似于计算属性，用于派生状态。
 3. **Mutation**: 唯一可以直接更改状态的方法，必须是同步的。
-4. **Action**: 用于提交 Mutation，可以包含异步操作。
+4. **Action**: 用于提交 Mutation，通过`commit`方法，可以包含异步操作。
 5. **Module**: 将 store 分成多个模块，提高可维护性。
 
 **Vue 3 的替代方案：**

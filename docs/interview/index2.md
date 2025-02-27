@@ -152,46 +152,7 @@ JavaScript 字符串具有许多内置方法，用于处理和操作字符串。
 
 3. **`charCodeAt()` 方法**：返回指定索引位置字符的 Unicode 编码。
 
-4. **`substring()` 方法**：返回字符串的子字符串，指定起始索引和结束索引。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.substring(0, 5)); // 'Hello'
-   ```
-
-5. **`slice()` 方法**：返回字符串的子字符串，指定起始索引和可选的结束索引。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.slice(0, 5)); // 'Hello'
-   ```
-
-6. **`indexOf()` 方法**：返回字符串中第一次出现指定子字符串的索引，如果未找到则返回 -1。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.indexOf("World")); // 7
-   ```
-
-7. **`lastIndexOf()` 方法**：返回字符串中最后一次出现指定子字符串的索引，如果未找到则返回 -1。
-
-8. **`replace()` 方法**：替换字符串中的指定子字符串为新的字符串。
-
-   ```javascript
-   var str = "Hello, World!";
-   var newStr = str.replace("World", "Universe");
-   console.log(newStr); // 'Hello, Universe!'
-   ```
-
-9. **`toLowerCase()` 和 `toUpperCase()` 方法**：将字符串转换为小写或大写。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.toLowerCase()); // 'hello, world!'
-   console.log(str.toUpperCase()); // 'HELLO, WORLD!'
-   ```
-
-10. **`trim()` 方法**：去除字符串两端的空白字符。
+4. **`trim()` 方法**：去除字符串两端的空白字符。
 
     ```javascript
     var str = "   Hello, World!   ";
@@ -199,13 +160,53 @@ JavaScript 字符串具有许多内置方法，用于处理和操作字符串。
     console.log(trimmedStr); // 'Hello, World!'
     ```
 
-11. **`split()` 方法**：将字符串分割为数组，使用指定的分隔符。
+5. **`indexOf()` 方法**：返回字符串中第一次出现指定子字符串的索引，如果未找到则返回 -1。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.indexOf("World")); // 7
+   ```
+
+6. **`lastIndexOf()` 方法**：返回字符串中最后一次出现指定子字符串的索引，如果未找到则返回 -1。
+
+7. **`replace()` 方法**：替换字符串中的指定子字符串为新的字符串。
+
+   ```javascript
+   var str = "Hello, World!";
+   var newStr = str.replace("World", "Universe");
+   console.log(newStr); // 'Hello, Universe!'
+   ```
+
+8. **`split()` 方法**：将字符串分割为数组，使用指定的分隔符。
 
     ```javascript
     var str = "apple,banana,cherry";
     var fruits = str.split(",");
     console.log(fruits); // ['apple', 'banana', 'cherry']
     ```
+
+9. **`substring()` 方法**：返回字符串的子字符串，指定起始索引和结束索引。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.substring(0, 5)); // 'Hello'
+   ```
+
+10. **`slice()` 方法**：返回字符串的子字符串，指定起始索引和可选的结束索引。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.slice(0, 5)); // 'Hello'
+   ```
+
+
+11. **`toLowerCase()` 和 `toUpperCase()` 方法**：将字符串转换为小写或大写。
+
+   ```javascript
+   var str = "Hello, World!";
+   console.log(str.toLowerCase()); // 'hello, world!'
+   console.log(str.toUpperCase()); // 'HELLO, WORLD!'
+   ```
 
 
 这些是一些常用的字符串方法，它们允许您对字符串进行各种操作，如查找、替换、拆分、转换大小写等。根据您的需求选择适当的方法。
@@ -236,7 +237,7 @@ console.log(counter()); // 2
 
 - **原型和原型链**：每个JavaScript对象都有一个内部属性 `[[Prototype]]`，通常称为**原型**，指向它的原型对象。这个原型对象本身也是一个对象，因此也有自己的原型。通过这种方式，对象之间形成了一个链式结构，即**原型链**。
 
-- **原型链的查找机制**：当访问一个对象的属性时，如果该对象自身没有这个属性，JavaScript引擎会沿着原型链向上查找，直到找到目标属性或到达原型链的末端（`null`）。这种机制允许对象共享属性和方法，节省内存消耗并提高代码复用性。
+- **原型链的查找机制**：当访问一个对象的属性或者方法时，如果该对象自身没有这个属性和方法，JavaScript引擎会沿着原型链向上查找，直到找到目标属性或到达原型链的末端（`null`）。这种机制允许对象共享属性和方法，节省内存消耗并提高代码复用性。
 
 例如：
 
