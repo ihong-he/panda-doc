@@ -18,7 +18,7 @@ export default defineConfig({
     },
     footer: {
       // message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-2025 Panda工作室'
+      copyright: 'Copyright © 2024-2026 Panda工作室'
     },
     algolia: { // algolia 搜索服务 与 内置 search 可二选一
       appId: 'Q6LPLP9RKV',
@@ -32,6 +32,19 @@ export default defineConfig({
       { text: '首页', link: '/' },
       { text: '技术', link: '/note/html&css' },
       { text: '开发', link: '/dev/dev1' },
+      { text: '提升',
+        items: [
+          {
+            // 该部分的标题
+            text: '技能提升',
+            items: [
+              { text: 'React学习笔记', link: '/up/up1' },
+              { text: '鸿蒙开发笔记', link: '/' },
+              // { text: 'Section B Item B', link: '...' }
+            ]
+          }
+        ]
+       },
       // { text: '实战', link: '/project/ggzx/index1' },
       {
         text: '实战',
@@ -78,6 +91,7 @@ export default defineConfig({
             { text: '小程序开发', link: '/note/miniApp' },
             { text: '数据可视化', link: '/note/visualization' },
             { text: 'Electron', link: '/note/electron' },
+            { text: 'React入门', link: '/note/react' },
             { text: 'test', link: '/note/test' },
           ]
         },
