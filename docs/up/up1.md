@@ -8,6 +8,7 @@ outline: deep
 本文档用来记录职业技能提升的学习笔记
 :::
 
-## PPT资料
+## React笔记
 
-[React介绍](/file/react/day01.pdf)
+- [React基础](/file/react/day01.pdf)
+- [React进阶](/file/react/day02.pdf)

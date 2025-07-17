@@ -2,7 +2,7 @@
 outline: deep
 ---
 
-# React 快速入门
+# React
 
 [React](https://zh-hans.react.dev/learn) 是用于构建 Web 和原生交互界面的库
 
@@ -249,7 +249,19 @@ function MyButton() {
 }
 ```
 
-注意，`onClick={handleClick}` 的结尾 **没有小括号！** 不要 调用 事件处理函数：你只需 把函数传递给事件 即可。当用户点击按钮时 React 会调用你传递的事件处理函数。
+::: warning 警告
+注意，`onClick={handleClick}` 的结尾 **没有小括号！** 如果加了括号 ()，就变成了 **立即调用** 这个函数：
+你只需 把函数传递给事件 即可。当用户点击按钮时 React 会调用你传递的事件处理函数。
+:::
+
+::: tip 提示
+如果需要参数：
+如果事件处理函数需要参数，可以用箭头函数包裹：
+```jsx
+<button onClick={() => handleClick('someArg')}>点我</button>
+```
+这里箭头函数会在点击时被调用，然后它再调用 `handleClick` 并传递参数。
+:::
 
 ## 八、更新界面
 

@@ -148,6 +148,17 @@ export default defineConfig({
             { text: '六、大屏开发', link: '/project/ggzx/index6' },
           ]
         }
+      ],
+      '/up/': [
+        {
+          text: 'React学习笔记',
+          collapsed: true,
+          items: [
+            { text: '一、React基础', link: '/up/react/react1/React基础-上' },
+            { text: '二、React进阶', link: '/up/react/react2/React基础-下' },
+            { text: '三、React项目', link: '/up/up3' },
+          ]
+        }
       ]
     },
     // 层级
