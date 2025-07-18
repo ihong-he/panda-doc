@@ -25,7 +25,7 @@ React由Meta公司开发，是一个用于 构建Web 和 原生交互界面 的�
 ![image.png](assets/02.png)
 
 ## 二、开发环境创建
-`create-react-app`是一个快速创建React开发环境的工具，底层由Webpack构件，封装了配置细节，开箱即用
+`create-react-app`是一个快速创建React开发环境的工具，底层由Webpack构建，封装了配置细节，开箱即用
 执行命令：
 ```bash
 npx create-react-app react-basic
@@ -95,7 +95,7 @@ function App(){
 ```
 ### JSX高频场景-列表渲染
 ![image.png](assets/04.png)
-> 在JSX中可以使用原生js种的`map方法` 实现列表渲染
+> 在JSX中可以使用原生js中的`map方法` 实现列表渲染
 
 ```jsx
 const list = [
@@ -218,7 +218,7 @@ function App(){
 ![image.png](assets/07.png)
 
 ### 组件基础使用
-> 在React中，一个组件就是**首字母大写的函数**，内部存放了组件的逻辑和视图UI, 渲染组件只需要把组件当成标签书写即可
+> 在React中，一个组件就是**首字母大写的函数**，内部存放了组件的逻辑和视图UI，渲染组件只需要把组件当成标签书写即可
 
 ```jsx
 // 1. 定义组件
@@ -264,11 +264,14 @@ function App(){
 
 ![image.png](assets/10.png)
 ## 七、组件的基础样式处理
-> React组件基础的样式控制有俩种方式，行内样式和class类名控制
+> React组件基础的样式控制有两种方式，**行内样式**和**class类名控制**
+
+**行内样式**
 
 ```jsx
 <div style={{ color:'red'}}>this is div</div>
 ```
+**class类名控制**
 
 ```css
 .foo{
@@ -295,6 +298,9 @@ function App(){
 3. 渲染导航Tab和高亮实现
 4. 评论列表排序功能实现
 ### 基础模版
+
+::: details 查看模板
+
 ```tsx
 import { useState } from 'react'
 import './App.scss'
@@ -455,7 +461,9 @@ const App = () => {
 
 export default App
 ```
+:::
 
+::: details 查看样式
 ```css
 .app {
   width: 80%;
@@ -740,7 +748,11 @@ export default App
   text-align: center;
 }
 ```
+:::
+
 ### 完成版本
+
+::: details 完整代码
 ```jsx
  import { useState } from 'react'
 import './App.scss'
@@ -948,3 +960,4 @@ const App = () => {
 export default App
 ```
 
+:::
