@@ -2,151 +2,185 @@
 outline: deep
 ---
 
-## 一、项目问题二
+## 数据处理与状态管理
 
-### 1.1 el-table表格编辑浅拷贝问题
+> 关注前端应用中数据的查找、过滤、合并、拷贝以及状态管理等问题
 
-在 Vue 中，当我们将一个对象赋值给另一个对象时，默认是浅拷贝，而不是深拷贝。浅拷贝只会复制对象的引用，而不会复制对象的内容。
+### 一、数组遍历与操作
 
-在 el-table 表格编辑弹窗中，我们将当前行的数据绑定到表单上时，默认是浅拷贝。因此，在表单中修改数据时，会影响原始数据，从而导致表格数据也随之变化。
+### 1.1、移除数组中不需要的项
 
-为了解决这个问题，我们需要使用深拷贝，而不是浅拷贝。深拷贝会复制对象的内容，而不是只是引用。
+**问题描述**
 
-```js{27,29}
-// 编辑表格数据方法
-edit (row) {
-  this.dialogVisible = true
-  // 方法一:
-  this.form = JSON.parse(JSON.stringify(row))
-  // 方法二:只适合扁平数据
-  this.form = {...row}
+在一个由对象组成的数组中，我们有时需要移除对象中的某些属性（例如 `age`），生成一个新的数组，保留所需的字段。这常用于后端接口字段过滤或前端展示优化。
+
+---
+
+**行之有效的解决方案**
+
+可以使用 `Array.map()` 遍历数组，并在每个对象中利用 **解构赋值** 或 `delete` 操作去除不需要的属性。推荐使用解构或 `Object.keys()` 动态重构新对象，以保持函数式编程风格（不改变原对象）。
+
+---
+
+**配套的代码示例**
+
+```javascript
+const arr = [
+  { id: 1, name: 'Tom', age: 15 },
+  { id: 2, name: 'Jack', age: 18 }
+];
+
+// 方法1：使用解构省略
+const newArr1 = arr.map(({ age, ...rest }) => rest);
+console.log(newArr1);
+// 输出: [{ id: 1, name: 'Tom' }, { id: 2, name: 'Jack' }]
+
+// 方法2：动态删除属性 (会改变副本)
+const newArr2 = arr.map(item => {
+  const copy = { ...item };
+  delete copy.age;
+  return copy;
+});
+console.log(newArr2);
+// 输出: [{ id: 1, name: 'Tom' }, { id: 2, name: 'Jack' }]
+```
+::: tip
+
+`({ age, ...rest })` 会从每个对象中取出 age 属性，同时用 `...rest` 收集除 age 以外的其他属性组成的新对象。
+
+:::
+
+---
+
+### 1.2、筛选出满足特定条件的元素
+
+**问题描述**
+在前端开发中，经常需要从对象数组中筛选出满足特定条件的所有元素，例如找出 `age > 18` 的所有用户。这种需求常见于表格过滤、数据统计等场景。
+
+---
+
+**行之有效的解决方案**
+可以使用 `Array.filter()` 方法，该方法会遍历数组中的每一个元素，并返回一个新的数组，其中只包含满足条件的元素。
+
+* **语法：** `arr.filter(item => 条件表达式)`
+* 返回值是一个新的数组，不会修改原始数组。
+
+---
+
+**配套的代码示例**
+
+```javascript
+const arr = [
+  { id: 1, name: 'Tom', age: 15 },
+  { id: 2, name: 'Jack', age: 18 },
+  { id: 3, name: 'Lucy', age: 20 }
+];
+
+// 筛选 age > 18 的所有对象
+const filteredArr = arr.filter(item => item.age > 18);
+
+console.log(filteredArr);
+// 输出: [ { id: 3, name: 'Lucy', age: 20 } ]
+```
+
+---
+
+**拓展：复杂条件筛选**
+
+```javascript
+// 筛选年龄大于15并且名字包含 'a' 的用户
+const result = arr.filter(item => item.age > 15 && item.name.includes('a'));
+console.log(result);
+// 输出: [ { id: 2, name: 'Jack', age: 18 } ]
+```
+
+---
+
+
+
+
+
+### 二、查找和过滤数据
+### 三、对象属性的操作
+
+#### 3.1、对象转数组
+
+**问题描述**
+
+在前端开发中，我们经常需要获取一个对象的所有属性名（key），并将其组成一个数组以便后续处理，例如遍历、判断或动态渲染 UI。
+
+---
+
+**行之有效的解决方案**
+
+JavaScript 提供了 `Object.keys()` 方法，它可以直接返回对象所有可枚举的属性名组成的数组。这是最简洁、最常用的方式。
+
+* `Object.keys(obj)` 会返回一个数组，包含对象 `obj` 所有可枚举属性的 key。
+* 若需要包括不可枚举属性或 `Symbol` 属性，可使用 `Object.getOwnPropertyNames()` 或 `Reflect.ownKeys()`。
+
+---
+
+**配套的代码示例**
+
+```javascript
+// 示例对象
+const person = {
+  name: "Alice",
+  age: 25,
+  city: "Beijing"
+};
+
+// 使用 Object.keys() 获取所有 key
+const keysArray = Object.keys(person);
+
+console.log(keysArray);
+// 输出: ["name", "age", "city"]
+```
+
+### 四、深拷贝与浅拷贝
+### 五、合并对象和数组
+
+#### 5.1、获取两个数组的交集或者并集
+
+**问题描述**
+在前端开发中，获取两个数组的交集（共同存在的元素）和并集（所有不重复的元素）是非常常见的需求，特别是在数据过滤、合并等操作中。
+
+---
+
+**行之有效的解决方案**
+
+* **交集**：过滤出第一个数组中存在且也存在于第二个数组的元素。使用 `Set` 加快查找。
+* **并集**：把两个数组合并后去重，使用 `Set` 可以方便地去重。
+
+---
+
+**配套的代码示例**
+
+```javascript
+// 获取交集
+function getIntersection(arr1, arr2) {
+  const set2 = new Set(arr2);
+  return arr1.filter(item => set2.has(item));
 }
+
+// 获取并集
+function getUnion(arr1, arr2) {
+  return Array.from(new Set([...arr1, ...arr2]));
+}
+
+// 示例
+const array1 = [1, 2, 3, 4];
+const array2 = [3, 4, 5, 6];
+
+console.log(getIntersection(array1, array2)); // 输出: [3, 4]
+console.log(getUnion(array1, array2));        // 输出: [1, 2, 3, 4, 5, 6]
 ```
 
-### 1.2 可拖拽调节的分割布局
+---
 
-实现一个可调整大小的布局，其中包含两个面板：左侧面板和右侧面板。用户可以通过拖拽分隔条来调整左侧面板的宽度，右侧面板会相应地填充空间。
+需要帮你写差集的简洁版本吗？或者其他数组操作？
 
-```vue
-<template>
-    <div class="resizable-layout">
-      <!-- 左侧面板 -->
-      <div
-        class="left-pane"
-        :style="{ width: leftWidth + 'px' }"
-        ref="leftPane"
-      >
-        <!-- Left Pane Content -->
-        Left Pane
-      </div>
-      <!-- 分割条 -->
-      <div
-        class="separator"
-        @mousedown="startResize"
-      ></div>
-      <!-- 右侧面板 -->
-      <div class="right-pane">
-        <!-- Right Pane Content -->
-        Right Pane
-      </div>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        isDragging: false, // 标记是否正在拖拽
-        startX: 0, // 记录拖拽开始时的鼠标水平坐标
-        startWidth: 0, // 记录拖拽开始时的左侧面板宽度
-        leftWidth: 200, // 左侧面板的初始宽度
-      };
-    },
-    methods: {
-      // 开始拖拽
-      startResize(event) {
-        this.isDragging = true; // 设置拖拽状态为true
-        this.startX = event.clientX; // 记录拖拽开始时的鼠标水平坐标
-        this.startWidth = this.$refs.leftPane.clientWidth; // 记录拖拽开始时的左侧面板宽度
-        // 监听文档上的mousemove事件和mouseup事件
-        document.addEventListener('mousemove', this.resizing);
-        document.addEventListener('mouseup', this.stopResize);
-      },
-      // 拖拽过程中调整左侧面板宽度
-      resizing(event) {
-        if (this.isDragging) { // 如果正在拖拽
-          const deltaX = event.clientX - this.startX; // 计算鼠标移动的水平距离
-          let newWidth = this.startWidth + deltaX; // 根据鼠标移动距离计算新的宽度
-          // 确保新宽度在100px和600px之间
-          newWidth = Math.min(Math.max(newWidth, 100), 600);
-          this.leftWidth = newWidth; // 更新左侧面板的宽度
-        }
-      },
-      // 停止拖拽
-      stopResize() {
-        this.isDragging = false; // 设置拖拽状态为false
-        // 移除文档上的mousemove事件和mouseup事件监听器
-        document.removeEventListener('mousemove', this.resizing);
-        document.removeEventListener('mouseup', this.stopResize);
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .resizable-layout {
-    display: flex;
-    width: 100%;
-    height: 300px;
-  }
-  
-  .left-pane {
-    background-color: lightblue;
-    height: 100%;
-    overflow: auto;
-  }
-  
-  .right-pane {
-    flex: 1;
-    background-color: lightgreen;
-    height: 100%;
-    overflow: auto;
-  }
-  
-  .separator {
-    width: 6px;
-    cursor: col-resize;
-    background-color: #eee;
-  }
-  </style>
-  
-```
 
-### 1.3 el-tree点击节点获取所有的父节点
 
-> 基础布局，添加 @node-click=“handleNodeClick”
 
-```js
-<el-tree :data="data" @node-click="handleNodeClick"></el-tree>
-```
 
-```js
-handleNodeClick(node) {
-  // 最终的数据
-  this.breadList = []
-  //  获取点击当节点的dom的信息
-  let selectNode = this.$refs.tree.getNode(node)
-  // 调用递归函数
-  this.platform(selectNode)
-},
-// 递归函数
-platform(node) {
-  if (!node.parent) {
-    return
-  }
-  this.breadList.unshift(node.data)
-  //调用递归
-  this.platform(node.parent)
-},
-
-```

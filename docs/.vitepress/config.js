@@ -101,10 +101,12 @@ export default defineConfig({
           text: '开发',
           collapsed: true,
           items: [
-            { text: 'HTML/CSS/JS', link: '/dev/dev1' },
-            { text: 'Vue/Git/HTTP', link: '/dev/dev2' },
-            { text: '项目问题一', link: '/dev/dev3' },
-            { text: '项目问题二', link: '/dev/dev4' },
+            { text: '前言', link: '/dev/dev1' },
+            { text: '项目搭建与环境配置', link: '/dev/dev2' },
+            { text: '组件与样式渲染', link: '/dev/dev3' },
+            { text: '数据处理与状态管理', link: '/dev/dev4' },
+            { text: '网络请求与接口调试', link: '/dev/dev5' },
+            { text: '性能优化与兼容调试', link: '/dev/dev6' },
           ]
         }
       ],
