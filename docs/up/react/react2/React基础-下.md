@@ -166,15 +166,15 @@ export default App
 
 1. 使用 `createContext`方法创建一个上下文对象Ctx 
 2. 在顶层组件（App）中通过 `Ctx.Provider` 组件提供数据 
-3. 在底层组件（B）中通过 `useContext` 钩子函数获取消费数据
+3. 在底层组件（B）中通过 `useContext` 钩子函数获取数据
 ```jsx
 // App -> A -> B
 
 import { createContext, useContext } from "react"
 
-// 1. createContext方法创建一个上下文对象
+// 1. createContext方法创建一个上下文对象Ctx
 
-const MsgContext = createContext()
+const Ctx = createContext()
 
 function A () {
   return (
@@ -187,7 +187,7 @@ function A () {
 
 function B () {
   // 3. 在底层组件 通过useContext钩子函数使用数据
-  const msg = useContext(MsgContext)
+  const msg = useContext(Ctx)
   return (
     <div>
       this is B compnent,{msg}
@@ -199,11 +199,11 @@ function App () {
   const msg = 'this is app msg'
   return (
     <div>
-      {/* 2. 在顶层组件 通过Provider组件提供数据 */}
-      <MsgContext.Provider value={msg}>
+      {/* 2. 在顶层组件 通过Provider提供数据 */}
+      <Ctx.Provider value={msg}>
         this is App
         <A />
-      </MsgContext.Provider>
+      </Ctx.Provider>
     </div>
   )
 }
@@ -213,7 +213,7 @@ export default App
 
 ## 八、useEffect
 ### 概念理解 
-`useEffect`是一个React Hook函数，用于在React组件中创建不是由事件引起而是由渲染本身引起的操作（副作用）, 比 如发送AJAX请求，更改DOM等等 
+`useEffect`是一个React Hook函数，用于在React组件中创建不是由事件引起而是由渲染本身引起的操作（副作用）, 比如发送AJAX请求，更改DOM等等 
 ![image.png](assets/10.png)
 :::info
 说明：上面的组件中没有发生任何的用户事件，组件渲染完毕之后就需要和服务器要数据，整个过程属于“只由渲染引起的操作”
@@ -225,8 +225,8 @@ export default App
 ![image.png](assets/11.png)
 说明： 
 
-1. 参数1是一个函数，可以把它叫做副作用函数，在函数内部可以放置要执行的操作 
-2. 参数2是一个数组（可选参），在数组里放置依赖项，不同依赖项会影响第一个参数函数的执行，当是一个空数组的时候，副作用函数只会在组件渲染完毕之后执行一次   
+1. 参数一是一个函数，可以把它叫做副作用函数，在函数内部可以放置要执行的操作 
+2. 参数二是一个数组（可选参），在数组里放置依赖项，不同依赖项会影响第一个参数函数的执行，当是一个空数组的时候，副作用函数只会在组件渲染完毕之后执行一次   
 :::info
 接口地址：http://geek.itheima.net/v1_0/channels
 :::

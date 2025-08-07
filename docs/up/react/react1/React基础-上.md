@@ -40,7 +40,7 @@ npx create-react-app react-basic
 :::
 ## 三、JSX基础
 ### 什么是JSX
-> JSX是JavaScript和XMl(HTML)的缩写，表示在JS代码中编写HTML模版结构，它是React中构建UI的方式
+> JSX是JavaScript和XML(HTML)的缩写，表示在JS代码中编写HTML模版结构，它是React中构建UI的方式
 
 ```jsx
 const message = 'this is message'
@@ -130,9 +130,10 @@ function App(){
 }
 ```
 ### JSX高频场景-复杂条件渲染
-![image.png](assets/06.png)
-> 需求：列表中需要根据文章的状态适配
-> 解决方案：自定义函数 + 判断语句
+<!-- ![image.png](assets/06.png) -->
+> 需求：列表中需要根据文章的状态适配不同的显示模式
+
+解决方案：自定义函数 + 判断语句
 
 ```jsx
 const type = 1  // 0|1|3
@@ -272,8 +273,8 @@ function App(){
 <div style={{ color:'red'}}>this is div</div>
 ```
 **class类名控制**
-
 ```css
+/* index.css */
 .foo{
   color: red;
 }

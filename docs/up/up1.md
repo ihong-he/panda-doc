@@ -10,5 +10,7 @@ outline: deep
 
 ## React笔记
 
-- [React基础](/file/react/day01.pdf)
-- [React进阶](/file/react/day02.pdf)
+- [React 基础](/file/react/day01.pdf)
+- [React 进阶](/file/react/day02.pdf)
+- [Redux 快速上手](/file/react/Redux快速上手.pdf)
+- [React-Router](/file/react/React-Router.pdf)
