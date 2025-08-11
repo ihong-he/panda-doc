@@ -159,6 +159,8 @@ export default defineConfig({
             { text: '一、React基础', link: '/up/react/react1/React基础-上' },
             { text: '二、React进阶', link: '/up/react/react2/React基础-下' },
             { text: '三、Redux', link: '/up/react/react3/Redux' },
+            { text: '四、React-Router', link: '/up/react/react4/ReactRouter基础' },
+            { text: '五、记账本项目', link: '/up/react/react5/ReactRouter记账本' },
           ]
         }
       ]

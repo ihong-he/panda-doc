@@ -2,7 +2,7 @@
 outline: deep
 ---
 
-## Redux 介绍
+## 一、Redux 介绍
 
 > Redux 是 React 最常用的集中状态管理工具，类似于 Vue 中的 Pinia（Vuex），可以独立于框架运行
 
@@ -15,7 +15,7 @@ outline: deep
 2. 单项数据流清晰，易于定位 bug
 3. 调试工具配套良好，方便调试
 
-## Redux 快速体验
+## 二、Redux 快速体验
 
 ### 1. 实现计数器
 
@@ -88,7 +88,7 @@ outline: deep
 -  `action`: 一个对象，用来描述你想怎么改数据
 -  `reducer`: 一个函数，根据 action 的描述更新 state
 
-## Redux 与 React - 环境准备
+## 三、环境准备
 
 > Redux 虽然是一个框架无关可以独立运行的插件，但是社区通常还是把它与 React 绑定在一起使用，以一个计数器案例体验一下 Redux + React 的基础使用
 
@@ -132,7 +132,7 @@ npm run start
 
 3. store 中的入口文件 index.js 的作用是组合 modules 中所有的子模块，并导出 store
 
-## Redux 与 React - 实现 counter
+## 四、实现 counter 模块
 
 ### 1. 整体路径熟悉
 
@@ -217,7 +217,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 ![image.png](assets/8.png)
 
-## Redux 与 React - 提交 action 传参
+## 五、提交 action 传参
 
 > 需求：组件中有俩个按钮 `add to 10` 和 `add to 20` 可以直接把 count 值修改到对应的数字，目标 count 值是在组件中传递过去的，需要在提交 action 的时候传递参数
 
@@ -226,7 +226,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 ![image.png](assets/10.png)
 
-## Redux 与 React - 异步 action 处理
+## 六、异步 action 处理
 
 **需求理解**
 ![image.png](assets/11.png)
@@ -304,13 +304,13 @@ function App() {
 export default App;
 ```
 
-## Redux 调试 - devtools
+## 七、Redux 调试 - devtools
 
 > Redux 官方提供了针对于 Redux 的调试工具，支持实时 state 信息展示，action 提交信息查看等
 
 ![image.png](assets/12.png)
 
-## 美团小案例
+## 八、美团小案例
 
 ### 1. 案例演示
 
