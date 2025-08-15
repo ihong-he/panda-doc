@@ -107,7 +107,7 @@ outline: deep
 1.  使用 CRA 快速创建 React 项目
 
 ```bash
-npx create-react-app react-redux
+npx create-react-app my-redux
 ```
 
 2.  安装配套工具
@@ -163,12 +163,10 @@ const counterStore = createSlice({
 // 解构出actionCreater
 const { increment, decrement } = counter.actions;
 
-// 获取reducer函数
-const counterReducer = counterStore.reducer;
-
-// 导出
+// 导出修改方法
 export { increment, decrement };
-export default counterReducer;
+// 默认导出reducer函数
+export default counterStore.reducer;
 ```
 
 ```javascript
@@ -186,7 +184,7 @@ export default configureStore({
 
 ### 3. 为 React 注入 store
 
-> react-redux 负责把 Redux 和 React 连接 起来，内置 Provider 组件 通过 store 参数把创建好的 store 实例注入到应用中，链接正式建立
+> `react-redux` 负责把 Redux 和 React 连接 起来，内置 `Provider` 组件 通过 store 参数把创建好的 store 实例注入到应用中，链接正式建立
 
 ```jsx
 import React from "react";
@@ -194,7 +192,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 // 导入store
 import store from "./store";
-// 导入store提供组件Provider
+// 提供组件Provider
 import { Provider } from "react-redux";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -207,13 +205,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 ### 4. React 组件使用 store 中的数据
 
-> 在 React 组件中使用 store 中的数据，需要用到一个钩子函数 - useSelector，它的作用是把 store 中的数据映射到组件中，使用样例如下：
+> 在 React 组件中使用 store 中的数据，需要用到一个钩子函数 - `useSelector`，它的作用是把 store 中的数据映射到组件中，使用样例如下：
 
 ![image.png](assets/7.png)
 
 ### 5. React 组件修改 store 中的数据
 
-> React 组件中修改 store 中的数据需要借助另外一个 hook 函数 - useDispatch，它的作用是生成提交 action 对象的 dispatch 函数，使用样例如下：
+> React 组件中修改 store 中的数据需要借助另外一个 hook 函数 - `useDispatch`，它的作用是生成提交 action 对象的 dispatch 函数，使用样例如下：
 
 ![image.png](assets/8.png)
 
@@ -222,7 +220,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 > 需求：组件中有俩个按钮 `add to 10` 和 `add to 20` 可以直接把 count 值修改到对应的数字，目标 count 值是在组件中传递过去的，需要在提交 action 的时候传递参数
 
 ![image.png](assets/9.png)
-实现方式：在 reducers 的同步修改方法中添加 action 对象参数，在调用 actionCreater 的时候传递参数，参数会被传递到 action 对象 payload 属性上
+实现方式：在 reducers 的同步修改方法中添加 `action` 对象参数，在调用 actionCreater 的时候传递参数，参数会被传递到 action 对象 `payload` 属性上
 
 ![image.png](assets/10.png)
 
@@ -237,7 +235,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 2. 单独封装一个函数，在函数内部 return 一个新函数，在新函数中
 
    - 封装异步请求并获取数据
-   - 调用同步 actionCreater 传入异步数据生成一个 action 对象，并使用 dispatch 提交
+   - 调用同步 actionCreater 传入异步数据生成一个 `action` 对象，并使用 dispatch 提交
 3. 组件中 dispatch 的写法保持不变
 
 **代码实现**
@@ -273,9 +271,7 @@ const fetchChannelList = () => {
 };
 
 export { fetchChannelList };
-
-const channelReducer = channelStore.reducer;
-export default channelReducer;
+export default channelStore.reducer;
 ```
 
 ```jsx
@@ -306,7 +302,7 @@ export default App;
 
 ## 七、Redux 调试 - devtools
 
-> Redux 官方提供了针对于 Redux 的调试工具，支持实时 state 信息展示，action 提交信息查看等
+> Redux 官方提供了针对于 Redux 的浏览器调试工具`Redux DevTools`，支持实时 state 信息展示、action 提交信息查看等
 
 ![image.png](assets/12.png)
 
@@ -381,9 +377,7 @@ const fetchFoodsList = () => {
 
 export { fetchFoodsList };
 
-const reducer = foodsStore.reducer;
-
-export default reducer;
+export default foodsStore.reducer;
 ```
 
 2- 组件使用 store 数据
@@ -398,6 +392,7 @@ const App = () => {
   // 触发action执行
   // 1. useDispatch -> dispatch 2. actionCreater导入进来 3.useEffect
   const dispatch = useDispatch();
+  const foodsList = useSelector(state => state.takeaway.foodsList)
   useEffect(() => {
     dispatch(fetchFoodsList());
   }, [dispatch]);
@@ -476,6 +471,9 @@ export default reducer;
 2- 编写组件逻辑
 
 ```jsx
+import { useDispatch, useSelector } from 'react-redux';
+import { setActiveIndex } from '../../store/modules/takeaway'
+
 const Menu = () => {
   const { foodsList, activeIndex } = useSelector((state) => state.foods);
   const dispatch = useDispatch();
@@ -542,6 +540,10 @@ import axios from "axios";
 
 const foodsStore = createSlice({
   name: "foods",
+  initialState: {
+    // 购物车列表
+    cartList: []
+  },
   reducers: {
     // 添加购物车
     addCart(state, action) {
@@ -621,7 +623,17 @@ const totalPrice = cartList.reduce((a, c) => a + c.price * c.count, 0);
   {cartList.length > 0 && (
     <div className="cartCornerMark">{cartList.length}</div>
   )}
-</div>;
+</div>
+{/* 购物车价格 */}
+  <div className="main">
+    <div className="price">
+      <span className="payableAmount">
+        <span className="payableAmountUnit">¥</span>
+        {totalPrice}
+      </span>
+    </div>
+    <span className="text">预估另需配送费 ¥5</span>
+  </div>
 ```
 
 ### 8. 购物车列表功能实现

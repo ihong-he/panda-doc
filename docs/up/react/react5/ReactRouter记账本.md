@@ -22,7 +22,7 @@ outline: deep
 ### 2. 路径解析配置
 配置步骤：
 
-1. 安装craco
+1. 安装`craco`
 ```bash
 npm i -D @craco/craco
 ```
@@ -100,7 +100,6 @@ npm i -D @craco/craco
 
 ```javascript
 // 账单列表相关store
-
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
 
@@ -140,7 +139,6 @@ export default reducer
 
 ```javascript
 // 组合子模块 导出store实例
-
 import { configureStore } from '@reduxjs/toolkit'
 import billReducer from './modules/billStore'
 
@@ -258,6 +256,8 @@ export default Layout
     </div>
   )
 ```
+> [!IMPORTANT]
+> 以下为黑马课程视频次日的笔记
 
 ## 八、月度账单-统计区域
 

@@ -14,3 +14,5 @@ outline: deep
 - [React 进阶](/file/react/day02.pdf)
 - [Redux 快速上手](/file/react/Redux快速上手.pdf)
 - [React-Router](/file/react/React-Router.pdf)
+- [记账本项目](/file/react/记账本项目.pdf)
+- [极客园项目一](/file/react/day06.pdf)

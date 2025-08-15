@@ -161,6 +161,7 @@ export default defineConfig({
             { text: '三、Redux', link: '/up/react/react3/Redux' },
             { text: '四、React-Router', link: '/up/react/react4/ReactRouter基础' },
             { text: '五、记账本项目', link: '/up/react/react5/ReactRouter记账本' },
+            { text: '六、极客园项目', link: '/up/react/react6/01.项目前置准备' },
           ]
         }
       ]
