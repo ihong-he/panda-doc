@@ -12,11 +12,24 @@ outline: deep
 5. 移动端组件库 - `antd-mobile`
 6. 请求插件 - `axios`
 
+```js 
+"dependencies": {
+  "react": "^18.3.0",
+  "react-dom": "^18.3.0"
+}
+```
+
+```bash 
+npm i @reduxjs/toolkit react-redux react-router-dom dayjs classnames antd-mobile axios
+```
+
+> [!IMPORTANT] 注意
+> `antd-mobile`对于 React 兼容的版本是 ^16.8.0、^17.0.0、^18.0.0。
+
 ## 二、配置别名路径
 ### 1. 背景知识
 - 路径解析配置（webpack），把 `@/` 解析为 `src/`
 - 路径联想配置（VsCode），VsCode 在输入 `@/` 时，自动联想出来对应的 `src/` 下的子级目录
-
 
 ![image.png](assets/12.png)
 ### 2. 路径解析配置
@@ -154,6 +167,7 @@ export default store
 ```jsx
 import router from './router'
 import { Provider } from 'react-redux'
+import store from './store';
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -256,7 +270,7 @@ export default Layout
     </div>
   )
 ```
-> [!IMPORTANT]
+> [!NOTE] 提示
 > 以下为黑马课程视频次日的笔记
 
 ## 八、月度账单-统计区域
@@ -264,6 +278,7 @@ export default Layout
 ![image.png](assets/22.png)
 
 ### 1. 准备静态结构
+
 ```jsx
 import { NavBar, DatePicker } from 'antd-mobile'
 import './index.scss'
@@ -315,6 +330,7 @@ const Month = () => {
 export default Month
 ```
 
+::: details 查看css代码
 ```css
 .monthlyBill {
   --ka-text-color: #191d26;
@@ -348,7 +364,7 @@ export default Month
       height: 135px;
       padding: 20px 20px 0px 18.5px;
       margin-bottom: 10px;
-      background-image: url(https://zqran.gitee.io/images/ka/month-bg.png);
+      background-image: url(https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/reactbase/ka/month-bg.png);
       background-size: 100% 100%;
 
       .date {
@@ -398,11 +414,13 @@ export default Month
     }
   }
 }
+
 ```
+:::
 
 ### 2. 点击切换时间选择框
 
-> 实现思路：
+> [!IMPORTANT] 实现思路
 > 1. 准备一个状态数据
 > 2. 点击切换状态
 > 3. 根据状态控制弹框打开关闭以及箭头样式
@@ -457,18 +475,19 @@ export default Month
 ### 3. 切换时间显示
 ![image.png](assets/23.png)
 
-> 实现思路：
+> [!IMPORTANT] 实现思路：
 > 1. 以当前时间作为默认值
 > 2. 在时间切换时完成时间修改
 
 
 ```jsx
 import dayjs from "dayjs"
-
+// 获取当前时间
 const [currentMonth, setCurrentMonth] = useState(() => {
     return dayjs().format('YYYY-MM')
 })
 
+// 时间选择完成
 const dateConfirm = (date) => {
   setDateVisible(false)
   const month = dayjs(date).format('YYYY-MM')
@@ -477,14 +496,42 @@ const dateConfirm = (date) => {
 ```
 
 ### 4. 统计功能实现
-> 实现思路：
+> [!IMPORTANT] 实现思路：
 > 1. 按月分组
 > 2. 根据获取到的时间作为key取当月的账单数组
 > 3. 根据当月的账单数组计算支出、收入、总计
 
+**useMemo的概念**
+
+`useMemo` 是 **React 的一个 Hook**，用于在函数组件中 **缓存计算结果**。
+
+**作用**
+
+* **避免重复计算**：只有在依赖项变化时，才会重新计算并返回结果。
+* **提升性能**：适合处理计算量大或需要避免不必要渲染的场景。
+
+**简单示例**
+
 ```jsx
+const expensiveValue = useMemo(() => {
+  return computeExpensiveValue(a, b); // 只有 a 或 b 改变时才会重新计算
+}, [a, b]);
+```
+
+👉 简单来说：**`useMemo` 用来记住一个计算结果，防止每次渲染都重新算一遍**。
+
+**核心代码**
+
+```jsx
+import dayjs from 'dayjs'
+import _ from 'lodash'
+import { useSelector } from 'react-redux'
+import { useState, useMemo, useEffect } from 'react'
+
 // 按月分组
 const billList = useSelector(state => state.bill.billList)
+// 定义每月的账单
+  const [currentMonthList, setCurrentMonthList] = useState([])
 const monthGroup = useMemo(() => {
   return _.groupBy(billList, item => dayjs(item.date).format('YYYY-MM'))
 }, [billList])
@@ -497,6 +544,8 @@ const dateConfirm = (date) => {
 
 // 计算统计
 const overview = useMemo(() => {
+  // 当前月份没数据，就返回0
+  if (!currentMonthList) return { income: 0, pay: 0, total: 0 }
   const income = currentMonthList.filter(item => item.type === 'income')
     .reduce((a, c) => a + c.money, 0)
   const pay = currentMonthList.filter(item => item.type === 'pay')
@@ -507,8 +556,18 @@ const overview = useMemo(() => {
     total: income + pay
   }
 }, [currentMonthList])
+
+// 首次加载获取当月数据
+useEffect(() => {
+  const list = monthGroup[dayjs().format('YYYY-MM')]
+  if(list) {
+    setCurrentMonthList(list)
+  }
+}, [currentMonthList])
 ```
 ### 5. 完整代码
+
+::: details 点我查看代码
 ```jsx
 import { useSelector } from "react-redux"
 import { NavBar, DatePicker } from 'antd-mobile'
@@ -608,6 +667,7 @@ const Month = () => {
 
 export default Month
 ```
+:::
 
 ## 九、月度账单-单日统计列表实现
 ![image.png](assets/24.png)
@@ -644,7 +704,9 @@ const DailyBill = () => {
 }
 export default DailyBill
 ```
-配套样式
+- 配套样式
+
+::: details 点我查看代码
 ```css
 .dailyBill {
   margin-bottom: 10px;
@@ -781,6 +843,7 @@ export default DailyBill
   }
 }
 ```
+:::
 ### 2. 按日分组账单数据
 ![image.png](assets/25.png)
 
@@ -1113,7 +1176,9 @@ const New = () => {
 
 export default New
 ```
-配套样式
+
+- 配套样式
+::: details 点我查看代码
 ```css
 .keepAccounts {
   --ka-bg-color: #daf2e1;
@@ -1286,7 +1351,7 @@ export default New
   }
 
 ```
-
+:::
 ### 2. 记账 - 支出和收入切换
 ```jsx
 const new = ()=>{
