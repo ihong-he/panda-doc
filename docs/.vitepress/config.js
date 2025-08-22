@@ -167,7 +167,13 @@ export default defineConfig({
             { text: '三、Redux', link: '/up/react/react3/Redux' },
             { text: '四、React-Router', link: '/up/react/react4/ReactRouter基础' },
             { text: '五、记账本项目', link: '/up/react/react5/ReactRouter记账本' },
-            { text: '六、极客园项目', link: '/up/react/react6/01.项目前置准备' },
+            { text: '六、极客园项目一', link: '/up/react/react6/01.项目前置准备' },
+            { text: '&nbsp;极客园项目二', link: '/up/react/react6/02.登录模块' },
+            { text: '&nbsp;极客园项目三', link: '/up/react/react6/03.Layout模块' },
+            { text: '&nbsp;极客园项目四', link: '/up/react/react6/04.发布文章模块' },
+            { text: '&nbsp;极客园项目五', link: '/up/react/react6/05.文章列表模块' },
+            { text: '&nbsp;极客园项目六', link: '/up/react/react6/06.编辑文章' },
+            { text: '&nbsp;极客园项目七', link: '/up/react/react6/07.项目打包' },
           ]
         }
       ]
