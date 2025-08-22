@@ -4,9 +4,8 @@ outline: deep
 
 ## 一、React介绍
 
-:::info
-React由Meta公司开发，是一个用于 构建Web 和 原生交互界面 的库
-:::
+> [!NOTE] 前言
+> React由Meta公司开发，是一个用于 构建Web 和 原生交互界面 的库
 
 ![image.png](assets/01.png)
 
@@ -34,7 +33,7 @@ npx create-react-app react-basic
 1. `npx`: Node.js工具命令，查找并执行后续的包命令
 2. `create-react-app`: 核心包（固定写法），用于创建React项目
 3. react-basic: React项目的名称（可以自定义）
-:::warning
+:::warning 补充
 创建React项目的更多方式
 [https://zh-hans.react.dev/learn/start-a-new-react-project](https://zh-hans.react.dev/learn/start-a-new-react-project)
 :::
@@ -69,8 +68,8 @@ function App(){
 2. 使用JS变量
 3. 函数调用和方法调用
 4. 使用JavaScript对象
-:::warning
-注意：if语句、switch语句、变量声明不属于表达式，不能出现在{}中
+:::warning 注意
+if语句、switch语句、变量声明不属于表达式，不能出现在{}中
 :::
 ```jsx
 const message = 'this is message'
@@ -196,8 +195,8 @@ function App(){
   )
 }
 ```
-:::warning
-注意：不能直接写函数调用，这里事件绑定需要一个函数引用
+:::warning 注意
+不能直接写函数调用，这里事件绑定需要一个函数引用
 :::
 ### 同时传递事件对象和自定义参数
 > 语法：在事件绑定的位置传递事件实参e和自定义参数，clickHandler中声明形参，注意顺序对应
@@ -300,9 +299,9 @@ function App(){
 4. 评论列表排序功能实现
 ### 基础模版
 
-::: details 查看模板
+::: code-group
 
-```tsx
+```tsx [Template]
 import { useState } from 'react'
 import './App.scss'
 import avatar from './images/bozai.png'
@@ -462,10 +461,9 @@ const App = () => {
 
 export default App
 ```
-:::
 
-::: details 查看样式
-```css
+
+```css [css]
 .app {
   width: 80%;
   margin: 50px auto;

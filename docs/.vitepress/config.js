@@ -9,6 +9,12 @@ export default defineConfig({
   lastUpdated: true,
   cleanUrls: false, // 当设置为 true 时，VitePress 将从 URL 中删除 .html 后缀
   ignoreDeadLinks: true,
+  markdown: {
+    image: {
+      // 默认禁用图片懒加载
+      lazyLoading: true
+    }
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: { src: '/doc-logo-mini.png', width: 24, height: 24 },

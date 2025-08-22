@@ -12,19 +12,22 @@ outline: deep
 5. 移动端组件库 - `antd-mobile`
 6. 请求插件 - `axios`
 
-```js 
+::: code-group
+
+```js [package.json]
 "dependencies": {
   "react": "^18.3.0",
   "react-dom": "^18.3.0"
 }
 ```
 
-```bash 
+```bash [命令行]
 npm i @reduxjs/toolkit react-redux react-router-dom dayjs classnames antd-mobile axios
 ```
+:::
 
 > [!IMPORTANT] 注意
-> `antd-mobile`对于 React 兼容的版本是 ^16.8.0、^17.0.0、^18.0.0。
+> `antd-mobile`对于 React 兼容的版本是 ^16.0.0、^17.0.0、^18.0.0。
 
 ## 二、配置别名路径
 ### 1. 背景知识
@@ -111,7 +114,8 @@ npm i -D @craco/craco
 ## 六、Redux管理账目列表
 ![image.png](assets/20.png)
 
-```javascript
+::: code-group
+```javascript [billStore.js]
 // 账单列表相关store
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
@@ -149,8 +153,7 @@ const reducer = billStore.reducer
 export default reducer
 ```
 
-
-```javascript
+```javascript [store/index.js]
 // 组合子模块 导出store实例
 import { configureStore } from '@reduxjs/toolkit'
 import billReducer from './modules/billStore'
@@ -164,7 +167,7 @@ const store = configureStore({
 export default store
 ```
 
-```jsx
+```jsx [src/index.js]
 import router from './router'
 import { Provider } from 'react-redux'
 import store from './store';
@@ -176,12 +179,16 @@ root.render(
   </Provider>
 )
 ```
+:::
+
 ## 七、TabBar功能实现
 ![image.png](assets/21.png)
 
 ### 1. 静态布局实现
 配套静态模版和样式文件
-```jsx
+
+::: code-group
+```jsx [Layout/index.js]
 import { TabBar } from "antd-mobile"
 import { useEffect } from "react"
 import { Outlet } from "react-router-dom"
@@ -235,7 +242,7 @@ const Layout = () => {
 
 export default Layout
 ```
-```css
+```css [index.scss]
 .layout {
   .container {
     position: fixed;
@@ -249,6 +256,7 @@ export default Layout
   }
 }
 ```
+:::
 ### 2. 切换路由实现
 > 监听change事件，在事件回调中调用路由跳转方法
 
@@ -279,7 +287,8 @@ export default Layout
 
 ### 1. 准备静态结构
 
-```jsx
+::: code-group
+```jsx [Month/index.js]
 import { NavBar, DatePicker } from 'antd-mobile'
 import './index.scss'
 
@@ -330,8 +339,7 @@ const Month = () => {
 export default Month
 ```
 
-::: details 查看css代码
-```css
+```css [index.scss]
 .monthlyBill {
   --ka-text-color: #191d26;
   height: 100%;
@@ -429,7 +437,7 @@ export default Month
 ```jsx
 import { NavBar, DatePicker } from 'antd-mobile'
 import './index.scss'
-import {  useState } from "react"
+import { useState } from "react"
 import classNames from "classnames"
 
 const Month = () => {
@@ -501,7 +509,7 @@ const dateConfirm = (date) => {
 > 2. 根据获取到的时间作为key取当月的账单数组
 > 3. 根据当月的账单数组计算支出、收入、总计
 
-**useMemo的概念**
+:tada: **useMemo的概念**
 
 `useMemo` 是 **React 的一个 Hook**，用于在函数组件中 **缓存计算结果**。
 
@@ -518,9 +526,9 @@ const expensiveValue = useMemo(() => {
 }, [a, b]);
 ```
 
-👉 简单来说：**`useMemo` 用来记住一个计算结果，防止每次渲染都重新算一遍**。
+:point_right: 简单来说：**`useMemo` 用来记住一个计算结果，防止每次渲染都重新算一遍**。
 
-**核心代码**
+:trophy: **核心代码**
 
 ```jsx
 import dayjs from 'dayjs'
@@ -672,7 +680,9 @@ export default Month
 ## 九、月度账单-单日统计列表实现
 ![image.png](assets/24.png)
 ### 1. 准备组件和配套样式
-```jsx
+
+::: code-group
+```jsx [Month/components/DayBill/index.js]
 import classNames from 'classnames'
 import './index.scss'
 
@@ -704,10 +714,8 @@ const DailyBill = () => {
 }
 export default DailyBill
 ```
-- 配套样式
 
-::: details 点我查看代码
-```css
+```css [index.scss]
 .dailyBill {
   margin-bottom: 10px;
   border-radius: 10px;
@@ -850,7 +858,8 @@ export default DailyBill
 ```javascript
 // 把当前月按日分组账单数据
   const dayGroup = useMemo(() => {
-    const group = _.groupBy(currentMonthList, (item) => dayjs(item.date).format('YYYY-MM-DD'))
+    const group = _.groupBy(currentMonthList, (item) => dayjs(item.date)
+    .format('YYYY-MM-DD'))
     return {
       dayKeys: Object.keys(group),
       group
@@ -928,7 +937,7 @@ export default DailyBill
 </div>
 ```
 ### 2. 适配Type
-1-准备静态数据
+- 准备静态数据
 ```javascript
 export const billListData = {
   pay: [
@@ -1006,12 +1015,11 @@ export const billTypeToName = Object.keys(billListData).reduce((prev, key) => {
   return prev
 }, {})
 ```
-2-适配type
+- 适配type
 ```javascript
  <div className="billType">{billTypeToName[item.useFor]}</div>
 ```
 ## 十一、月度账单-切换打开关闭
-![image.png](https://cdn.nlark.com/yuque/0/2023/png/274425/1680169396175-a10287d1-cc4a-4464-b295-aea0becb3805.png#averageHue=%23fcfcfc&clientId=u4bda8888-0a67-4&from=paste&height=98&id=u1d780ff6&name=image.png&originHeight=196&originWidth=736&originalType=binary&ratio=2&rotation=0&showTitle=false&size=15931&status=done&style=none&taskId=uc682e670-0453-45ac-9d64-b891c330814&title=&width=368)
 
 ![image.png](assets/27.png)
 
@@ -1081,6 +1089,8 @@ export default Icon
 
 ## 十三、记账功能
 ### 1. 记账 - 结构渲染
+
+::: code-group
 ```jsx
 import { Button, DatePicker, Input, NavBar } from 'antd-mobile'
 import Icon from '@/components/Icon'
@@ -1177,8 +1187,6 @@ const New = () => {
 export default New
 ```
 
-- 配套样式
-::: details 点我查看代码
 ```css
 .keepAccounts {
   --ka-bg-color: #daf2e1;
