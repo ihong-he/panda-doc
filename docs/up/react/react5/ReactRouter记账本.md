@@ -327,7 +327,6 @@ const Month = () => {
             className="kaDate"
             title="记账日期"
             precision="month"
-            visible={false}
             max={new Date()}
           />
         </div>
@@ -855,7 +854,8 @@ export default DailyBill
 ### 2. 按日分组账单数据
 ![image.png](assets/25.png)
 
-```javascript
+::: code-group
+```javascript [Month/index.js]
 // 把当前月按日分组账单数据
   const dayGroup = useMemo(() => {
     const group = _.groupBy(currentMonthList, (item) => dayjs(item.date)
@@ -867,6 +867,7 @@ export default DailyBill
   }, [currentMonthList])
   console.log(dayGroup)
 ```
+:::
 ### 3. 遍历日账单组件并传入参数
 ```jsx
  {/* 日账单 */}
@@ -919,7 +920,9 @@ export default DailyBill
 ![image.png](assets/26.png)
 
 ### 1. 渲染基础列表
-```jsx
+
+::: code-group
+```jsx [Month/components/DayBill/index.js]
 {/* 单日列表 */}
 <div className="billList">
   {billList.map(item => {
@@ -936,6 +939,7 @@ export default DailyBill
   })}
 </div>
 ```
+:::
 ### 2. 适配Type
 - 准备静态数据
 ```javascript
@@ -1039,7 +1043,9 @@ const [visible, setVisible] = useState(false)
 ## 十二、月度账单-Icon组件封装
 ![image.png](assets/28.png)
 ### 1. 准备静态结构
-```jsx
+
+::: code-group
+```jsx [components/Icon/index.js]
 const Icon = () => {
   return (
     <img
@@ -1055,6 +1061,7 @@ const Icon = () => {
 
 export default Icon
 ```
+:::
 ### 2. 设计参数
 ```jsx
 const BASE_URL = 'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/reactbase/ka/'
@@ -1088,10 +1095,11 @@ export default Icon
 ```
 
 ## 十三、记账功能
+
 ### 1. 记账 - 结构渲染
 
 ::: code-group
-```jsx
+```jsx [pages/New/index.js]
 import { Button, DatePicker, Input, NavBar } from 'antd-mobile'
 import Icon from '@/components/Icon'
 import './index.scss'
@@ -1187,7 +1195,7 @@ const New = () => {
 export default New
 ```
 
-```css
+```css [index.scss]
 .keepAccounts {
   --ka-bg-color: #daf2e1;
   --ka-color: #69ae78;
@@ -1395,31 +1403,88 @@ const new = ()=>{
 }
 ```
 ### 3. 记账 - 新增一笔
-```jsx
+
+::: code-group
+```js [store/modules/billStore.js]
+// 账单列表相关store
+import { createSlice } from '@reduxjs/toolkit'
+import axios from 'axios'
+
+const billStore = createSlice({
+  name: 'bill',
+  // 数据状态state
+  initialState: {
+    billList: []
+  },
+  reducers: {
+    // 同步添加账单方法
+    addBill (state, action) {
+      state.billList.push(action.payload)
+    }
+  }
+})
+
+const addBillList = (data) => {
+  return async (dispatch) => {
+    // 编写异步新增请求(参照json-server文档)
+    const res = await axios.post('http://localhost:8888/ka', data)
+    // 触发同步reducer
+    dispatch(addBill(res.data))
+  }
+}
+
+export { addBillList }
+// 导出reducer
+const reducer = billStore.reducer
+
+export default reducer
+
+```
+```jsx [pages/New/index.js]
+import { Button, DatePicker, Input, NavBar } from 'antd-mobile'
+import Icon from '@/components/Icon'
+import './index.scss'
+import classNames from 'classnames'
+import { billListData } from '@/contants'
+import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { addBillList } from '@/store/modules/billStore'
 
 const New = () => {
+  const navigate = useNavigate()
+  // 区分切换状态
+  const [type, setType] = useState('pay')
+  const dispatch = useDispatch()
+  // 收集账单类型
+  const [userFor, setUserFor] = useState('')
   // 收集金额
   const [money, setMoney] = useState(0)
-  const moneyChange = (value) => {
-    setMoney(value)
-  }
-
-  // 收集账单类型
-  const [useFor, setUseFor] = useState('')
-  const dispatch = useDispatch()
-  // 保存账单
-  const saveBill = () => {
-    // 收集表单数据
+  // 定义日期弹出层显示和隐藏
+  const [dataVisible, setDataVisible] = useState(false)
+  // 定义日期
+  const [currentDate, setCurrentDate] = useState('')
+  // 新增账单
+  const addBill = () => {
+    // 收集账单数据
     const data = {
-      type: billType,
-      money: billType === 'pay' ? -money : +money,
-      date: new Date(),
-      useFor: useFor
+      type: type,
+      userFor: userFor,
+      date: currentDate || new Date(),
+      money: type === 'pay' ? -money : money,
     }
-    console.log(data)
+    console.log('账单数据-->>>', data);
     dispatch(addBillList(data))
   }
+
+  // 日期确认
+  const dateConfirm = (date) => {
+    console.log('date:', date)
+    setCurrentDate(date)
+    setDataVisible(false)
+    
+  }
+
   return (
     <div className="keepAccounts">
       <NavBar className="nav" onBack={() => navigate(-1)}>
@@ -1430,15 +1495,15 @@ const New = () => {
         <div className="kaType">
           <Button
             shape="rounded"
-            className={classNames(billType === 'pay' ? 'selected' : '')}
-            onClick={() => setBillType('pay')}
+            className={classNames(type === 'pay' ? 'selected' : '')}
+            onClick={() => setType('pay')}
           >
             支出
           </Button>
           <Button
-            className={classNames(billType === 'income' ? 'selected' : '')}
+            className={classNames(type === 'income' ? 'selected' : '')}
             shape="rounded"
-            onClick={() => setBillType('income')}
+            onClick={() => setType('income')}
           >
             收入
           </Button>
@@ -1448,11 +1513,13 @@ const New = () => {
           <div className="kaForm">
             <div className="date">
               <Icon type="calendar" className="icon" />
-              <span className="text">{'今天'}</span>
+              <span className="text" onClick={() => setDataVisible(true)}>{currentDate ? currentDate.toLocaleDateString() : "今天"}</span>
               <DatePicker
                 className="kaDate"
                 title="记账日期"
                 max={new Date()}
+                visible={dataVisible}
+                onConfirm={dateConfirm}
               />
             </div>
             <div className="kaInput">
@@ -1461,7 +1528,7 @@ const New = () => {
                 placeholder="0.00"
                 type="number"
                 value={money}
-                onChange={moneyChange}
+                onChange={(value) => setMoney(Number(value))}
               />
               <span className="iconYuan">¥</span>
             </div>
@@ -1470,8 +1537,8 @@ const New = () => {
       </div>
 
       <div className="kaTypeList">
-        {/* 数据区域 */}
-        {billListData[billType].map(item => {
+        {/* 根据切换状态显示 */}
+        {billListData[type].map(item => {
           return (
             <div className="kaType" key={item.type}>
               <div className="title">{item.name}</div>
@@ -1481,10 +1548,10 @@ const New = () => {
                     <div
                       className={classNames(
                         'item',
-                        ''
+                        userFor === item.type ? 'selected' : ''
                       )}
                       key={item.type}
-                      onClick={() => setUseFor(item.type)}
+                      onClick={() => setUserFor(item.type)}
                     >
                       <div className="icon">
                         <Icon type={item.type} />
@@ -1500,7 +1567,7 @@ const New = () => {
       </div>
 
       <div className="btns">
-        <Button className="btn save" onClick={saveBill}>
+        <Button className="btn save" onClick={addBill}>
           保 存
         </Button>
       </div>
@@ -1510,4 +1577,8 @@ const New = () => {
 
 export default New
 ```
+:::
 
+> [!WARNING] 提示
+> `Input`组件输入数据类型为string，需要转换成数字类型。
+> `DatePicker`组件数据类型为Date类型，需要转换成字符串类型，才能正常渲染显示。

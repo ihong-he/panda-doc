@@ -5,7 +5,7 @@ outline: deep
 ## 一、React介绍
 
 > [!NOTE] 前言
-> React由Meta公司开发，是一个用于 构建Web 和 原生交互界面 的库
+> React 由 Meta 公司开发，是一个用于构建 **Web 应用** 和 **原生交互界面** 的库。
 
 ![image.png](assets/01.png)
 
