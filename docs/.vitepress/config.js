@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "PandaDoc",
   description: "A VitePress Document",
-  head: [['link', { rel: 'icon', href: '/panda-doc/favicon.ico' }]], 
+  head: [['link', { rel: 'icon', href: '/panda-doc/favicon.ico' }]],
   base: '/panda-doc/', // 使用相对路径，线上部署非根路径时需要修改
   lastUpdated: true,
   cleanUrls: false, // 当设置为 true 时，VitePress 将从 URL 中删除 .html 后缀
@@ -38,7 +38,8 @@ export default defineConfig({
       { text: '首页', link: '/' },
       { text: '技术', link: '/note/html&css' },
       { text: '开发', link: '/dev/dev1' },
-      { text: '提升',
+      {
+        text: '提升',
         items: [
           {
             // 该部分的标题
@@ -50,7 +51,7 @@ export default defineConfig({
             ]
           }
         ]
-       },
+      },
       // { text: '实战', link: '/project/ggzx/index1' },
       {
         text: '实战',
@@ -160,20 +161,25 @@ export default defineConfig({
       '/up/': [
         {
           text: 'React学习笔记',
-          collapsed: true,
+          collapsed: false,
           items: [
             { text: '一、React基础', link: '/up/react/react1/React基础-上' },
             { text: '二、React进阶', link: '/up/react/react2/React基础-下' },
             { text: '三、Redux', link: '/up/react/react3/Redux' },
             { text: '四、React-Router', link: '/up/react/react4/ReactRouter基础' },
             { text: '五、记账本项目', link: '/up/react/react5/ReactRouter记账本' },
-            { text: '六、极客园项目一', link: '/up/react/react6/01.项目前置准备' },
-            { text: '&nbsp;极客园项目二', link: '/up/react/react6/02.登录模块' },
-            { text: '&nbsp;极客园项目三', link: '/up/react/react6/03.Layout模块' },
-            { text: '&nbsp;极客园项目四', link: '/up/react/react6/04.发布文章模块' },
-            { text: '&nbsp;极客园项目五', link: '/up/react/react6/05.文章列表模块' },
-            { text: '&nbsp;极客园项目六', link: '/up/react/react6/06.编辑文章' },
-            { text: '&nbsp;极客园项目七', link: '/up/react/react6/07.项目打包' },
+            {
+              text: '六、极客园项目', collapsed: true, items: [
+                { text: '1. 项目前置准备', link: '/up/react/react6/01.项目前置准备' },
+                { text: '2. 登录模块', link: '/up/react/react6/02.登录模块' },
+                { text: '3. Layout模块', link: '/up/react/react6/03.Layout模块' },
+                { text: '4. 发布文章模块', link: '/up/react/react6/04.发布文章模块' },
+                { text: '5. 文章列表模块', link: '/up/react/react6/05.文章列表模块' },
+                { text: '6. 编辑文章', link: '/up/react/react6/06.编辑文章' },
+                { text: '7. 项目打包', link: '/up/react/react6/07.项目打包' },
+              ]
+            },
+
           ]
         }
       ]
