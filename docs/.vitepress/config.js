@@ -135,6 +135,7 @@ export default defineConfig({
           text: '项目',
           collapsed: true,
           items: [
+            { text: '极客园后台系统', link: '/interview/project/jky-pc' },
             { text: '博欣信息管理系统', link: '/interview/project/ims' },
             { text: '试剂管理系统', link: '/interview/project/reagent' },
             { text: '行政诉讼E监督', link: '/interview/project/e-supervise' },
@@ -169,7 +170,7 @@ export default defineConfig({
             { text: '四、React-Router', link: '/up/react/react4/ReactRouter基础' },
             { text: '五、记账本项目', link: '/up/react/react5/ReactRouter记账本' },
             {
-              text: '六、极客园项目', collapsed: true, items: [
+              text: '六、极客园-PC', collapsed: true, items: [
                 { text: '1. 项目前置准备', link: '/up/react/react6/01.项目前置准备' },
                 { text: '2. 登录模块', link: '/up/react/react6/02.登录模块' },
                 { text: '3. Layout模块', link: '/up/react/react6/03.Layout模块' },
@@ -179,6 +180,13 @@ export default defineConfig({
                 { text: '7. 项目打包', link: '/up/react/react6/07.项目打包' },
               ]
             },
+            {
+              text: '七、极客园-移动端', collapsed: true, items: [
+                { text: '1. 项目前置准备', link: '/up/react/react7/01.项目初始化' },
+                { text: '2. 列表模块', link: '/up/react/react7/02.列表模块' },
+                { text: '3. 详情模块', link: '/up/react/react7/03.详情模块' },
+              ]
+            }
 
           ]
         }
