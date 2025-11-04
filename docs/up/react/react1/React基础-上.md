@@ -24,7 +24,10 @@ outline: deep
 ![image.png](assets/02.png)
 
 ## 二、开发环境创建
-`create-react-app`是一个快速创建React开发环境的工具，底层由Webpack构建，封装了配置细节，开箱即用
+
+### 使用`create-react-app`
+> `create-react-app`是一个快速创建React开发环境的工具，底层由Webpack构建，封装了配置细节，开箱即用
+
 执行命令：
 ```bash
 npx create-react-app react-basic
@@ -33,10 +36,19 @@ npx create-react-app react-basic
 1. `npx`: Node.js工具命令，查找并执行后续的包命令
 2. `create-react-app`: 核心包（固定写法），用于创建React项目
 3. react-basic: React项目的名称（可以自定义）
-:::warning 补充
-创建React项目的更多方式
-[https://zh-hans.react.dev/learn/start-a-new-react-project](https://zh-hans.react.dev/learn/start-a-new-react-project)
+:::warning 警告
+由于 `Create React App`目前没有活跃的维护者，并且已经有许多现有的框架能够解决这些问题，React官方决定弃用 `Create React App`
 :::
+
+### 使用Vite（推荐）
+
+> [Vite](https://cn.vite.dev/) 是一个构建工具，旨在为现代网络项目提供更快更简洁的开发体验。
+
+```bash
+npm create vite@latest my-app -- --template react
+```
+[Vite](https://cn.vite.dev/) 采用约定式设计，开箱即提供合理的默认配置。它拥有丰富的插件生态系统，能够支持快速热更新、JSX、Babel/SWC 等常见功能。
+
 ## 三、JSX基础
 ### 什么是JSX
 > JSX是JavaScript和XML(HTML)的缩写，表示在JS代码中编写HTML模版结构，它是React中构建UI的方式
@@ -58,9 +70,14 @@ function App(){
 1. HTML的声明式模版写法
 2. JavaScript的可编程能力
 ### JSX的本质
-> JSX并不是标准的JS语法，它是 JS的语法扩展，浏览器本身不能识别，需要通过解析工具做解析之后才能在浏览器中使用
+> JSX并不是标准的JS语法，它是 JS的语法扩展，浏览器本身不能识别，需要通过解析工具如`Babel`做解析之后才能在浏览器中使用
 
 ![image.png](assets/03.png)
+
+::: info 补充
+`Babel` 是一个JavaScript 编译器。它的主要作用是将使用最新、最前沿的 JavaScript 语法（如 ES2015/ES6 及更高版本）或非标准语法（如 JSX）编写的代码，转换（编译）成向后兼容的、能在当前和旧版本浏览器或环境中运行的 JavaScript 代码。
+:::
+
 ### JSX高频场景-JS表达式
 > 在JSX中可以通过 `大括号语法{}` 识别JavaScript中的表达式，比如常见的变量、函数调用、方法调用等等
 

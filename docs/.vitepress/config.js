@@ -46,7 +46,7 @@ export default defineConfig({
             text: '技能提升',
             items: [
               { text: 'React学习笔记', link: '/up/up1' },
-              { text: '鸿蒙开发笔记', link: '/' },
+              { text: '鸿蒙开发笔记', link: '/harmony/hm1' },
               // { text: 'Section B Item B', link: '...' }
             ]
           }
@@ -190,7 +190,18 @@ export default defineConfig({
 
           ]
         }
-      ]
+      ],
+      '/harmony/': [
+        {
+          text: 'Harmony',
+          collapsed: true,
+          items: [
+            { text: 'Harmony基础', link: '/harmony/hm1' },
+            { text: 'Harmony进阶', link: '/harmony/hm2' },
+            { text: '云音乐项目', link: '/harmony/hm3' },
+          ]
+        }
+      ],
     },
     // 层级
     sidebarDepth: 3,

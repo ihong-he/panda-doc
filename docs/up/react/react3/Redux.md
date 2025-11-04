@@ -4,7 +4,7 @@ outline: deep
 
 ## 一、Redux 介绍
 
-> Redux 是 React 最常用的集中状态管理工具，类似于 Vue 中的 Pinia（Vuex），可以独立于框架运行
+> <Pronounce word="Redux" /> 是 React 最常用的集中状态管理工具，类似于 Vue 中的 Pinia（Vuex），可以独立于框架运行
 
 作用：通过集中管理的方式管理应用的状态
 
@@ -15,71 +15,9 @@ outline: deep
 2. 单项数据流清晰，易于定位 bug
 3. 调试工具配套良好，方便调试
 
-## 二、Redux 快速体验
+## 二、Redux 数据流
 
-### 1. 实现计数器
-
-> 需求：不和任何框架绑定，不使用任何构建工具，使用纯 Redux 实现计数器
-
-![image.png](assets/2.png)
-使用步骤：
-
-1. 定义一个 `reducer` 函数 （根据当前想要做的修改返回一个新的状态）
-2. 使用`createStore`方法传入 `reducer` 函数生成一个`store`实例对象
-3. 使用 store 实例的 `subscribe` 方法 订阅数据的变化（数据一旦变化，可以得到通知）
-4. 使用 store 实例的 `dispatch` 方法提交`action`对象 触发数据变化（告诉 reducer 你想怎么改数据）
-5. 使用 store 实例的 `getState` 方法 获取最新的状态数据更新到视图中
-
-代码实现：
-
-```html
-<button id="decrement">-</button>
-<span id="count">0</span>
-<button id="increment">+</button>
-
-<script src="https://unpkg.com/redux@latest/dist/redux.min.js"></script>
-
-<script>
-  // 定义reducer函数
-  // 内部主要的工作是根据不同的action 返回不同的state
-  function counterReducer(state = { count: 0 }, action) {
-    switch (action.type) {
-      case "INCREMENT":
-        return { count: state.count + 1 };
-      case "DECREMENT":
-        return { count: state.count - 1 };
-      default:
-        return state;
-    }
-  }
-  // 使用reducer函数生成store实例
-  const store = Redux.createStore(counterReducer);
-
-  // 订阅数据变化
-  store.subscribe(() => {
-    console.log(store.getState());
-    document.getElementById("count").innerText = store.getState().count;
-  });
-  // 增
-  const inBtn = document.getElementById("increment");
-  inBtn.addEventListener("click", () => {
-    store.dispatch({
-      type: "INCREMENT",
-    });
-  });
-  // 减
-  const dBtn = document.getElementById("decrement");
-  dBtn.addEventListener("click", () => {
-    store.dispatch({
-      type: "DECREMENT",
-    });
-  });
-</script>
-```
-
-### 2. Redux 数据流架构
-
-> Redux 的难点是理解它对于数据修改的规则, 下图动态展示了在整个数据的修改中，数据的流向
+> Redux 的难点是理解它对于数据修改的规则, 下图动态展示了在整个数据的修改中数据的流向
 
 ![1](assets/3.png)
 为了职责清晰，Redux 代码被分为三个核心的概念，我们学 redux，其实就是学这三个核心概念之间的配合，三个概念分别是:
@@ -130,7 +68,7 @@ npm run start
 
 2. 应用通常会有很多个子 store 模块，所以创建一个 `modules` 目录，在内部编写业务分类的子 store
 
-3. store 中的入口文件 index.js 的作用是组合 modules 中所有的子模块，并导出 store
+3. store 中的入口文件 `index.js` 的作用是组合 modules 中所有的子模块，并导出 store
 
 ## 四、实现 counter 模块
 
@@ -140,7 +78,8 @@ npm run start
 
 ### 2. 使用 React Toolkit 创建 counterStore
 
-```javascript
+::: code-group
+```javascript [store/modules/counterStore.js]
 import { createSlice } from "@reduxjs/toolkit";
 
 const counterStore = createSlice({
@@ -169,7 +108,7 @@ export { increment, decrement };
 export default counterStore.reducer;
 ```
 
-```javascript
+```javascript [store/index.js]
 import { configureStore } from "@reduxjs/toolkit";
 
 import counterReducer from "./modules/counterStore";
@@ -181,10 +120,11 @@ export default configureStore({
   },
 });
 ```
+:::
 
 ### 3. 为 React 注入 store
 
-> `react-redux` 负责把 Redux 和 React 连接 起来，内置 `Provider` 组件 通过 store 参数把创建好的 store 实例注入到应用中，链接正式建立
+> `react-redux`内置 `Provider` 组件，负责把 Redux 和 React 连接 起来。通过 store 参数把创建好的 store 实例注入到应用中，链接正式建立
 
 ```jsx
 import React from "react";
@@ -205,19 +145,20 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 ### 4. React 组件使用 store 中的数据
 
-> 在 React 组件中使用 store 中的数据，需要用到一个钩子函数 - `useSelector`，它的作用是把 store 中的数据映射到组件中，使用样例如下：
+> 在 React 组件中使用 store 中的数据，需要用到一个钩子函数 `useSelector`，它的作用是把 store 中的数据映射到组件中，使用样例如下：
 
 ![image.png](assets/7.png)
 
 ### 5. React 组件修改 store 中的数据
 
-> React 组件中修改 store 中的数据需要借助另外一个 hook 函数 - `useDispatch`，它的作用是生成提交 action 对象的 dispatch 函数，使用样例如下：
+> React 组件中修改 store 中的数据需要借助另外一个 hook 函数 <Pronounce word="useDispatch" />，它的作用是生成提交 action 对象的 dispatch 函数，使用样例如下：
 
 ![image.png](assets/8.png)
 
 ## 五、提交 action 传参
 
-> 需求：组件中有俩个按钮 `add to 10` 和 `add to 20` 可以直接把 count 值修改到对应的数字，目标 count 值是在组件中传递过去的，需要在提交 action 的时候传递参数
+> [!NOTE] 需求
+> 组件中有两个按钮 `add to 10` 和 `add to 20` 可以直接把 count 值修改到对应的数字，目标 count 值是在组件中传递过去的，需要在提交 action 的时候传递参数
 
 ![image.png](assets/9.png)
 实现方式：在 reducers 的同步修改方法中添加 `action` 对象参数，在调用 actionCreater 的时候传递参数，参数会被传递到 action 对象 `payload` 属性上
@@ -308,11 +249,12 @@ export default App;
 
 ## 八、美团小案例
 
+> [!NOTE] 开发思路
+> 使用 RTK（Redux Toolkit）来管理应用状态, 组件负责 数据渲染 和 dispatch action。
+
 ### 1. 案例演示
 
 ![image.png](assets/13.png)
-
-> 基本开发思路：使用 RTK（Redux Toolkit）来管理应用状态, 组件负责 数据渲染 和 dispatch action
 
 ### 2. 准备并熟悉环境
 
