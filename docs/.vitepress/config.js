@@ -11,7 +11,7 @@ export default defineConfig({
   ignoreDeadLinks: true,
   markdown: {
     image: {
-      // 默认禁用图片懒加载
+      // 设置图片懒加载
       lazyLoading: true
     }
   },
