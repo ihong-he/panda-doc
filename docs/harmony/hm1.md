@@ -6,7 +6,7 @@ outline: deep
 
 ## 前言：鸿蒙生态与课程价值
 
-![An image](/img/hm.png)
+<ImgPreview :imgs="['/img/hm.png']" />
 
 华为余承东在2025年全员信中提出：“鸿蒙三分天下有其一，是历史赋予我们这代终端人的责任与使命”，并明确2025年鸿蒙生态核心目标——半年到一年内实现10万个原生应用上架。
 
@@ -23,7 +23,7 @@ outline: deep
 
 ## 二、学习路线
 
- ![An image](/img/hm1.png)
+ <ImgPreview :imgs="['/img/hm1.png']" />
 
 ## 三、鸿蒙开发环境搭建
 
@@ -31,7 +31,7 @@ outline: deep
 
 了解编程所需开发环境，能够独立搭建鸿蒙开发环境
 
- ![An image](/img/hm2.png)
+ <ImgPreview :imgs="['/img/hm2.png']" />
 
 ### 步骤1：安装软件（DevEco Studio）
 
@@ -235,6 +235,8 @@ sum(1, 2); // 结果为3
 #### 核心目标
 
 掌握组件写法，使用组件布局界面
+
+<ImgPreview :imgs="['/img/hm3.png']" />
 
 #### 核心概念
 
