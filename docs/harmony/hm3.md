@@ -63,7 +63,7 @@ outline: deep
 
 3. 安装路径要求：同开发环境，不选 C 盘，无中文/特殊符号
 
-## 三 项目基础配置
+## 三、项目基础配置
 
 在鸿蒙（HarmonyOS）API 16（对应 Stage 模型）开发中，修改应用图标和名称的步骤如下：
 
@@ -119,25 +119,163 @@ outline: deep
 
 完成以上步骤后，重新编译运行即可看到新图标和名称。
 
-## 四、广告页实现
+## 四、Navigation 及广告页
 
-### 4.1 开屏广告
+### 4.1 系统路由表
 
-1.  使用 Navigation 组件实现页面导航
+在 ArkUI 中，系统路由表是一个**核心的配置机制**，它像一个“地址簿”，告诉 Navigation 组件在收到一个页面名称（例如'PageOne'）时，应该去哪个文件找对应的页面，以及如何构建它。下面这个表格清晰地展示了如何在基于 Navigation 的路由中使用它：
 
-2.  核心代码：
+| 任务             | 配置文件              | 关键配置/代码示例                                                                                            |
+| :--------------- | :-------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **声明路由表**   | `module.json5`        | `"routerMap": "$profile:route_map"`                                                                          |
+| **定义页面映射** | `route_map.json`      | `{"name": "PageOne", "pageSourceFile": "src/main/ets/pages/PageOne.ets", "buildFunction": "PageOneBuilder"}` |
+| **构建目标页**   | 你的 PageOne.ets 文件 | 使用`@Builder`修饰构建函数（例如`PageOneBuilder`）                                                           |
+| **执行页面跳转** | 你的导航页/其他组件   | `this.pathStack.pushPathByName('PageOne', null)`                                                             |
 
-    - ```TypeScript
-      Navigation() {
-        NavDestination('首页') { // 子页面
-          // 首页内容
-        }
+#### 🔧 详细配置与使用步骤
+
+下面我们来看看如何具体完成上述配置，并实现页面跳转。
+
+1.  **配置工程文件**
+
+    首先，你需要在项目的 `module.json5` 文件中声明你将使用一个外部路由配置文件。
+
+    ```json
+    // module.json5
+    {
+      "module": {
+        // ... 其他配置 ...
+        "routerMap": "$profile:route_map"
       }
-      ```
+    }
+    ```
 
-3.  控制跳转对象：NavPathStack
+2.  **创建路由表文件**
 
-### 4.2 定时跳转
+    接下来，在 `resources/base/profile/` 目录下创建一个名为 `route_map.json` 的文件。在这个文件里，你需要定义具体的页面映射关系。
+
+    ```json
+    // resources/base/profile/route_map.json
+    {
+      "routerMap": [
+        {
+          "name": "Start", // 你跳转时使用的页面名称
+          "pageSourceFile": "src/main/ets/pages/Start.ets", // 页面源文件路径
+          "buildFunction": "StartBuilder", // 用于构建该页面的函数名
+          "data": {
+            "description": "this is Start" // 可选的额外数据
+          }
+        }
+        // 你可以继续添加更多页面的映射...
+      ]
+    }
+    ```
+
+3.  **构建目标页面**
+
+    你的目标页面（例如 `Start.ets`）必须提供一个用 `@Builder` 装饰器修饰的函数，这个函数的名称需要与路由表中 `buildFunction` 字段指定的名称一致。
+
+    ```typescript
+    // src/main/ets/pages/Start.ets
+    // 跳转页面入口函数
+    @Builder
+    export function StartBuilder() {
+      Start();
+    }
+
+    @Component
+    struct Start {
+      pathStack: NavPathStack = new NavPathStack();
+
+      build() {
+        NavDestination() {
+          Button("跳转到布局页")
+            .onClick(() => {
+              this.pathStack.pushPathByName("Layout", null, false)
+            })
+        }
+        .title('广告页')
+        .onReady((context: NavDestinationContext) => {
+          this.pathStack = context.pathStack;
+        })
+      }
+    }
+    ```
+
+4.  **执行页面跳转**
+
+    最后，在你发起跳转的组件（通常是导航页）中，你需要一个 `NavPathStack` 对象，并调用其方法进行跳转。
+
+    ```typescript
+    // 例如在 index.ets 导航页中
+    @Entry
+    @Component
+    struct Index {
+      pageStack : NavPathStack = new NavPathStack();
+
+      build() {
+        Navigation(this.pageStack){
+        }.onAppear(() => {
+          this.pageStack.pushPathByName("Start", null, false);
+        })
+        .hideNavBar(true)
+      }
+    }
+    ```
+
+#### 💡 核心概念与优势
+
+- **工作原理**：系统路由表在应用编译时就被处理。当你调用 `pushPathByName('Start')` 时，Navigation 组件内部的 `NavPathStack` 会去查询路由表，找到名为'Start'的配置，然后根据配置找到对应的 `.ets` 文件和 `Builder` 函数，最终完成页面的实例化与显示。
+- **为何使用它**：使用系统路由表是实现 **跨包路由**（例如跳转到 HAR 或 HSP 包中的页面）的基础。同时，它将页面名称与具体实现解耦，让代码更清晰，也更易于维护。
+- **Navigation 的优势**：相较于传统的 `@ohos.router` 模块，**Navigation 组件被官方推荐用于实现更灵活的组件内导航**。它支持更丰富的动效、生命周期管理、路由拦截以及一次开发多端部署的自动适配能力（如在平板上自动切换为分栏模式）。
+
+### 4.2 开屏广告
+
+> 使用`NavDestination` 组件实现广告页面布局
+
+- `NavPathStack`: 用于管理导航路径
+- `replacePathByName`: 替换当前路径，不支持返回
+
+**核心代码**
+
+  ```TypeScript
+    // 跳转页面入口函数
+    @Builder
+    export function StartBuilder() {
+      Start();
+    }
+
+    @Component
+    struct Start {
+      pathStack: NavPathStack = new NavPathStack();
+
+      build() {
+        NavDestination() {
+
+          Stack({alignContent: Alignment.TopEnd}) {
+            // 背景图片
+            Image($r("app.media.ad"))
+              .width("100%")
+              .height("100%")
+              .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]) // 扩展安全区域，避开系统UI
+
+            // 跳过按钮
+            Button("跳过")
+              .backgroundColor(Color.Gray)
+              .margin(5)
+              .onClick(() => {
+                this.pathStack.replacePathByName("Layout", null, false)
+              })
+          }
+        }
+        .onReady((context: NavDestinationContext) => {
+          this.pathStack = context.pathStack;
+        })
+      }
+    }
+  ```
+
+### 4.3 定时跳转
 
 1. 生命周期函数：`aboutToAppear()`（组件即将显示时执行）
 2. 延迟函数：`setTimeout(函数, 时间)`（毫秒单位）
@@ -146,6 +284,7 @@ outline: deep
 aboutToAppear(): void {
   setTimeout(() => {
     // 页面跳转代码（如跳转到首页）
+    this.pathStack.replacePathByName("Layout", null, false)
   }, 3000); // 3秒后自动跳转
 }
 ```
