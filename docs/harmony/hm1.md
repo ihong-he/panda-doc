@@ -1,5 +1,5 @@
 ---
-outline: deep
+outline: [1,3]
 ---
 
 # HarmonyOS 5.0 开发与实战
@@ -374,6 +374,8 @@ Image(图像资源路径)
 
 **先整体，再局部；先布局，再内容，后美化**
 
+<ImgPreview :imgs="['/img/hm4.png']" />
+
 ### 核心组件与属性
 
 1. 可滚动列表组件：
@@ -397,3 +399,61 @@ Image(图像资源路径)
       ```
 
    2. 作用：避免内容被手机状态栏、导航栏遮挡
+
+
+### 代码实现
+
+```TypeScript
+@Entry  // 标记为应用入口组件
+@Component  // 标记为自定义组件
+struct Index {
+  build() {
+    Column() {  // 垂直布局容器
+      // 标题部分
+      Text('猜你喜欢')
+        .fontColor('#fff')
+        .width('100%')  // 宽度占满父容器
+        .margin({ bottom: 15 })  // 底部外边距15单位
+      
+      // 内容列表部分
+      List() {  // 列表组件
+        ListItem() {  // 列表项
+          Row() {  // 水平布局容器
+            // 左侧图片
+            Image($r('app.media.zxq'))  // 引用资源文件中的图片
+              .width(('30%'))  // 宽度设为父容器的30%
+            
+            // 中间内容区域
+            Column() {  // 垂直布局容器
+              Text('我的梦')
+                .fontColor('#fff')
+                .margin({bottom: 25})
+              
+              Row(){  // 水平布局容器（歌手信息行）
+                Text('VIP')
+                  .fontSize(14)
+                  .fontColor('red')
+                  .border({width: 1, color: Color.Red, radius: 5})  // 红色边框，圆角5
+                  .padding(2)
+                  .margin({right: 10})
+                
+                Text('张靓颖')
+                  .fontColor('gray')
+              }
+            }
+            .layoutWeight(1)  // 设置布局权重为1，占据剩余空间
+            
+            // 右侧更多操作图标
+            Image($r('app.media.ic_more'))  // 更多操作图标
+              .width(50)
+          }
+        }
+      }
+    }
+    .width('100%')  // 容器宽度占满
+    .height('100%')  // 容器高度占满
+    .backgroundColor('black')  // 背景色设为黑色
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])  // 扩展安全区域，避开系统UI
+  }
+}
+```
