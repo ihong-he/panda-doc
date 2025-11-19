@@ -18,7 +18,7 @@ outline: deep
 <ImgPreview :imgs="['/img/hm5.png']" />
 
 - **启动页（Splash）**：3 秒倒计时跳转，支持手动跳过，适配刘海屏安全区域。
-- **底部 Tab 导航**：包含“推荐”“发现”“动态”“我的”四大主页面，使用`Navigation`与`Tabs`组件实现。
+- **底部 Tab 导航**：包含 **推荐、发现、动态、我的** 四大主页面，使用`Navigation`与`Tabs`组件实现。
 - **推荐页内容**：
   - 顶部搜索栏
   - 轮播广告图（Swiper 组件）
@@ -48,8 +48,6 @@ outline: deep
   - 网络请求与异步处理
   - 安全区适配与设备兼容
 - **工程结构规范**：按功能分模块组织代码（pages, components, models, utils），培养良好开发习惯
-
----
 
 ## 二、模拟器配置
 
@@ -123,14 +121,14 @@ outline: deep
 
 ### 4.1 系统路由表
 
-在 ArkUI 中，系统路由表是一个**核心的配置机制**，它像一个“地址簿”，告诉 Navigation 组件在收到一个页面名称（例如'PageOne'）时，应该去哪个文件找对应的页面，以及如何构建它。下面这个表格清晰地展示了如何在基于 Navigation 的路由中使用它：
+在 ArkUI 中，系统路由表是一个**核心的配置机制**，它像一个“地址簿”，告诉 Navigation 组件在收到一个页面名称（例如'Start'）时，应该去哪个文件找对应的页面，以及如何构建它。下面这个表格清晰地展示了如何在基于 Navigation 的路由中使用它：
 
-| 任务             | 配置文件              | 关键配置/代码示例                                                                                            |
-| :--------------- | :-------------------- | :----------------------------------------------------------------------------------------------------------- |
-| **声明路由表**   | `module.json5`        | `"routerMap": "$profile:route_map"`                                                                          |
-| **定义页面映射** | `route_map.json`      | `{"name": "PageOne", "pageSourceFile": "src/main/ets/pages/PageOne.ets", "buildFunction": "PageOneBuilder"}` |
-| **构建目标页**   | 你的 PageOne.ets 文件 | 使用`@Builder`修饰构建函数（例如`PageOneBuilder`）                                                           |
-| **执行页面跳转** | 你的导航页/其他组件   | `this.pathStack.pushPathByName('PageOne', null)`                                                             |
+| 任务             | 配置文件            | 关键配置/代码示例                                                                                        |
+| :--------------- | :------------------ | :------------------------------------------------------------------------------------------------------- |
+| **声明路由表**   | `module.json5`      | `"routerMap": "$profile:route_map"`                                                                      |
+| **定义页面映射** | `route_map.json`    | `{"name": "Start", "pageSourceFile": "src/main/ets/pages/Start.ets", "buildFunction": "PageOneBuilder"}` |
+| **构建目标页**   | 你的 Start.ets 文件 | 使用`@Builder`修饰构建函数（例如`StartBuilder`）                                                         |
+| **执行页面跳转** | 你的导航页/其他组件 | `this.pathStack.pushPathByName('Start', null)`                                                           |
 
 #### 🔧 详细配置与使用步骤
 
@@ -177,20 +175,31 @@ outline: deep
 
     ```typescript
     // src/main/ets/pages/Start.ets
-    // 跳转页面入口函数
+    /**
+     * StartBuilder构建器函数
+     * 用于构建Start组件的入口点
+     */
     @Builder
     export function StartBuilder() {
       Start();
     }
 
+    /**
+     * Start组件
+     * 广告页组件，提供跳转到布局页的功能
+     */
     @Component
     struct Start {
+
+      // 导航路径栈，用于管理页面导航历史
       pathStack: NavPathStack = new NavPathStack();
 
       build() {
+        // 创建导航目标组件
         NavDestination() {
           Button("跳转到布局页")
             .onClick(() => {
+              // 参数说明：页面名称为"Layout"，无传递数据，不带动画效果
               this.pathStack.pushPathByName("Layout", null, false)
             })
         }
@@ -214,8 +223,10 @@ outline: deep
       pageStack : NavPathStack = new NavPathStack();
 
       build() {
+        // 创建Navigation导航容器，使用pageStack管理页面栈
         Navigation(this.pageStack){
         }.onAppear(() => {
+          // 页面首次显示时，将"Start"页面推入导航栈
           this.pageStack.pushPathByName("Start", null, false);
         })
         .hideNavBar(true)
@@ -231,49 +242,48 @@ outline: deep
 
 ### 4.2 开屏广告
 
-> 使用`NavDestination` 组件实现广告页面布局
-
-- `NavPathStack`: 用于管理导航路径
-- `replacePathByName`: 替换当前路径，不支持返回
+- 背景图片：全屏显示一张广告图（stack层叠）。
+- 跳过按钮：点击后跳转到`Layout`主页面。
+- 导航管理：通过 `pathStack` 控制页面跳转。
 
 **核心代码**
 
-  ```TypeScript
-    // 跳转页面入口函数
-    @Builder
-    export function StartBuilder() {
-      Start();
-    }
+```TypeScript
+  // 跳转页面入口函数
+  @Builder
+  export function StartBuilder() {
+    Start();
+  }
 
-    @Component
-    struct Start {
-      pathStack: NavPathStack = new NavPathStack();
+  @Component
+  struct Start {
+    pathStack: NavPathStack = new NavPathStack();
 
-      build() {
-        NavDestination() {
+    build() {
+      NavDestination() {
 
-          Stack({alignContent: Alignment.TopEnd}) {
-            // 背景图片
-            Image($r("app.media.ad"))
-              .width("100%")
-              .height("100%")
-              .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]) // 扩展安全区域，避开系统UI
+        Stack({alignContent: Alignment.TopEnd}) {
+          // 背景图片
+          Image($r("app.media.ad"))
+            .width("100%")
+            .height("100%")
+            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM]) // 扩展安全区域，避开系统UI
 
-            // 跳过按钮
-            Button("跳过")
-              .backgroundColor(Color.Gray)
-              .margin(5)
-              .onClick(() => {
-                this.pathStack.replacePathByName("Layout", null, false)
-              })
-          }
+          // 跳过按钮
+          Button("跳过")
+            .backgroundColor(Color.Gray)
+            .margin(5)
+            .onClick(() => {
+              this.pathStack.replacePathByName("Layout", null, false)
+            })
         }
-        .onReady((context: NavDestinationContext) => {
-          this.pathStack = context.pathStack;
-        })
       }
+      .onReady((context: NavDestinationContext) => {
+        this.pathStack = context.pathStack;
+      })
     }
-  ```
+  }
+```
 
 ### 4.3 定时跳转
 
@@ -291,27 +301,84 @@ aboutToAppear(): void {
 
 ## 五、布局页：Tabs 选项卡
 
-### 5.1 核心语法
+### 5.1 Tabs 选项卡
 
-```TypeScript
-Tabs({barPosition: BarPosition.End}) { // 选项卡位置在底部
-  TabContent() {
-    // 推荐组件内容
-  }.tabBar('推荐') // 选项卡菜单文字
+Tabs组件的页面组成包含两个部分，分别是`TabContent`和`TabBar`。
 
+TabContent是内容页，TabBar是导航页签栏，页面结构如下图所示，根据不同的导航类型，布局会有区别，可以分为底部导航、顶部导航、侧边导航，其导航栏分别位于底部、顶部和侧边。
+
+<ImgPreview :imgs="['/img/hm8.png']" />
+
+每一个`TabContent`对应的内容需要有一个页签，可以通过TabContent的`tabBar`属性进行配置。
+
+```typescript
+Tabs() {
   TabContent() {
-    // 发现组件内容
-  }.tabBar('发现')
+    Text('首页的内容').fontSize(30)
+  }
+  .tabBar('首页')
+  ...
 }
 ```
 
-### 5.2 交互功能实现
+导航栏位置使用Tabs的`barPosition`参数进行设置。默认情况下，导航栏位于顶部，此时，barPosition为`BarPosition.Start`。
+
+```typescript
+Tabs({ barPosition: BarPosition.End }) {
+  // TabContent的内容：首页、发现、推荐、我的
+  // ...
+}
+```
+### 5.2 布局页代码
+
+```TypeScript
+// 跳转页面入口函数
+@Builder
+export function LayoutBuilder() {
+  Layout();
+}
+
+interface TabClass {
+  text: string
+  icon: ResourceStr
+}
+
+@Component
+struct Layout {
+  pathStack: NavPathStack = new NavPathStack();
+  tabData: TabClass[] = [
+    { text: '推荐', icon: $r('app.media.ic_recommend') },
+    { text: '发现', icon: $r('app.media.ic_find') },
+    { text: '动态', icon: $r('app.media.ic_moment') },
+    { text: '我的', icon: $r('app.media.ic_mine') }
+  ]
+
+  build() {
+    NavDestination() {
+      Tabs({ barPosition: BarPosition.End }) {
+        ForEach(this.tabData, (item: TabClass, index: number) => {
+          TabContent() {
+            Text('内容区域' + index).fontSize(30)
+          }
+          .tabBar(item.text)
+        })
+      }
+    }
+    .title('布局页')
+    .onReady((context: NavDestinationContext) => {
+      this.pathStack = context.pathStack;
+    })
+  }
+}
+```
+
+### 5.3 交互功能实现
 
 1. 菜单默认高亮：定义状态变量`@Local currentIndex: number = 0`，根据索引设置颜色
 
 2. 切换功能：
 
-   1. ```TypeScript
+      ```TypeScript
       Tabs().onChange((index: number) => {
         this.currentIndex = index; // 记录当前选中索引
       })
