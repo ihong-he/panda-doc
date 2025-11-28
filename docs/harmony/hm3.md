@@ -242,7 +242,7 @@ outline: deep
 
 ### 4.2 开屏广告
 
-- 背景图片：全屏显示一张广告图（stack层叠）。
+- 背景图片：全屏显示一张广告图（stack 层叠）。
 - 跳过按钮：点击后跳转到`Layout`主页面。
 - 导航管理：通过 `pathStack` 控制页面跳转。
 
@@ -303,13 +303,13 @@ aboutToAppear(): void {
 
 ### 5.1 Tabs 选项卡
 
-Tabs组件的页面组成包含两个部分，分别是`TabContent`和`TabBar`。
+Tabs 组件的页面组成包含两个部分，分别是`TabContent`和`TabBar`。
 
-TabContent是内容页，TabBar是导航页签栏，页面结构如下图所示，根据不同的导航类型，布局会有区别，可以分为底部导航、顶部导航、侧边导航，其导航栏分别位于底部、顶部和侧边。
+TabContent 是内容页，TabBar 是导航页签栏，页面结构如下图所示，根据不同的导航类型，布局会有区别，可以分为底部导航、顶部导航、侧边导航，其导航栏分别位于底部、顶部和侧边。
 
 <ImgPreview :imgs="['/img/hm8.png']" />
 
-每一个`TabContent`对应的内容需要有一个页签，可以通过TabContent的`tabBar`属性进行配置。
+每一个`TabContent`对应的内容需要有一个页签，可以通过 TabContent 的`tabBar`属性进行配置。
 
 ```typescript
 Tabs() {
@@ -321,7 +321,7 @@ Tabs() {
 }
 ```
 
-导航栏位置使用Tabs的`barPosition`参数进行设置。默认情况下，导航栏位于顶部，此时，barPosition为`BarPosition.Start`。
+导航栏位置使用 Tabs 的`barPosition`参数进行设置。默认情况下，导航栏位于顶部，此时，barPosition 为`BarPosition.Start`。
 
 ```typescript
 Tabs({ barPosition: BarPosition.End }) {
@@ -329,6 +329,7 @@ Tabs({ barPosition: BarPosition.End }) {
   // ...
 }
 ```
+
 ### 5.2 布局页代码
 
 ```TypeScript
@@ -378,137 +379,189 @@ struct Layout {
 
 2. 切换功能：
 
-      ```TypeScript
-      Tabs().onChange((index: number) => {
-        this.currentIndex = index; // 记录当前选中索引
-      })
-      ```
+   ```TypeScript
+   Tabs().onChange((index: number) => {
+     this.currentIndex = index; // 记录当前选中索引
+   })
+   ```
 
 3. 内容切换：根据 currentIndex 条件渲染不同组件
 
 ## 六、推荐内容实现
 
-1. 搜索区域：使用 Row 容器+TextInput 输入框
+### 6.1 搜索区域
 
-   1. ```TypeScript
-      Row() {
-        TextInput({ placeholder: '搜索歌曲/歌手' }).placeholderColor('#999');
-      }.backgroundColor('#f5f5f5').padding(10);
-      ```
+[TextInput](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-basic-components-textinput) 是鸿蒙应用开发中最基础的交互组件之一，主要用于接收用户输入的文本信息。
 
-2. 轮播图区域：
+**关键属性（常用）**
 
-   1. ```TypeScript
-      Swiper() {
-        Image('网络图片链接1').width('100%');
-        Image('网络图片链接2').width('100%');
-      }.autoPlay(true) // 自动播放
-      ```
+以下是一些用于控制单行文本框行为和外观的最关键属性：
 
-   2. 注意：网络图片需要在配置中开通 INTERNET 权限
+| 属性名         | 类型                                             | 说明                                                                                 |
+| :------------- | :----------------------------------------------- | :----------------------------------------------------------------------------------- |
+| `placeholder`  | `string`                                         | **占位符文本**。在用户没有输入任何内容时显示的灰色提示文字，如“请输入用户名”。       |
+| `text`         | `string`                                         | **输入框的当前文本内容**。可用于设置初始值或获取用户输入的值。                       |
+| `type`         | `InputType`                                      | **输入框类型**。这是一个枚举，非常重要，它决定了键盘类型和输入规则。                 |
+|                | - `Normal`: 默认类型，普通文本。                 |
+|                | - `Password`: 密码类型，输入内容显示为圆点。     |
+|                | - `Email`: 邮箱地址，键盘会优化显示`@`和`.com`。 |
+|                | - `Number`: 纯数字，调出数字键盘。               |
+| `enterKeyType` | `EnterKeyType`                                   | **回车键的显示类型**。提示用户按下回车键会执行什么操作，如“搜索”、“发送”、“完成”等。 |
+| `maxLength`    | `number`                                         | **最大输入长度**。限制用户最多能输入的字符数。                                       |
 
-3. 每日推荐/推荐歌单：
+---
 
-   1. 标题：使用@Builder 封装复用
-   2. 内容：使用 List 组件渲染，配合循环渲染展示多首歌曲
+**关键事件（常用）**
 
-## 七、页面跳转进阶（非 Navigation 子页）
+通过监听这些事件，可以响应用户的交互：
 
-1. 全局共享跳转对象：使用 AppStorageV2 实现应用级状态共享
+| 事件名     | 描述                                                                     |
+| :--------- | :----------------------------------------------------------------------- |
+| `onChange` | **输入内容变化时触发**。这是最常用的事件，可以实时获取用户最新输入的值。 |
+| `onSubmit` | **按下回车键时触发**。在单行模式下，这是用户完成输入并准备提交的信号。   |
 
-2. 核心代码：
+---
 
-   1. ```TypeScript
-      pathStack: NavPathStack = AppStorageV2.connect(NavPathStack, 'navStack', () => new NavPathStack())!
-      ```
-
-3. 跳转调用：`this.pathStack.pushPathByName('播放页')`
-
-## 八、播放功能实现
-
-### 8.1 AVPlayer 播放流程
-
-1. 创建播放器：`createAVPlayer()`
-2. 设置播放资源：指定歌曲 URL
-3. 监听状态：`player.on('stateChange', () => {})`（监听播放状态变化）
-4. 播控功能：`player.play()`（播放）、`player.pause()`（暂停）、`player.seek(时间)`（跳转播放）
-
-### 8.2 播放器工具类封装
-
-1. 定义工具类：
-
-   1. ```TypeScript
-      class AvPlayerManager {
-        // 播放器属性和方法（如创建、播放、暂停）
-      }
-      ```
-
-2. 实例化调用：`const playerManager: AvPlayerManager = new AvPlayerManager()`
-
-### 8.3 播放数据共享
-
-1. 定义共享数据类型：
-
-   1. ```TypeScript
-      @ObservedV2 // 监听类属性变化
-      export class GlobalMusic {
-        @Trace img: string = ""; // 歌曲封面
-        @Trace name: string = ""; // 歌曲名称
-        @Trace time: number = 0; // 当前播放时间
-        @Trace duration: number = 0; // 歌曲总时长
-      }
-      ```
-
-2. 共享数据操作：
-
-   1. 创建共享数据：`AppStorageV2.connect(GlobalMusic, 'SONG_KEY', () => new GlobalMusic())`
-   2. 页面使用：`@Local playState: GlobalMusic = AppStorageV2.connect(GlobalMusic, 'SONG_KEY', () => new GlobalMusic())`
-
-### 8.4 播放进度控制
-
-使用 Slider 组件实现进度条：
+**完整代码**
 
 ```TypeScript
-Slider({
-  value: this.playState.time, // 当前播放时间
-  min: 0,
-  max: this.playState.duration // 歌曲总时长
-}).onChange((value) => {
-  playerManager.seek(value); // 跳转到指定进度
-})
+Row() {
+  Image($r('app.media.ic_search'))
+    .width(22)
+    .fillColor('#817D83')
+  TextInput({ placeholder: '请输入歌曲名' })
+    .placeholderColor('#817D83')
+    .layoutWeight(1)
+    .padding({ left: 5 })
+    .fontColor('#999')
+  Image($r('app.media.ic_code'))
+    .width(22)
+    .fillColor('#817D83')
+}
+.width('100%')
+.backgroundColor('#2D2B29')
+.border({ radius: 20 })
+.padding({ left: 8, right: 8 })
 ```
 
-## 九、播控核心功能
+### 6.2 轮播图区域
 
-1. 播放/暂停：根据播放状态切换，修改共享数据中的状态标识
-2. 上一首/下一首：
-   1. 下一首：`playingIndex++`，超出数组长度则重置为 0
-   2. 上一首：`playingIndex--`，小于 0 则设为数组最后一个索引
-3. 播放模式切换：
-   1. 列表播放：按顺序循环
-   2. 随机播放：随机生成索引
-   3. 单曲循环：索引不变
-4. 播放列表管理：
-   1. 滑动移除歌曲：使用`splice(索引, 1)`删除数组元素
-   2. 切歌逻辑：如果移除的是正在播放的歌曲，自动播放下一首
+[Swiper](https://developer.huawei.com/consumer/cn/doc/harmonyos-references/ts-container-swiper) 组件是一个功能强大的滑块视图容器，主要用于实现子组件的轮播显示效果。
 
-## 十、播控中心（后台播放）
+在实际编码中，你通常需要结合 `ForEach` 循环来遍历数据，动态生成 Swiper 的子项
 
-实现后台播放/熄屏播放需配置：
+| 类别           | 项目                | 说明                                     |
+| :------------- | :------------------ | :--------------------------------------- |
+| **核心属性**   | `index`             | 设置当前显示的子组件索引，支持双向绑定。 |
+|                | `autoPlay`          | 控制是否自动轮播。                       |
+|                | `interval`          | 自动轮播的时间间隔，单位为毫秒。         |
+|                | `loop`              | 控制是否循环播放。                       |
+|                | `duration`          | 设置页面切换时的动画时长。               |
+| **控制器方法** | `showNext()`        | 滑动到下一页。                           |
+|                | `showPrevious()`    | 滑动到上一页。                           |
+|                | `finishAnimation()` | 停止播放动画。                           |
 
-1. 接入 AVSession（媒体会话）：注册控制命令、设置播放状态和元数据
-2. 申请长时任务：避免播放被系统强制中断
-3. 生命周期管理：创建会话、注销会话（回收内存资源）
+**完整代码**
 
-## 十一、Cursor 工具使用（AI 辅助开发）
+```TypeScript
+ Swiper() {
+     ForEach(this.swiperList, (item: string) => {
+       Image(item)
+         .width('100%')
+         .border({radius: 5})
+     })
+   }
+   .autoPlay(true)
+```
 
-### 11.1 核心功能
+> [!IMPORTANT] 注意
+> 网络图片需要在`module.json5`配置文件的`requestPermissions`标签中声明 [INTERNET](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/declare-permissions) 权限
 
-基于项目进行 AI 对话，生成代码，提升开发效率
+### 6.3 每日推荐
 
-### 11.2 使用步骤
+`List/ForEach`实现横向列表布局，`maxLines`和`textOverflow`处理文本溢出显示，`clip`控制子组件显示范围，以及`@Builder`装饰器构建可复用UI组件
 
-1. 下载安装 Cursor 工具
-2. 注册登录账号
-3. 配置：安装汉化插件，设置相关规则
-4. 使用：在项目中提问，让 AI 生成所需代码（如“生成一个歌曲列表项组件”）
+**每日推荐代码**
+
+::: code-group
+
+```ts [Recomment.ets]
+  // 推荐区域
+  this.titleBuilder('每日推荐')
+  List() {
+    ForEach(this.dailyRecommend, (item: recommendDailyType) => {
+      ListItem() {
+        Column() {
+          Text(item.type)
+          Image(item.img)
+            .width('100%')
+          Text(item.title)
+            // maxLines是截断，用于限制文本的显示长度
+            .maxLines(2)
+            // textOverflow是超出显示省略号，用于限制文本的显示长度
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+      }
+      .width('40%')
+      .backgroundColor(Color.Pink)
+      .border({ radius: 10 })
+      .margin({ right: 10 })
+      // clip是裁剪，用于限制子组件的显示范围
+      .clip(true)
+    })
+  }
+  .listDirection(Axis.Horizontal)
+  .height(230)
+
+```
+
+```ts [titleBuilder]
+@Builder
+  titleBuilder(title: string) {
+    Row() {
+      Text(title)
+        .fontColor('#000')
+        .fontWeight(700)
+        .layoutWeight(1)
+      Image($r('app.media.ic_more'))
+        .width(22)
+        .fillColor('#000')
+    }
+    .width('100%')
+    .height(40)
+  }
+```
+:::
+
+**推荐歌单代码**
+
+::: code-group
+```ts [Recomment.ets]
+  // 推荐歌单
+  this.titleBuilder('推荐歌单')
+  List() {
+    ForEach(this.recommendList, (item: recommendListType) => {
+      ListItem() {
+        Column() {
+          // Stack组件是堆叠布局，可以设置子组件的堆叠顺序，并支持子组件的堆叠位置。
+          Stack({alignContent: Alignment.TopStart}) {
+            Image(item.img)
+            Text(item.count)
+          }
+          Text(item.title)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        .width('30%')
+        .backgroundColor(Color.Green)
+        .margin({ right: 10 })
+      }
+    })
+
+  }
+  // listDirection是列表方向，设置为水平
+  .listDirection(Axis.Horizontal)
+
+```
+:::
+

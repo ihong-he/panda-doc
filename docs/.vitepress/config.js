@@ -198,7 +198,8 @@ export default defineConfig({
           items: [
             { text: 'Harmony基础', link: '/harmony/hm1' },
             { text: 'Harmony进阶', link: '/harmony/hm2' },
-            { text: '云音乐项目', link: '/harmony/hm3' },
+            { text: '云音乐项目一', link: '/harmony/hm3' },
+            { text: '云音乐项目二', link: '/harmony/hm4' },
           ]
         }
       ],
