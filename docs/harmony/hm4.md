@@ -1114,19 +1114,173 @@ class AvPlayerManager {
 
 ## 九、播控核心功能
 
-1. 播放/暂停：根据播放状态切换，修改共享数据中的状态标识
-2. 上一首/下一首：
-   1. 下一首：`playingIndex++`，超出数组长度则重置为 0
-   2. 上一首：`playingIndex--`，小于 0 则设为数组最后一个索引
-3. 播放模式切换：
-   1. 列表播放：按顺序循环
-   2. 随机播放：随机生成索引
-   3. 单曲循环：索引不变
-4. 播放列表管理：
-   1. 滑动移除歌曲：使用`splice(索引, 1)`删除数组元素
-   2. 切歌逻辑：如果移除的是正在播放的歌曲，自动播放下一首
+### 9.1 播放/暂停功能
 
-## 十、播控中心（后台播放）
+> [!IMPORTANT] 核心概念
+> 实现智能的播放状态管理，通过响应式数据同步更新 UI 界面，提供流畅的用户交互体验
+
+播放/暂停功能是音乐播放器的核心交互之一，需要实现以下关键功能：
+- 根据当前播放状态动态切换按钮图标
+- 通过共享的全局状态管理播放/暂停状态
+- 在不同页面间保持播放状态的一致性
+
+#### 9.1.1 定义全局播放状态
+
+首先在全局音乐状态类中添加播放状态标识，使用 `@ObservedV2` 和 `@Trace` 装饰器确保状态变化能够自动触发 UI 更新：
+
+::: code-group
+```ts [globalMusic.ets]
+@ObservedV2
+export class GlobalMusic {
+  /**
+   * 播放状态标识
+   * - true: 正在播放
+   * - false: 已暂停
+   * 使用 @Trace 装饰器标记为可追踪属性，实现响应式数据绑定
+   */
+  @Trace isPlay: boolean = false
+}
+```
+:::
+
+#### 9.1.2 播放器管理类中的状态控制
+
+在 `AvPlayerManager` 类中实现完整的播放/暂停状态管理逻辑：
+
+::: code-group
+```ts [AvPlayerManager.ets]
+class AvPlayerManager {
+  // AVPlayer 播放器实例
+  player: media.AVPlayer | null = null
+  
+  // 全局共享的播放状态数据
+  currentSong: GlobalMusic = AppStorageV2.connect(GlobalMusic, 'SONG_KEY', () => new GlobalMusic())!
+  
+  /**
+   * 初始化播放器并设置状态监听
+   */
+  async init() {
+    this.player.on('stateChange', (state) => {
+      if (state === 'initialized') {
+        // 播放器初始化完成，准备播放资源
+        this.player?.prepare()
+      } else if (state === 'prepared') {
+        // 播放资源准备完成，开始播放并更新状态
+        this.player?.play()
+        this.currentSong.isPlay = true  // 设置播放状态为 true
+      }
+    })
+  }
+  
+  /**
+   * 播放指定歌曲
+   * 处理多种播放场景的状态管理
+   */
+  singPlay(song: SongItemType) {
+    // 检查歌曲是否在播放列表中（简化逻辑）
+    const inList = true
+    
+    if(inList) {
+      // 如果正在播放当前歌曲，继续播放并更新状态
+      if(this.currentSong.url === song.url) {
+        this.player?.play()
+        this.currentSong.isPlay = true  // 更新播放状态
+      }
+    }
+  }
+  
+  /**
+   * 暂停播放
+   * 停止播放并更新共享状态
+   */
+  paused() {
+    this.player?.pause()
+    this.currentSong.isPlay = false  // 设置播放状态为 false
+  }
+}
+```
+:::
+
+#### 9.1.3 播放页面中的交互实现
+
+在播放页面中，根据当前播放状态动态显示播放/暂停按钮，并实现点击切换功能：
+
+::: code-group
+```ts [Play.ets]
+/**
+ * 播放/暂停按钮实现
+ * 根据当前播放状态动态切换图标和功能
+ */
+Image(this.playState.isPlay ? $r('app.media.ic_paused') : $r('app.media.ic_play'))
+  .fillColor(Color.White)
+  .width(50)
+  .onClick(() => {
+    // 根据当前状态执行相应操作
+    if (this.playState.isPlay) {
+      // 正在播放 → 暂停
+      playerManager.paused()
+    } else {
+      // 已暂停 → 播放当前歌曲
+      playerManager.singPlay(this.playState.playList[this.playState.playIndex])
+    }
+  })
+```
+:::
+
+#### 9.1.4 发现页面的播放状态展示
+
+在发现页面中，通过条件渲染显示当前正在播放歌曲的视觉标识：
+
+::: code-group
+```ts [Find.ets]
+/**
+ * 播放状态指示器
+ * 当歌曲正在播放时显示波形动画图标
+ */
+if(this.playState.url === item.url && this.playState.isPlay) {
+  Image($r('app.media.wave'))
+    .width(24)
+    .fillColor('#FF6B9D')  // 播放状态专属颜色
+}
+```
+:::
+
+### 9.2 上一首/下一首功能
+
+> [!TIP] 智能切歌逻辑
+> 实现循环播放逻辑，确保播放列表的连续性和用户体验的完整性
+
+切歌功能需要处理播放列表的边界情况，提供智能的循环播放体验：
+
+1. **下一首功能**：`playingIndex++`，当索引超出数组长度时自动重置为 0（从头开始）
+
+```ts
+// 下一首
+nextPlay() {
+  this.currentSong.playIndex++
+  if(this.currentSong.playIndex >= this.currentSong.playList.length) {
+    this.currentSong.playIndex = 0
+  }
+  this.singPlay(this.currentSong.playList[this.currentSong.playIndex])
+  console.log('下一首:', JSON.stringify(this.currentSong.playList))
+}
+```
+
+2. **上一首功能**：`playingIndex--`，当索引小于 0 时自动设为数组最后一个索引（循环播放）
+
+```ts
+// 上一首
+prevPlay() {
+  this.currentSong.playIndex--
+  if(this.currentSong.playIndex < 0) {
+    this.currentSong.playIndex = this.currentSong.playList.length - 1
+  }
+  this.singPlay(this.currentSong.playList[this.currentSong.playIndex])
+}
+```
+
+
+## 十、后台播放
 
 > [!IMPORTANT] 核心概念
 > 音视频应用在实现音视频功能的同时，需要接入媒体会话即 `AVSession Kit` 来实现完整的后台播放体验。后台播放是音乐类应用的核心功能，确保用户在切换应用或锁屏时音乐不会中断。
@@ -1293,18 +1447,214 @@ class AvPlayerManager {
 3. **权限声明**：在配置文件中明确声明后台运行权限和音频播放背景模式
 4. **生命周期管理**：在合适的时机（应用启动、播放开始）初始化和申请后台功能
 
-**用户体验优化：**
-- 后台播放时，用户可以在锁屏界面、通知栏控制音乐播放
-- 应用切换到后台后，音乐不会中断，持续播放
-- 系统会智能管理后台资源，确保应用性能和系统稳定性
 
-## 十一、Cursor 工具使用（AI 辅助开发）
+## 十一、播控中心同步
 
-### 11.1 核心功能
+> [!IMPORTANT] 核心概念
+> 实现与系统播控中心的数据同步，确保后台播放时用户可以通过通知栏、锁屏界面等系统控件无缝控制音乐播放
+
+播控中心同步是音乐播放器的重要功能，它允许应用与系统媒体控制中心建立双向通信。当应用在后台播放音乐时，用户可以通过系统提供的播控界面（如通知栏、锁屏界面、蓝牙设备等）来控制播放状态，实现真正的后台播放体验。
+
+### 11.1 播控中心同步架构
+
+播控中心同步的核心在于建立应用与系统之间的双向通信机制：
+
+1. **应用 → 系统**：应用将当前播放状态（播放/暂停、歌曲信息、进度等）同步到系统播控中心
+2. **系统 → 应用**：系统将用户操作（播放、暂停、切歌等）传递回应用执行
+3. **生命周期管理**：合理的资源申请和释放，确保应用稳定运行
+
+### 11.2 媒体会话管理器增强实现
+
+在原有的 `AvSessionManager` 类基础上，增加播控中心同步的核心功能：
+
+::: code-group
+```ts [AvSessionManager.ets]
+import { avSession } from '@kit.AVSessionKit'
+import { SongItemType } from "../models/music"
+
+class AvSessionManager {
+  session: avSession.AVSession | null = null
+
+  /**
+   * 初始化媒体会话并注册事件监听
+   * 该方法在应用启动时调用，建立与系统播控中心的连接
+   */
+  async init() {
+    // 注册所有播放控制事件监听器
+    this.registerEvent()
+  }
+
+  /**
+   * 设置播控中心显示的歌曲元数据
+   * 该方法在歌曲切换时调用，更新播控中心显示的歌曲信息
+   * @param song 当前播放的歌曲对象
+   */
+  setAvMetaData(song: SongItemType) {
+    this.session?.setAVMetadata({
+      assetId: song.id,           // 歌曲唯一标识符
+      title: song.name,           // 歌曲名称（显示在播控中心）
+      mediaImage: song.img,       // 歌曲封面图片URL
+      artist: song.author,        // 歌手/作者信息
+      duration: this.playState.duration  // 歌曲总时长
+    })
+  }
+
+  /**
+   * 设置播控中心播放状态
+   * 该方法在播放状态变化时调用，同步当前播放进度和状态
+   */
+  setAVPlayBackState() {
+    this.session?.setAVPlaybackState({
+      // 播放状态：播放中或已暂停
+      state: this.playState.isPlay ? 
+        avSession.PlaybackState.PLAYBACK_STATE_PLAY : 
+        avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+      speed: 1,  // 播放速度（1.0表示正常速度）
+      position: {
+        elapsedTime: this.playState.time,      // 当前播放进度（毫秒）
+        updateTime: new Date().getTime()       // 状态更新时间戳
+      },
+      duration: this.playState.duration        // 歌曲总时长
+    })
+  }
+
+  /**
+   * 注册播控中心事件监听器
+   * 监听用户通过系统播控界面发送的控制指令
+   */
+  registerEvent() {
+    // 监听播放指令（用户点击播控中心的播放按钮）
+    this.session?.on('play', () => {
+      playerManager.singPlay(this.playState.playList[this.playState.playIndex])
+    })
+
+    // 监听暂停指令（用户点击播控中心的暂停按钮）
+    this.session?.on('pause', () => {
+      playerManager.paused()
+    })
+
+    // 监听上一首指令（用户点击播控中心的上一首按钮）
+    this.session?.on('playPrevious', () => {
+      playerManager.prevPlay()
+    })
+
+    // 监听下一首指令（用户点击播控中心的下一首按钮）
+    this.session?.on('playNext', () => {
+      playerManager.nextPlay()
+    })
+
+    // 监听进度跳转指令（用户在播控中心拖动进度条）
+    this.session?.on('seek', (value: number) => {
+      playerManager.seekPlay(value)
+    })
+
+    // 激活媒体会话，开始接收系统控制指令
+    this.session?.activate()
+  }
+}
+```
+:::
+
+### 11.3 播放器管理器中的同步集成
+
+在 `AvPlayerManager` 中集成播控中心同步功能，确保播放状态变化时及时同步到系统：
+
+::: code-group
+```ts [AvPlayerManager.ets]
+class AvPlayerManager {
+  /**
+   * 播放指定歌曲
+   * 该方法不仅启动音频播放，还会同步信息到播控中心
+   * @param song 要播放的歌曲对象
+   */
+  singPlay(song: SongItemType) {
+    // 设置播控中心显示的歌曲元数据（封面、名称、歌手等）
+    sessionManager.setAvMetaData(song)
+    
+    // 设置播控中心的播放状态（播放中、进度等）
+    sessionManager.setAVPlayBackState()
+    
+    // 执行具体的播放逻辑...
+  }
+
+  /**
+   * 切换歌曲
+   * 在歌曲切换时同步更新播控中心显示的信息
+   */
+  async changeSong() {
+    // 获取当前播放的歌曲信息
+    const currentSong = this.currentSong.playList[this.currentSong.playIndex]
+    
+    // 更新播控中心显示的歌曲元数据
+    sessionManager.setAvMetaData(currentSong)
+    
+    // 执行切歌逻辑...
+  }
+
+  /**
+   * 暂停播放
+   * 暂停播放时同步状态到播控中心
+   */
+  paused() {
+    // 设置播控中心状态为暂停
+    sessionManager.setAVPlayBackState()
+    
+    // 执行暂停逻辑...
+  }
+}
+```
+:::
+
+### 11.4 资源管理与生命周期
+
+合理的资源管理是确保应用稳定运行的关键，需要在合适的时机申请和释放资源：
+
+::: code-group
+```ts [AvPlayerManager.ets]
+/**
+ * 释放播放器资源
+ * 在应用退出或不再需要播放功能时调用，避免资源泄漏
+ */
+async release() {
+  await this.player?.release()
+}
+```
+
+```ts [AvSessionManager.ets]
+/**
+ * 注销媒体会话
+ * 在应用退出时调用，断开与系统播控中心的连接
+ */
+async destroy() {
+  await this.session?.destroy()
+}
+```
+
+```ts [EntryAbility.ets]
+/**
+ * 窗口阶段销毁时的回调
+ * 应用退出时释放所有相关资源
+ */
+onWindowStageDestroy(): void {
+  // 注销媒体会话，断开与系统播控中心的连接
+  sessionManager.destroy()
+  
+  // 释放播放器资源，避免内存泄漏
+  playerManager.release()
+}
+```
+:::
+
+
+
+
+## 十二、Cursor 工具使用（AI 辅助开发）
+
+### 12.1 核心功能
 
 基于项目进行 AI 对话，生成代码，提升开发效率
 
-### 11.2 使用步骤
+### 12.2 使用步骤
 
 1. 下载安装 Cursor 工具
 2. 注册登录账号

@@ -13,7 +13,8 @@ export default defineConfig({
     image: {
       // 设置图片懒加载
       lazyLoading: true
-    }
+    },
+    lineNumbers: true // 启用行号
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
