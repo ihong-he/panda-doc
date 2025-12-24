@@ -2,384 +2,664 @@
 outline: deep
 ---
 
-# 开始
+# Web前端面试必备
 
-::: tip 提示
-本文档用来记录一些web前端开发工程师高频面试题
+::: tip 面试小贴士
+本文档专为准备Web前端开发工程师面试的同学打造，覆盖企业最常问的核心面试题，帮你快速掌握关键知识点！
 :::
 
 ## 目录表
 [[toc]]
 
-## 一、HTML
+## 一、HTML基础
 
-### 1、DOCTYPE的作用
+### 1、DOCTYPE是什么？为什么必须要有？
 
-`DOCTYPE` 是一个声明，它必须位于每个HTML文档的顶部，在 `<html>` 标签之前。其主要作用是**告诉浏览器当前文档使用的HTML版本，使浏览器能够正确地渲染页面**。
+简单来说，DOCTYPE就像是告诉浏览器"嘿，我用的是哪个版本的HTML来写这个网页"的声明。它必须放在HTML文档的最顶部，在`<html>`标签之前。
 
-例如，HTML5 的 `DOCTYPE` 声明非常简单：
-```html
-<!DOCTYPE html>
+**核心作用**：
+- 告诉浏览器用哪种标准来解析和渲染页面
+- 避免浏览器进入"怪异模式"，保证页面在不同浏览器中显示一致
+- HTML5的DOCTYPE非常简单：`<!DOCTYPE html>`
+
+面试时可以说：没有DOCTYPE，浏览器可能用老版本的标准解析页面，导致样式错乱、布局问题，这是前端开发的基础常识。
+
+### 2、什么是HTML语义化？为什么重要？
+
+语义化就是"用对标签做对事"——根据内容的含义选择合适的HTML标签，而不是只考虑外观效果。
+
+**举个例子**：
+- 用`<header>`、`<footer>`、`<nav>`等标签来表示页面的不同部分
+- 用`<strong>`表示重要内容，用`<em>`表示强调，而不是直接用`<b>`、`<i>`
+
+**为什么企业这么重视语义化**：
+1. **SEO友好**：搜索引擎更容易理解页面结构，提升排名
+2. **可访问性好**：屏幕阅读器能更好地为视障用户朗读内容
+3. **代码维护性高**：团队协作时别人一看就懂每个区域的用途
+4. **样式与结构分离**：便于后期重构和样式调整
+
+面试回答技巧：强调语义化是现代Web开发的基础，体现了开发者的专业素养。
+
+### 3、浏览器渲染页面的过程是什么？
+
+这是一个高频面试题，考察对浏览器工作原理的理解。
+
+**简单来说的渲染流程**：
+1. **解析HTML** → 构建DOM树
+2. **解析CSS** → 构建CSSOM树  
+3. **合并DOM和CSSOM** → 生成渲染树
+4. **布局（Layout）** → 计算每个元素的位置和大小
+5. **绘制（Paint）** → 把内容画到屏幕上
+6. **合成（Composite）** → 处理层级关系
+
+**关键优化点**：
+- CSS阻塞渲染，JS会阻塞HTML解析
+- 重排和重绘会影响性能
+- 理解这个过程有助于写出性能更好的代码
+
+### 4、行内元素 vs 块级元素，怎么转换？
+
+**行内元素（inline）**：
+- 不会单独占一行，和其他元素排在一行
+- 不能设置width、height，margin上下无效
+- 常见：`<span>`、`<a>`、`<img>`、`<strong>`
+
+**块级元素（block）**：
+- 独占一行，默认占满父容器宽度
+- 可以设置width、height、margin等
+- 常见：`<div>`、`<p>`、`<h1>-<h6>`、`<ul>`、`<li>`
+
+**转换方式**：
+```css
+/* 块级转行内 */
+div { display: inline; }
+
+/* 行内转块级 */
+span { display: block; }
+
+/* 两全其美：行内块 */
+span { display: inline-block; }
 ```
 
-这使得浏览器以标准模式渲染页面，避免了怪异模式（quirks mode）带来的兼容性问题。简单来说，它确保了网页在不同浏览器中尽可能一致地显示。
+现在还有`flex`、`grid`等显示模式，Flexbox和Grid布局在现代开发中更常用。
 
-### 2、对HTML语义化的了解
+### 5、HTML5有哪些重要的新特性？
 
-HTML语义化指的是使用HTML标签时，根据**内容的结构和意义**来选择合适的标签，而不是仅仅基于表现形式。正确使用语义化标签有助于提升代码的可读性和可维护性，并且对SEO（搜索引擎优化）和无障碍访问也有积极影响。
+HTML5带来了革命性变化，这些是面试官最喜欢问的：
 
-例如：
-- 使用 `<header>`、`<footer>`、`<article>` 和 `<section>` 等标签明确网页的结构。
-- 使用 `<strong>` 和 `<em>` 分别表示重要文本和强调文本，而不是单纯地使用 `<b>` 和 `<i>` 标签。
+**新的语义化标签**：
+- 结构标签：`<header>`、`<footer>`、`<nav>`、`<main>`、`<article>`、`<section>`、`<aside>`
+- 让代码更有意义，利于SEO和无障碍访问
 
-这样做不仅让页面结构更清晰，还能帮助搜索引擎更好地理解页面内容，同时也能改善屏幕阅读器用户的体验。
+**多媒体支持**：
+- `<audio>`、`<video>`标签，告别Flash时代
+- 原生支持音频视频播放
 
-### 3、Web标准以及W3C
+**表单增强**：
+- 新的input类型：`email`、`date`、`number`、`tel`等
+- 新属性：`placeholder`、`required`、`pattern`等
+- 内置验证功能，减少JavaScript代码
 
-Web标准是由W3C（万维网联盟）等组织制定的一系列规范和指南，旨在确保网页内容的互操作性和可访问性。这些标准涵盖了HTML、CSS、JavaScript等多个方面，指导开发者如何构建高效、兼容且易于维护的网站。
+**图形和存储**：
+- `<canvas>`：绘图API，可以画图、做游戏
+- `localStorage`、`sessionStorage`：客户端存储
+- 离线应用支持
 
-- **HTML** 标准定义了网页结构和内容标记的方式。
-- **CSS** 标准规定了如何为网页添加样式和布局。
-- **JavaScript** 标准（如ECMAScript）则描述了脚本语言的行为规则。
+**新API**：
+- 地理定位、拖拽、WebSocket等
 
-遵循Web标准的好处包括：
-- **兼容性**：确保网页在不同浏览器和设备上都能正常显示。
-- **可维护性**：使代码更加清晰易读，便于维护和扩展。
-- **无障碍性**：支持更多的用户，包括使用辅助技术的人群。
+面试时重点说：HTML5让Web应用变得更强大，减少了对第三方插件的依赖。
 
-W3C通过制定这些标准并推广其应用，促进了互联网技术的发展与统一。遵循这些标准有助于创建更高质量的网页。
+### 6、存储方案对比：Cookie vs LocalStorage vs SessionStorage
 
-### 4、行级元素和块级元素
+这个表格记下来，面试时直接说：
 
-**行级元素（inline elements）** 主要用于包裹文本或其他行内元素，它们不会在页面上开始新行。常见的行级元素包括：
-- `<a>`：超链接
-- `<span>`：通用行级容器
-- `<img>`：图像
-- `<strong>` 和 `<em>`：强调文本
+| 特性 | Cookie | LocalStorage | SessionStorage |
+|------|--------|--------------|----------------|
+| **大小限制** | 4KB左右 | 5-10MB | 5-10MB |
+| **生命周期** | 可设置过期时间 | 永久保存（除非手动清除） | 仅当前标签页有效 |
+| **作用域** | 同域名下所有窗口 | 同源下所有页面 | 仅当前标签页 |
+| **HTTP请求** | 每次都会自动携带 | 不会 | 不会 |
+| **安全性** | 相对较低，易被劫持 | 较安全 | 较安全 |
 
-**块级元素（block-level elements）** 总是在新的一行开始，并且尽可能地扩展以占据其父容器的全部宽度。常见的块级元素包括：
-- `<div>`：通用块级容器
-- `<p>`：段落
-- `<h1>` 到 `<h6>`：标题
-- `<ul>` 和 `<ol>`：无序和有序列表
+**实际应用场景**：
+- **Cookie**：用户登录状态、购物车信息、个性化设置
+- **LocalStorage**：用户偏好设置、离线数据缓存
+- **SessionStorage**：表单数据临时保存、页面间数据传递
 
-**转换方法**
+**面试回答技巧**：现在更推荐使用LocalStorage/SessionStorage，除非必须与服务器交互才用Cookie。
 
-可以通过CSS属性来转换元素的显示方式：
+## 二、CSS核心知识
 
-- **将块级元素转换为行级元素**：使用 `display: inline;`
-  ```css
-  div {
-    display: inline;
-  }
-  ```
+### 1、CSS选择器优先级，这个必须背下来！
 
-- **将行级元素转换为块级元素**：使用 `display: block;`
-  ```css
-  span {
-    display: block;
-  }
-  ```
+**优先级从高到低**：
+1. `!important`（慎用，会让维护变得困难）
+2. **内联样式** `style="color: red"`
+3. **ID选择器** `#header`
+4. **类选择器/属性选择器/伪类** `.class`、`[type="text"]`、`:hover`
+5. **元素选择器/伪元素** `div`、`::before`
+6. **通配选择器** `*`
 
-此外，还有其他一些显示模式如 `inline-block`，它允许元素既保持行内元素不换行的特点，又具备设置宽高的能力，适用于需要同时控制布局和排列的情况。例如：
+**简单记忆法**：
+- 内联 > ID > 类/属性 > 标签 > 通配
+- 相同优先级时，后面的覆盖前面的
+- 可以用计算器类比：内联(1000) + ID(100) + 类(10) + 标签(1)
+
+**面试常见问题**：
 ```css
-span {
-  display: inline-block;
-  width: 100px;
-  height: 50px;
+/* 优先级：0,0,2,0（两个类选择器） */
+.nav .item { color: blue; }
+
+/* 优先级：0,1,0,0（一个ID选择器） */  
+#nav { color: red; } /* 红色会胜出 */
+```
+
+### 2、哪些CSS属性可以继承？
+
+**可继承的主要属性**（记住这些常用的）：
+
+**字体相关**：
+- `font-family`、`font-size`、`font-weight`、`font-style`
+- `color`、`line-height`、`letter-spacing`、`text-align`
+
+**其他**：
+- `visibility`、`cursor`、`list-style`
+
+**不可继承的常见属性**：
+- 盒模型相关：`width`、`height`、`margin`、`padding`、`border`
+- 背景相关：`background`、`background-color`
+- 定位相关：`position`、`top`、`left`、`right`、`bottom`
+- 显示相关：`display`、`overflow`
+
+**面试技巧**：可以强制继承用`inherit`值，但要注意性能影响。
+
+### 3、盒模型是什么？box-sizing怎么用？
+
+**盒模型就是网页元素的"包装盒"**，每个元素都是一个矩形盒子，包含：
+
+1. **内容区（Content）**：实际内容所在
+2. **内边距（Padding）**：内容到边框的距离
+3. **边框（Border）**：元素的边框线
+4. **外边距（Margin）**：元素与其他元素的距离
+
+**两种盒模型标准**：
+
+**标准盒模型（content-box，默认）**：
+- `width`和`height`只包含内容区域
+- 总宽度 = width + padding + border + margin
+
+**IE盒模型（border-box）**：
+- `width`和`height`包含内容、内边距和边框
+- 总宽度 = width + margin
+
+**实际开发建议**：
+```css
+/* 现代开发推荐使用border-box */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 ```
 
-通过灵活运用这些CSS属性，可以根据设计需求调整元素的显示行为。
+**为什么推荐border-box**：计算更直观，不会因为加了padding和border而意外撑大容器。
 
-### 5、H5新元素和新特性
+### 4、CSS3新特性，这些是重点！
 
-HTML5引入了许多新元素和特性，使得网页开发更加灵活、强大。以下是HTML5的一些关键新元素和特性：
+**Flexbox弹性布局**（现在最常用）：
+- 一维布局系统，特别适合移动端
+- `display: flex` + `justify-content` + `align-items`
+- 解决了很多经典布局难题
 
-**新的语义化标签**
+**Grid网格布局**（二维布局）：
+- `display: grid`，最强大的布局系统
+- 适合复杂页面布局，如后台管理系统
+- 响应式设计的利器
 
-`<header>`、`<footer>`、 `<nav>`、`<article>`、`<section>`、`<aside>`、`<main>`
+**视觉增强**：
+- `border-radius`圆角
+- `box-shadow`阴影
+- 渐变背景（linear-gradient, radial-gradient）
+- `transition`过渡动画
+- `transform`变形（旋转、缩放、位移）
+- `@keyframes`关键帧动画
 
-**多媒体支持**
-- `<audio>` 和 `<video>`：提供对音频和视频内容的支持，不再需要第三方插件。
+**选择器增强**：
+- `:nth-child()`、`:nth-of-type()`结构伪类
+- `:not()`否定伪类
+- 属性选择器 `[attr^="value"]`
 
-**表单增强**
-- 新的输入类型：`email`, `url`, `number`, `range`, `date`, `time`, 等。
-- 新的属性：`placeholder`, `required`, `pattern`, `autocomplete`, 等，提供了更强大的表单验证功能。
+**响应式设计**：
+- 媒体查询 `@media`
+- 相对单位 `vw`、`vh`、`rem`
 
-**图形和绘图**
-- `<canvas>`：通过JavaScript API在网页上绘制图形。
-- SVG（可缩放矢量图形）：一种基于XML的图像格式，适合于创建高质量的矢量图形。
+**现代特性**：
+- CSS变量 `--main-color`
+- `filter`滤镜效果
+- `backdrop-filter`毛玻璃效果
 
-**客户端存储**
-- **Web Storage**：包括 `localStorage` 和 `sessionStorage`，允许在客户端存储数据。
+面试时重点说Flexbox和Grid，因为现在项目中使用频率最高。
 
-**其他API和特性**
-- **地理定位 API**：允许获取用户的地理位置。
-- **拖放 API**：实现拖放操作。
-- **WebSocket API**：提供全双工通信协议。
+### 5、px、em、rem有什么区别？怎么选？
 
-这些新元素和特性大大扩展了HTML的功能，使得开发者能够创建出更加丰富和交互性强的网页。
+**px（像素）**：
+- 绝对单位，固定大小
+- 优点：精确，兼容性好
+- 缺点：不利于响应式设计和用户缩放
 
-### 6、cookie、sessionStorage 和 localStorage 的区别
+**em**：
+- 相对单位，相对于父元素的字体大小
+- 2em = 父元素字体大小的2倍
+- 优点：可以整体缩放
+- 缺点：嵌套时容易混乱，1.5em的1.5em不是简单乘法
 
-`Cookie`、`sessionStorage` 和 `localStorage` 都是用来在客户端存储数据的机制，但它们在存储容量、生命周期和作用域等方面存在显著差异。
+**rem（root em）**：
+- 相对单位，相对于根元素`<html>`的字体大小
+- 1rem = html字体大小（通常设置为16px）
+- 优点：全局统一，方便整体缩放
+- 缺点：需要计算
 
-**Cookie**
-- **用途**：主要用于存储少量用户信息（如登录状态），并随每次请求发送到服务器。
-- **存储大小**：通常每个cookie最大为4KB。
-- **生命周期**：可以通过设置`expires`或`max-age`属性来控制，可以是会话级别的（关闭浏览器即失效）或者持久化的（设定具体过期时间）。
-
-**sessionStorage**
-- **用途**：用于临时存储一个会话期间的数据，适合于保存不需要长期保留的信息。
-- **存储大小**：大多数现代浏览器支持至少5MB的数据存储。
-- **生命周期**：仅在当前标签页打开期间有效，关闭标签页后数据会被清除。
-
-**localStorage**
-- **用途**：用于长期存储数据，即使浏览器关闭或电脑重启后数据依然存在。
-- **存储大小**：大多数现代浏览器支持至少5MB的数据存储。
-- **生命周期**：除非手动删除，否则数据将一直保留在用户的设备上。
-
-**总结对比**
-
-| 特性       | Cookie                         | sessionStorage            | localStorage              |
-|------------|-------------------------------|---------------------------|---------------------------|
-| 存储大小   | 4KB左右                        | 至少5MB                   | 至少5MB                   |
-| 生命周期   | 可配置（会话或持久化）         | 当前标签页会话期间        | 持久化，直到被删除        |
-| 数据共享   | 同一域名下                    | 仅限当前标签页            | 同一源下的所有页面        |
-| 自动发送   | 是（每次HTTP请求）             | 否                        | 否                        |
-
-选择哪种存储方式取决于应用的具体需求，例如是否需要跨页面共享数据、数据的有效期要求等。
-
-## 二、CSS
-
-### 1、 CSS选择器及其优先级
-
-CSS选择器优先级是根据选择器的类型来决定的，优先级决定了当多个规则应用于同一个元素时，哪一个样式会被应用。以下是几种常见的CSS选择器及其对应的优先级规则，从高到低排列：
-
-1. **内联样式**（如：`style="..."`）——最高优先级。
-2. **ID选择器**（如：`#header`）——第二高优先级。
-3. **类选择器、属性选择器和伪类**（如：`.class`, `[type="text"]`, `:hover`）——第三高优先级。
-4. **元素选择器和伪元素选择器**（如：`div`, `::before`）——第四高优先级。
-5. **通用选择器（`*`）、组合选择器（如后代选择器、子选择器等）** ——没有增加优先级。
-
-优先级可以通过计算选择器的特定值来确定：
-- 内联样式加1,0,0,0
-- 每个ID选择器加0,1,0,0
-- 每个类选择器、属性选择器或伪类加0,0,1,0
-- 每个元素选择器或伪元素选择器加0,0,0,1
-
-若优先级相同，则后来的样式会覆盖前面的样式，除非前面的样式带有`!important`声明，这将使该样式的优先级提升至非常高，但应谨慎使用，因为它可能会导致维护上的困难。 
-
-### 2、CSS中可继承属性
-
-在CSS中，某些属性是可以从父元素继承到子元素的，这被称为“可继承属性”。以下是一些常见的可继承属性：
-
-1. **文本相关属性：**
-   - `color`：文本颜色。
-   - `font-family`：字体系列。
-   - `font-size`：字体大小。
-   - `font-weight`：字体粗细。
-   - `letter-spacing`：字符间距。
-   - `line-height`：行高。
-   - `text-align`：文本对齐方式。
-   - `visibility`：可见性。
-
-2. **其他：**
-   - `cursor`：鼠标指针样式。
-   - `direction`：文字方向（如从左至右或从右至左）。
-
-需要注意的是，并不是所有CSS属性都是可继承的。例如，边距（`margin`）、填充（`padding`）、边框（`border`）、背景（`background`）等布局相关的属性默认是不可继承的。不过，您可以通过显式地设置`inherit`关键字来强制这些属性继承自父元素。
-
-### 3、对盒模型的理解
-
-盒模型是CSS中用于布局和设计的基础概念，它将每个HTML元素视为一个矩形的盒子。这个盒子由四个部分组成：
-
-1. **内容区（Content）**：显示实际内容，如文本或图片。它的大小可以通过`width`和`height`属性控制。
-2. **内边距（Padding）**：透明区域，位于内容区与边框之间。通过`padding`属性设置，增加内容区周围的空白。
-3. **边框（Border）**：围绕内边距的一条线，可以通过`border`属性定义其宽度、样式和颜色。
-4. **外边距（Margin）**：透明区域，位于边框之外，用来与其他元素保持距离。使用`margin`属性来调整。
-
-此外，有两种盒模型标准：W3C标准盒模型（默认情况下，`width`和`height`只包括内容区）和IE盒模型（`width`和`height`包括内容区、内边距和边框）。
-
-可以通过`box-sizing`属性切换这两种模式:
-
+**现代开发最佳实践**：
 ```css
-box-sizing: content-box; /* 标准盒模型（默认值） */
-box-sizing: border-box;  /* IE盒模型*/
-```
+/* 设置基础字体大小 */
+html {
+    font-size: 16px;
+}
 
-### 4、 CSS3中有哪些新特性
+/* 响应式调整 */
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+}
 
-CSS3引入了许多新特性，增强了网页设计的灵活性和用户体验。以下是一些主要的新特性：
+/* 使用rem单位 */
+.container {
+    width: 20rem;  /* 320px */
+    margin: 1rem;  /* 16px */
+}
 
-1. **选择器增强**：新增了伪类选择器（如`:nth-child`）和伪元素选择器（如`::before`），使得更精确地选取页面元素成为可能。
-
-2. **圆角边框与阴影**：支持圆角边框（`border-radius`）、阴影效果（`box-shadow`）。
-
-3. **渐变**：线性和径向渐变可以用来创建平滑的颜色过渡效果，无需使用图片。
-
-4. **过渡与动画**：通过`transition`属性可以在状态变化时添加动画效果；`@keyframes`规则允许定义复杂的动画序列。
-
-5. **变形**：`transform`属性提供了旋转、缩放、倾斜和平移等转换功能。
-
-6. **布局模式**：
-   - **弹性盒子布局（Flexbox）**：提供了一种更加有效的布局方式，特别适合用于响应式设计。
-   - **网格布局（Grid）**：一个强大的二维布局系统，用于创建复杂的网页布局。
-   - **多列布局**：使用`column-count`和`column-width`等属性来分割内容。
-
-7. **媒体查询**：让开发者可以根据设备特征应用不同的样式表，实现响应式设计。
-
-8. **滤镜效果**：`filter`属性可用于应用模糊、亮度调整等视觉效果。
-
-这些特性的加入，使得前端开发人员能够创建更加丰富、动态和美观的用户界面，而不需要依赖额外的JavaScript代码或图片资源。
-
-### 5、px、em、rem的区别
-
-`px`、`em`和`rem`是CSS中用于定义尺寸的单位，它们各自有不同的特点和适用场景：
-
-1. **px（像素）**：
-   - **定义**：绝对单位，表示屏幕上的物理像素点。
-   - **特点**：精确控制元素大小，但不随浏览器或用户的缩放设置变化。
-   - **使用场景**：适合用于需要固定大小的元素，如细线边框或图标大小。
-
-2. **em**：
-   - **定义**：相对单位，基于元素本身的字体大小计算。如果未明确指定，则继承自父元素的字体大小。
-   - **特点**：相对于当前元素或其最近的父元素的字体大小进行缩放，这使得它非常适合创建响应式布局。
-   - **使用场景**：适用于希望根据文本大小调整其他属性（如间距或内边距）的情况。然而，由于它是相对于父元素的字体大小，可能会导致嵌套层次较深时难以维护。
-
-3. **rem**：
-   - **定义**：相对单位，基于根元素（即`<html>`标签）的字体大小计算。
-   - **特点**：与`em`类似，但它总是参照根元素的字体大小，避免了嵌套带来的复杂性。
-   - **使用场景**：非常适用于响应式设计，因为它简化了相对大小的管理。通过仅改变根元素的字体大小，可以轻松地调整整个页面的布局和字体大小，特别适合实现全局一致的缩放效果。
-
-**总结**：
-- 使用`px`可以获得最精确的控制，但在创建响应式设计时不够灵活。
-- `em`允许基于父元素进行相对缩放，适合于局部调整，但需要注意嵌套层级的影响。
-- `rem`提供了一种简单的方式来在整个文档中保持一致的比例，特别适合快速调整整体设计和实现响应式布局。在现代网页设计中，通常推荐优先使用`rem`来处理大多数尺寸需求。
-
-### 6、水平垂直居中的实现
-
-实现元素水平垂直居中的方法有多种，这里提供几种常见的方案：
-
-1. **Flexbox 方法**：
-   - 父容器设置 `display: flex; justify-content: center; align-items: center;`。
-   - 子元素无需特殊设置即可自动居中。
-
-2. **Grid 方法**：
-   - 父容器设置 `display: grid; place-items: center;`。
-   - 同样，子元素不需要额外设置。
-
-3. **绝对定位和 transform 方法**：
-   - 父容器设置 `position: relative;`。
-   - 子元素设置 `position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`。
-
-4. **表格布局方法**：
-   - 父容器设置 `display: table;` 并包含一个内部的 div 设置为 `display: table-cell; vertical-align: middle; text-align: center;`。
-   - 子元素放在该 div 内，默认即会居中。
-
-选择哪种方法取决于具体的应用场景和个人偏好。Flexbox 和 Grid 因其简洁性和灵活性而特别受欢迎。
-
-### 9、CSS画三角
-
-要使用CSS绘制一个三角形，您可以借助CSS的边框和透明边框技巧。以下是一个示例：
-
-**HTML**
-
-```html
-<div class="triangle-up"></div>
-```
-
-**CSS**
-```css
-.triangle-up {
-    width: 0;
-    height: 0;
-    border-left: 50px solid transparent; /* 左边透明边界 */
-    border-right: 50px solid transparent; /* 右边透明边界 */
-    border-bottom: 100px solid #ff0000; /* 底部红色边界，决定三角形的颜色和高度 */
+/* 边框、阴影等固定尺寸用px */
+.button {
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 ```
 
-这个例子中，我们创建了一个没有宽度和高度的`div`，然后通过设置其左右边界的宽度为50px并且颜色为透明，底部边界的高度设为100px且颜色为红色（#ff0000），从而形成一个向上指的三角形。
+**面试回答技巧**：推荐使用rem配合媒体查询做响应式，px用于固定尺寸，em慎用。
 
-如果你想要不同方向的三角形，只需调整哪个边界的尺寸和颜色。例如，要创建一个向右的三角形，你可以这样修改CSS：
+### 6、元素水平垂直居中的N种方法
 
+这是面试必考题，建议掌握前3种：
+
+**1. Flexbox方法（最推荐）**：
 ```css
-.triangle-right {
-    width: 0;
-    height: 0;
-    border-top: 50px solid transparent;
-    border-bottom: 50px solid transparent;
-    border-left: 100px solid #ff0000;
+.parent {
+    display: flex;
+    justify-content: center;  /* 水平居中 */
+    align-items: center;      /* 垂直居中 */
 }
 ```
 
-这将创建一个指向右侧的红色三角形。通过改变不同的边框属性，你可以轻松地创建任何方向的三角形。
+**2. Grid方法（简单优雅）**：
+```css
+.parent {
+    display: grid;
+    place-items: center;  /* 一行搞定 */
+}
+```
 
-### 10、说说对BFC的理解
+**3. 绝对定位 + transform（兼容性好）**：
+```css
+.parent {
+    position: relative;
+}
+.child {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+```
 
-BFC，即块级格式化上下文（Block Formatting Context），是一个在CSS布局中非常重要的概念，它影响着元素的布局和排列方式。以下是对BFC的理解：
+**其他方法了解即可**：
+- 绝对定位 + margin（需要知道子元素尺寸）
+- 表格布局（老方法，不推荐）
+- line-height（仅适用于单行文本）
 
-1. **BFC的基本概念：** BFC是一种独立的渲染区域，其中的元素按照一定规则进行布局和渲染。BFC内的元素相对于外部元素是隔离的，它们不会影响到外部元素的布局，也不受外部元素的影响。
+**面试选择策略**：优先说Flexbox，次选Grid，最后提transform作为兼容方案。
 
-2. **创建BFC的条件：** BFC可以通过以下方式创建：
-   - 根元素 `<html>`
-   - 浮动元素（元素的`float`属性不为`none`）
-   - 绝对定位元素（元素的`position`属性为`absolute`或`fixed`）
-   - `overflow`属性不为`visible`的元素（例如，`overflow: auto;`或`overflow: hidden;`）
+### 7、BFC到底是什么？什么时候用？
 
-3. **BFC的影响：** BFC对元素的布局和排列有重要影响，主要体现在以下几个方面：
-   - 阻止外部浮动元素影响内部元素的布局。
-   - 防止内部元素溢出BFC。
-   - 计算BFC高度时，会考虑浮动元素的高度。
-   - 内部元素垂直排列不会互相重叠，而是按照规则进行排列。
+**BFC（块级格式化上下文）**简单理解就是一个独立的"小宇宙"：
 
-4. **常见应用场景：** BFC在解决一些常见的布局问题时非常有用，例如清除浮动、避免外边距折叠等。一些常见的应用场景包括：
-   - 清除浮动：通过在容器元素上创建BFC，可以清除内部浮动元素对父容器高度的影响。
-   - 避免外边距折叠：BFC内部的垂直外边距不会与外部元素的外边距发生折叠，有助于更精确地控制元素之间的间距。
-   - 制作两栏布局：可以使用BFC来创建一个左右两栏布局，其中一个栏浮动，另一个创建BFC以避免影响浮动栏的布局。
+- BFC内部元素的布局不会影响外部
+- 外部元素也不会影响BFC内部
+- 就像一个隔离的布局环境
 
-总之，BFC是CSS布局中的一个重要概念，它能够帮助开发者更好地控制元素的布局和排列，解决一些常见的布局问题。理解BFC对于掌握复杂布局和解决一些奇怪的布局行为问题非常重要。
+**如何创建BFC**：
+- `overflow: hidden/auto`（最常用）
+- `display: flex/grid`
+- `position: absolute/fixed`
+- `float: left/right`
 
-### 11、实现移动端1px边框
+**BFC能解决什么问题**：
 
-由于不同的移动设备具有不同的DPR(设备像素比)，以及不同的浏览器支持度，实现1px边框可能需要使用不同的方法。以下是一些常见的实现1px边框的方法：
+1. **清除浮动**：父容器加`overflow: hidden`
+2. **防止margin重叠**：相邻元素用一个包起来
+3. **两栏自适应布局**：左边浮动，右边触发BFC
+
+**面试回答技巧**：BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对少了，但理解它对调试布局bug很有帮助。
+
+### 8、移动端1px边框问题怎么解决？
+
+**问题原因**：移动设备像素比(DPR) > 1时，CSS的1px在设备上会显示成多个物理像素，显得很粗。
+
+**常见解决方案**：
+
+**1. 使用transform缩放（推荐）**：
+```css
+.border-1px {
+    position: relative;
+}
+.border-1px::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: #ddd;
+    transform: scaleY(0.5);
+    transform-origin: 0 0;
+}
+```
+
+**2. 使用viewport + rem**：
+- 设置viewport的initial-scale为0.5
+- 所有尺寸都按2倍设计，用rem单位
+
+**3. 使用媒体查询**：
+```css
+@media (-webkit-min-device-pixel-ratio: 2) {
+    .border-1px::after { transform: scaleY(0.5); }
+}
+@media (-webkit-min-device-pixel-ratio: 3) {
+    .border-1px::after { transform: scaleY(0.33); }
+}
+```
+
+**面试回答重点**：说明问题产生的原因，提出1-2种具体解决方案。
+
+### 9、重绘和重排的区别？如何优化？
+
+**重排（Reflow/回流）**：
+- 元素的尺寸、位置发生改变
+- 比如修改width、height、margin、display等
+- 会重新计算整个页面的布局
+- 消耗很大，要尽量避免
+
+**重绘（Repaint）**：
+- 元素的外观发生改变，但位置不变
+- 比如修改color、background、visibility等
+- 只需要重新绘制受影响的区域
+- 消耗相对较小
+
+**优化策略**：
+
+**1. 批量操作DOM**：
+```css
+/* 不要这样 - 触发多次重排 */
+element.style.width = '100px';
+element.style.height = '100px';
+element.style.margin = '10px';
+
+/* 应该这样 - 一次性修改 */
+element.className = 'new-style';
+```
+
+**2. 使用transform和opacity**：
+- 这两个属性由合成线程处理，不会触发重排
+- 动画优先使用`transform: translate()`而不是改变`left/top`
+
+**3. 避免频繁读取布局信息**：
+```javascript
+// 不要在循环中读取offsetWidth
+for(let i = 0; i < 1000; i++) {
+    console.log(element.offsetWidth); // 每次都触发重排
+}
+```
+
+**4. 使用will-change优化**：
+```css
+.element {
+    will-change: transform, opacity;
+}
+```
+
+**面试技巧**：强调重排比重绘更耗性能，给出具体的优化代码示例。
+
+### 10、CSS性能优化有哪些方法？
+
+**1. 选择器优化**：
+- 避免过深的嵌套：`.nav .item .link .text`（太深）
+- 使用类选择器代替标签选择器：`.header`比`div.header`好
+- 避免通配选择器`*`
+
+**2. 减少重排重绘**：
+- 使用transform和opacity做动画
+- 批量修改样式
+- 使用DocumentFragment批量添加DOM
+
+**3. CSS加载优化**：
+- 关键CSS内联，非关键CSS异步加载
+- 使用CSS压缩工具
+- 合理使用`@import`（会阻塞渲染）
+
+**4. 现代CSS技巧**：
+- 使用CSS变量减少重复代码
+- 合理使用contain属性
+- 利用GPU加速：`transform: translateZ(0)`
+
+**5. 代码组织**：
+- 按模块组织CSS
+- 避免冗余样式
+- 使用CSS-in-JS或原子化CSS减少体积
+
+面试时说：CSS优化主要是从选择器性能、渲染性能、加载性能三个方面入手。
+
+### 11、Flexbox布局完全指南
+
+Flexbox现在是响应式布局的首选方案，面试官经常问具体用法：
+
+**核心概念**：
+- **容器（flex container）**：设置`display: flex`的父元素
+- **项目（flex items）**：容器的直接子元素
+- **主轴（main axis）**：默认水平方向
+- **交叉轴（cross axis）**：默认垂直方向
+
+**容器属性**（父元素）：
+```css
+.flex-container {
+    display: flex;
+    
+    /* 主轴方向 */
+    flex-direction: row | row-reverse | column | column-reverse;
+    
+    /* 换行 */
+    flex-wrap: nowrap | wrap | wrap-reverse;
+    
+    /* 主轴对齐 */
+    justify-content: flex-start | flex-end | center | space-between | space-around;
+    
+    /* 交叉轴对齐 */
+    align-items: stretch | flex-start | flex-end | center | baseline;
+    
+    /* 多行对齐 */
+    align-content: flex-start | flex-end | center | space-between | space-around;
+}
+```
+
+**项目属性**（子元素）：
+```css
+.flex-item {
+    /* 排序 */
+    order: 1;
+    
+    /* 放大比例 */
+    flex-grow: 1;
+    
+    /* 缩小比例 */
+    flex-shrink: 0;
+    
+    /* 基础大小 */
+    flex-basis: 200px;
+    
+    /* 简写：flex: flex-grow flex-shrink flex-basis */
+    flex: 1 0 200px;
+    
+    /* 单独对齐 */
+    align-self: flex-start | flex-end | center;
+}
+```
+
+**常见布局场景**：
+
+**水平垂直居中**：
+```css
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+```
+
+**两栏布局（左边固定，右边自适应）**：
+```css
+.container {
+    display: flex;
+}
+.left {
+    width: 200px;
+    flex-shrink: 0;
+}
+.right {
+    flex: 1;
+}
+```
+
+**面试重点**：能说出`justify-content`和`align-items`的区别，以及`flex: 1`的作用。
+
+### 12、响应式设计实战技巧
+
+**媒体查询基础**：
+```css
+/* 移动端优先 */
+body { font-size: 14px; }
+
+/* 平板 */
+@media (min-width: 768px) {
+    body { font-size: 16px; }
+}
+
+/* 桌面端 */
+@media (min-width: 1024px) {
+    body { font-size: 18px; }
+}
+```
+
+**响应式单位选择**：
+- **rem**：字体、间距、padding等
+- **vw/vh**：视口相关，如大图、全屏组件
+- **%**：相对父元素，如容器宽度
+- **px**：边框、阴影等固定元素
+
+**移动端适配方案**：
+```css
+/* 1. 设置viewport */
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+/* 2. 使用rem + 媒体查询 */
+html {
+    font-size: 16px;
+}
+@media (max-width: 375px) {
+    html { font-size: 14px; }
+}
+
+/* 3. flexible.js方案（淘宝方案） */
+(function flexible(window, document) {
+    // 根据屏幕宽度设置根字体大小
+})();
+```
+
+**现代CSS技术**：
+- **CSS Grid**：复杂响应式布局
+- **CSS自定义属性**：动态主题切换
+- **Container Queries**：基于容器而非视口的响应式
+
+**面试回答技巧**：重点说rem方案和媒体查询，能提到Grid和Container Queries会加分。
+
+## 三、实战面试题
+
+### 1、如何实现一个三栏布局？
+
+**面试时至少要会3种方法**：
+
+**1. Flexbox方案（最推荐）**：
+```css
+.container {
+    display: flex;
+}
+.left, .right {
+    width: 200px;
+    flex-shrink: 0;
+}
+.main {
+    flex: 1;
+}
+```
+
+**2. Grid方案**：
+```css
+.container {
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+}
+```
+
+**3. 圣杯布局（经典面试题）**：
+- 左右栏浮动，中间栏margin
+- 利用负margin和relative定位
 
 
-1. **使用伪元素`::after`：**
+### 2、暗黑模式实现方案
 
-   第一种方法是使用伪元素来创建1px边框。这种方法通常更适合在需要精确控制的情况下使用，因为它可以确保边框的精确显示。例如：
+**CSS变量 + 媒体查询**：
+```css
+:root {
+    --bg-color: #fff;
+    --text-color: #333;
+}
 
-   ```css
-   .element::after {
-     content: '';
-     display: block;
-     width: 100%;
-     height: 1px;
-     background: #e5e5e5;
-   }
-   ```
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #fff;
+    }
+}
 
-   这种方法的好处是在高DPR设备上可以获得更清晰的边框效果。
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: background 0.3s, color 0.3s;
+}
+```
 
-2. **使用`border-image`：**
+**JavaScript切换方案**：
+```javascript
+// 添加主题类
+document.body.classList.toggle('dark-theme');
+// 存储用户偏好
+localStorage.setItem('theme', 'dark');
+```
 
-   `border-image`属性允许您使用图像来定义边框。您可以创建一个像素值为1px的图片，然后将其应用到元素的边框上。这种方法需要一些额外的工作，但可以确保在各种情况下都有一致的1px边框。
 
-   ```css
-   .element {
-     border-width: 1px;
-     border-image: url('1px-border.png') 1 stretch;
-   }
-   ```
-
-   在这里，`1px-border.png`是一个包含1px宽度的实线的图像。
-
-### 12、重绘 VS 重排
-
-**重绘（Repaint）**：当页面元素的样式发生变化（如颜色、背景等）但不影响布局时，浏览器重新绘制元素的外观。重绘开销较小。
-
-**重排（Reflow）**：当元素的尺寸或位置发生变化（如修改`width`、`height`、`margin`等）时，浏览器重新计算布局并重新渲染页面。重排开销较大，可能影响性能。
-
-简单来说，重绘只影响样式，重排则会影响布局。
+**总结**：HTML&CSS面试的核心是基础扎实 + 实战经验 + 性能意识。重点掌握布局、性能优化、现代CSS特性，就能从容应对大部分面试！

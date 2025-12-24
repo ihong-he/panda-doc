@@ -4,404 +4,642 @@ outline: deep
 ## 目录表
 [[toc]]
 
-## 一、JavaScript 基础
+## JavaScript 基础
 
 ### 1、JS数据类型
 
-JavaScript 有七种基本数据类型：
+JS有8种数据类型，记住7个基本类型+1个引用类型就行：
 
-1. **Number**：用于整数和浮点数。
-2. **String**：用于表示文本数据，即字符串。
-3. **Boolean**：仅有两个值`true`和`false`，用于逻辑运算。
-4. **Undefined**：当声明一个变量但未赋值时，默认值为`undefined`。
-5. **Null**：只有一个值`null`，表示无或空值。
-6. **Symbol**（ES6 新增）：表示独一无二的值，通常用作对象属性的键。
-7. **BigInt**（ES11 新增）：用于安全地存储和操作大整数。
+**7个基本类型（原始值）：**
+- **Number**：数字，包括整数和小数
+- **String**：字符串，用单引号或双引号包起来
+- **Boolean**：布尔值，就两个值 true/false
+- **Undefined**：未定义，变量声明了但没赋值
+- **Null**：空值，表示"没有对象"
+- **Symbol**：独一无二的值，ES6新增
+- **BigInt**：大整数，ES11新增，能装超大数字
 
-此外，还有**Object**类型，它是一种引用类型，用于存储复杂的数据结构如对象、数组、函数等。这些是构成 JavaScript 语言基础的所有数据类型。
+**1个引用类型：**
+- **Object**：对象，包括数组、函数、日期等复杂类型
+
+面试重点：基本类型是值传递，引用类型是引用传递，这是面试高频考点！
 
 ### 2、如何检测数据类型
 
-在 JavaScript 中，您可以使用不同的方法来检测数据类型。以下是一些常用的方法：
+面试官经常问这个，记住这几个方法就够了：
 
-1. **typeof 操作符**：`typeof` 操作符用于检测变量或值的数据类型，并返回一个表示数据类型的字符串。
+**1. typeof - 最常用**
+- 优点：简单快捷，能检测基本类型
+- 缺点：检测null返回"object"，数组也是"object"，有点坑
+- 记住这个陷阱：typeof null === "object"，这是JS历史遗留问题
 
-   ```javascript
-   typeof 5; // 返回 "number"
-   typeof "Hello"; // 返回 "string"
-   typeof true; // 返回 "boolean"
-   typeof undefined; // 返回 "undefined"
-   typeof null; // 返回 "object"（注意这是一个历史遗留问题，null被错误地认为是"object"）
-   typeof {}; // 返回 "object"
-   typeof []; // 返回 "object"（数组也被错误地认为是"object"）
-   typeof function () {}; // 返回 "function"
-   ```
+**2. instanceof - 检测对象类型**
+- 用来判断对象是不是某个构造函数的实例
+- 比如：[] instanceof Array 是true
+- 坑点：不同iframe之间的数组instanceof会失败，因为构造函数不同
 
-   `typeof` 对于大多数数据类型都有效，但对于对象和数组来说，它只会返回 "object"。要进一步检测对象的具体类型，需要使用其他方法。
+**3. Object.prototype.toString.call() - 最准确**
+- 这是检测数据类型最可靠的方法
+- 能准确识别各种类型，包括数组、日期等
+- 写法稍微复杂，但结果最准
 
-2. **Array.isArray()**：用于检测一个值是否为数组。
+**4. Array.isArray() - 专门检测数组**
+- ES6新增，专门用来判断是不是数组
+- 比instanceof更可靠，跨iframe也能用
 
-   ```javascript
-   Array.isArray([]); // 返回 true
-   Array.isArray({}); // 返回 false
-   ```
-
-   这是专门用于检测数组的方法。
-
-3. **instanceof 操作符**：`instanceof` 操作符用于检测对象是否是特定构造函数的实例。
-
-   ```javascript
-   let d = new Date();
-   d instanceof Date; // 返回 true，d是Date对象的实例
-   ```
-
-   `instanceof` 主要用于检测自定义的构造函数和实例之间的关系。
-
-这些方法可以根据您的需求来选择使用，根据不同情况来确定数据类型是很重要的，特别是在处理不同类型的数据时。
+面试技巧：先说typeof的优缺点，再说instanceof的局限性，最后说toString.call是最完美的方案！
 
 ### 3、null vs undefined
 
-`null`和`undefined`在 JavaScript 中都是表示“无”的值，但它们之间有一些关键的区别：
+这个面试经常问，记住几个关键点就能说清楚：
 
-1. **含义与用途**：
+**一句话总结：**
+- undefined 是"还没赋值"，null 是"主动设为空"
 
-   - `undefined`：表示一个变量已声明但尚未赋值，或者对象属性不存在时的默认值。它意味着“未定义”，通常用于指示变量或属性还没有被赋予有效的值。
-   - `null`：表示一个变量指向的对象为空（即没有对象），或者有意地将一个变量设置为“空”或“无”。它代表的是“无值”或“空值”。
+**具体区别：**
 
-2. **类型差异**：
+**undefined 的情况：**
+- 变量声明了但没赋值
+- 对象属性不存在
+- 函数没有返回值
+- 函数参数没传值
 
-   - 使用`typeof`操作符检查时，`undefined`的结果是`"undefined"`，而`null`的结果却是`"object"`。这是一个历史遗留问题，实际上`null`被认为是一个原始值。
+**null 的情况：**
+- 程序员主动设置成null
+- 表示"这里应该有个对象，但现在是空的"
+- 比如DOM获取不到元素时返回null
 
-3. **赋值意图**：
-   - 当你使用`null`时，通常是明确地指出这个变量不引用任何对象，是一种有意识的空值设定。
-   - `undefined`则更多时候是由 JavaScript 引擎自动分配的，表明某物尚未被赋予特定值。
+**记住这个面试技巧：**
+- typeof undefined 是 "undefined"
+- typeof null 是 "object"（JS历史bug）
+- undefined == null 是true，但 undefined === null 是false
 
-简单来说，如果你想要表达“这里应该有一个值，但现在没有”，你可以选择`null`。而`undefined`则更常用于描述“这里本应有一个值，但它尚未被设置或不可用”。理解这两者的区别有助于编写更加精确和清晰的代码。
+**实际应用：**
+- 初始化变量用 null（表示将来会放对象）
+- 判断变量是否声明用 typeof variable !== "undefined"
+- 判断对象是否存在用 obj != null
+
+面试时就说：一个是被动的（undefined），一个是主动的（null）！
 
 ### 4、数组基本方法
 
-JavaScript 中数组有许多常用的方法，这些方法用于操作和处理数组的元素。以下是一些常见的数组方法，以及每个方法的示例：
+数组方法是面试必考点，记住这些分类就很清晰：
 
-1. **`push()` 方法**：向数组末尾添加一个或多个元素，并返回新的数组长度。
+**改变原数组的方法（会修改原数组）：**
+- push/pop - 尾部添加/删除
+- unshift/shift - 头部添加/删除  
+- splice - 增删改全能选手
+- sort - 排序
+- reverse - 反转
 
-2. **`pop()` 方法**：移除数组最后一个元素，并返回移除的元素。
+**不改变原数组的方法（返回新数组）：**
+- concat - 合并数组
+- slice - 切片，不包含结束位置
+- join - 拼接成字符串
+- toString - 转字符串
 
-3. **`unshift()` 方法**：向数组开头添加一个或多个元素，并返回新的数组长度。
+**查找方法：**
+- indexOf/lastIndexOf - 查找索引，找不到返回-1
+- includes - ES6新增，判断是否包含，返回true/false
 
-4. **`shift()` 方法**：移除数组的第一个元素，并返回移除的元素。
+**面试重点：splice方法最强大**
+- splice(start, deleteCount, items...)
+- 一个方法搞定增删改
+- 记住参数：从哪开始，删几个，加什么
 
-5. **`concat()` 方法**：合并两个或多个数组，返回一个新的数组，不会改变原始数组。
+**技巧对比：**
+- slice(start, end) - 不改变原数组，包头不包尾
+- splice(start, length) - 改变原数组，从哪开始删几个
 
-6. **`join()` 方法**：将数组的所有元素组成一个字符串，并使用指定的分隔符分隔元素。
-
-7. **`slice()` 方法**：从数组中提取指定范围的元素，并返回一个新的数组，不会改变原始数组。
-
-   ```javascript
-   var fruits = ["apple", "banana", "cherry", "orange", "kiwi"];
-   var slicedFruits = fruits.slice(1, 4);
-   console.log(slicedFruits); // ['banana', 'cherry', 'orange']
-   ```
-
-8. **`indexOf()` 方法**：返回数组中第一个匹配元素的索引，如果未找到匹配元素则返回 -1。
+**记忆口诀：**
+- 增删用splice，不改变用slice
+- 找位置用indexOf，判断存在用includes
+- 头尾操作push/pop和unshift/shift要记牢！
 
 
 ### 5、数组遍历方法
 
-JavaScript 数组有多种方法用于遍历数组中的元素。以下是一些常用的数组遍历方法：
+这是现在面试的重点，ES6+数组方法必须掌握：
 
-1. **`forEach()` 方法**：遍历数组的每一个元素，并对每个元素执行指定的回调函数，没有返回值。
+**遍历但不改变数组（纯遍历）：**
+- forEach() - 就是为了遍历，没返回值，不改变原数组
+- 注意：forEach不能用break，需要用for...of
 
-2. **`map()` 方法**：遍历数组的每一个元素，并调用指定的函数，最终返回一个新的数组。
+**遍历并返回新数组：**
+- map() - 最常用，一对一转换，返回新数组
+- filter() - 过滤，返回符合条件的元素组成的新数组
 
-   ```javascript
-   var numbers = [1, 2, 3, 4, 5];
-   var doubled = numbers.map(function (number) {
-     return number * 2;
-   });
-   console.log(doubled); // [2, 4, 6, 8, 10]
-   ```
+**遍历并返回单个值：**
+- reduce() - 累计算器，最终返回一个值
+- 用法：reduce(callback, initialValue)
+- 常见场景：求和、求乘积、数组转对象
 
-3. **`filter()` 方法**：用于过滤数组的元素，返回一个符合指定条件的新数组，不会改变原始数组。
+**遍历并返回布尔值：**
+- some() - 有一项满足条件就返回true
+- every() - 所有项都满足条件才返回true
 
-4. **`reduce()` 方法**：对数组的元素累加应用一个函数，返回一个累加的结果。
+**查找元素：**
+- find() - 返回第一个满足条件的元素
+- findIndex() - 返回第一个满足条件的元素索引
 
-   ```javascript
-   var numbers = [1, 2, 3, 4, 5];
-   var sum = numbers.reduce(function (accumulator, currentNumber) {
-     return accumulator + currentNumber;
-   }, 0); // 初始值为 0
-   console.log(sum); // 15
-   ```
+**面试高频问题：**
+1. forEach和map的区别？
+   - forEach没返回值，map有返回值
+   - forEach不返回新数组，map返回新数组
+   - map可以用链式调用，forEach不行
 
-5. **`some()` 方法**：检查数组中是否至少有一个元素满足指定条件，如果有则返回 `true`，否则返回 `false`。
+2. reduce的应用场景？
+   - 数组求和、求平均
+   - 数组转对象
+   - 数组扁平化
 
-6. **`every()` 方法**：检查数组中是否所有元素都满足指定条件，如果是则返回 `true`，否则返回 `false`。
+**记忆技巧：**
+- 遍历用forEach
+- 转换用map  
+- 过滤用filter
+- 累计用reduce
+- 判断用some/every
+- 查找用find/findIndex
 
 ### 6、字符串方法
 
-JavaScript 字符串具有许多内置方法，用于处理和操作字符串。以下是一些常用的字符串方法：
+字符串方法也挺多，记住这些常用的就行：
 
-1. **`length` 属性**：返回字符串的长度。
+**查找相关：**
+- indexOf/lastIndexOf - 查找位置，找不到返回-1
+- includes() - ES6新增，判断是否包含，返回true/false
+- startsWith/endsWith() - ES6新增，判断开头/结尾
 
-2. **`charAt()` 方法**：返回指定索引位置的字符。
+**取子串：**
+- slice(start, end) - 最常用，包头不包尾
+- substring(start, end) - 和slice类似，但参数为负数时处理不同
+- substr(start, length) - 已废弃，不建议用
 
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.charAt(0)); // 'H'
-   ```
+**替换和分割：**
+- replace() - 替换，默认只替换第一个
+- replaceAll() - ES2021新增，替换所有
+- split() - 字符串转数组
 
-3. **`charCodeAt()` 方法**：返回指定索引位置字符的 Unicode 编码。
+**修改大小写：**
+- toUpperCase()/toLowerCase() - 转 大写/小写
 
-4. **`trim()` 方法**：去除字符串两端的空白字符。
+**去除空格：**
+- trim() - 去除首尾空格
+- trimStart()/trimEnd() - ES6新增，分别去除开头/结尾空格
 
-    ```javascript
-    var str = "   Hello, World!   ";
-    var trimmedStr = str.trim();
-    console.log(trimmedStr); // 'Hello, World!'
-    ```
+**面试重点：**
+1. slice和substring的区别？
+   - slice支持负数索引，substring负数当0处理
+   - slice可以反着写slice(-3)，substring不行
 
-5. **`indexOf()` 方法**：返回字符串中第一次出现指定子字符串的索引，如果未找到则返回 -1。
+2. replace和replaceAll的区别？
+   - replace只替换第一个，replaceAll替换所有
+   - replace可以用正则/g实现替换所有
 
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.indexOf("World")); // 7
-   ```
+**实用技巧：**
+- 字符串反转：str.split('').reverse().join('')
+- 重复字符串：str.repeat(n)
+- 字符串补齐：padStart/padEnd（ES6）
 
-6. **`lastIndexOf()` 方法**：返回字符串中最后一次出现指定子字符串的索引，如果未找到则返回 -1。
-
-7. **`replace()` 方法**：替换字符串中的指定子字符串为新的字符串。
-
-   ```javascript
-   var str = "Hello, World!";
-   var newStr = str.replace("World", "Universe");
-   console.log(newStr); // 'Hello, Universe!'
-   ```
-
-8. **`split()` 方法**：将字符串分割为数组，使用指定的分隔符。
-
-    ```javascript
-    var str = "apple,banana,cherry";
-    var fruits = str.split(",");
-    console.log(fruits); // ['apple', 'banana', 'cherry']
-    ```
-
-9. **`substring()` 方法**：返回字符串的子字符串，指定起始索引和结束索引。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.substring(0, 5)); // 'Hello'
-   ```
-
-10. **`slice()` 方法**：返回字符串的子字符串，指定起始索引和可选的结束索引。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.slice(0, 5)); // 'Hello'
-   ```
-
-
-11. **`toLowerCase()` 和 `toUpperCase()` 方法**：将字符串转换为小写或大写。
-
-   ```javascript
-   var str = "Hello, World!";
-   console.log(str.toLowerCase()); // 'hello, world!'
-   console.log(str.toUpperCase()); // 'HELLO, WORLD!'
-   ```
-
-
-这些是一些常用的字符串方法，它们允许您对字符串进行各种操作，如查找、替换、拆分、转换大小写等。根据您的需求选择适当的方法。
+记住：现代项目更多使用includes、startsWith、endsWith这些ES6方法！
 
 ### 7、闭包函数
 
-闭包是指有权访问另一个函数作用域中变量的函数。
+闭包是JS的核心概念，面试必问，理解透彻很重要：
 
-- **原理**：在一个函数内部定义另一个函数，内部函数可以访问外部函数的变量。当外部函数执行完毕后，其内部变量本应该被销毁，但因为内部函数仍然引用这些变量，所以这些变量不会被垃圾回收机制回收，从而形成了闭包。
-- **作用**：可以用来保留变量的状态或者实现数据隐藏和封装，例如在JavaScript中模拟私有变量。比如：
+**一句话定义：**
+闭包就是函数能记住并访问它的词法作用域，即使函数在其词法作用域之外执行。
+
+**白话解释：**
+内部函数能访问外部函数的变量，而且外部函数执行完后，这些变量还不会被销毁，因为内部函数还在引用它们。
+
+**闭包的形成条件：**
+1. 函数嵌套函数
+2. 内部函数引用外部函数的变量
+3. 外部函数被调用，内部函数被返回或在外部被调用
+
+**实际应用场景：**
+1. **防抖节流函数** - 最常见
+2. **模块化** - 避免全局污染
+3. **私有变量** - JS没有真正的私有变量，用闭包模拟
+4. **事件处理** - 保存状态
+
+**经典面试题例子：**
 ```javascript
-function outerFunction() {
-    let count = 0;
-    return function innerFunction() {
-        count++;
-        return count;
-    };
+for(var i = 0; i < 3; i++) {
+    setTimeout(() => console.log(i), 100)
 }
-let counter = outerFunction();
-console.log(counter()); // 1
-console.log(counter()); // 2
+// 输出：3, 3, 3
+
+// 用闭包解决：
+for(var i = 0; i < 3; i++) {
+    (function(j) {
+        setTimeout(() => console.log(j), 100)
+    })(i)
+}
+// 输出：0, 1, 2
 ```
-在这个例子中，`innerFunction`就是一个闭包，它可以访问`outerFunction`中的`count`变量，并且这个变量在多次调用`counter`函数时能够一直保存状态。
+
+**闭包的优缺点：**
+- 优点：变量持久化、避免全局污染、实现封装
+- 缺点：内存泄漏风险（变量不会被回收）
+
+**面试回答技巧：**
+1. 先说概念定义
+2. 再说形成条件
+3. 然后说应用场景
+4. 最后说优缺点
+
+记住：闭包就是"函数+它能访问的变量"的组合！
 
 ### 8、原型、原型链
 
-在JavaScript中，原型（Prototype）和原型链（Prototype Chain）是实现继承的核心机制。
+原型链是JS继承的核心，理解了它就理解了JS的对象机制：
 
-- **原型和原型链**：每个JavaScript对象都有一个内部属性 `[[Prototype]]`，通常称为**原型**，指向它的原型对象。这个原型对象本身也是一个对象，因此也有自己的原型。通过这种方式，对象之间形成了一个链式结构，即**原型链**。
+**核心概念：**
+1. 每个对象都有个`__proto__`属性，指向它的原型对象
+2. 每个函数都有个`prototype`属性，也是原型对象
+3. 原型对象也有自己的原型，这样一层一层就形成了原型链
 
-- **原型链的查找机制**：当访问一个对象的属性或者方法时，如果该对象自身没有这个属性和方法，JavaScript引擎会沿着原型链向上查找，直到找到目标属性或到达原型链的末端（`null`）。这种机制允许对象共享属性和方法，节省内存消耗并提高代码复用性。
+**白话理解：**
+就像继承关系一样，儿子从父亲那里继承属性，父亲从爷爷那里继承，一直往上追溯。
 
-例如：
+**原型链查找过程：**
+访问对象属性时：
+1. 先在对象自己身上找
+2. 没找到就去`__proto__`上找（原型对象）
+3. 还没找到就去原型的`__proto__`上找
+4. 一直找到`Object.prototype.__proto__`（等于null）为止
 
-```javascript
-let obj = {};
-console.log(obj.toString()); // 使用了从Object.prototype继承的方法toString
+**三个重要属性：**
+- `prototype` - 函数的属性，指向原型对象
+- `__proto__` - 对象的属性，指向构造函数的原型
+- `constructor` - 原型对象的属性，指回构造函数
+
+**经典关系图：**
+```
+function Person() {}
+let p = new Person()
+
+p.__proto__ === Person.prototype
+Person.prototype.constructor === Person
+Person.prototype.__proto__ === Object.prototype
+Object.prototype.__proto__ === null
 ```
 
-在这个例子中，`obj`对象本身没有定义`toString`方法，但它可以通过原型链访问到`Object.prototype`上的`toString`方法。
+**面试常问题：**
+1. 如何实现继承？
+   - 原型链继承、构造函数继承、组合继承、ES6 class继承
+
+2. instanceOf原理？
+   - 就是沿着原型链查找构造函数的prototype属性
+
+3. hasOwnProperty和in的区别？
+   - hasOwnProperty只检查自身属性
+   - in会检查整个原型链
+
+**记忆技巧：**
+- 函数有prototype，对象有__proto__
+- 查找属性就沿着__proto__链往上找
+- 最终都会找到Object.prototype
 
 
 ### 9、new 操作符
 
-在 JavaScript 中，`new` 操作符用于创建对象的实例。当使用 `new` 操作符创建一个对象实例时，它执行以下步骤：
+new操作符是JS中创建对象实例的核心，面试经常问它的原理：
 
-1. 创建一个空对象：首先，`new` 操作符会创建一个新的空对象，这个对象将成为最终的实例。
+**new操作符做了什么：**
+1. 创建一个空对象 {}
+2. 设置这个空对象的原型（__proto__）指向构造函数的prototype
+3. 执行构造函数，把this指向这个新对象
+4. 如果构造函数没有返回对象，就返回这个新对象
 
-2. 设置对象的原型：新创建的空对象会被设置一个原型，它用于继承构造函数的属性和方法。
-
-3. 执行构造函数：`new` 操作符会调用构造函数，并将新创建的空对象绑定到构造函数内部的 `this` 上。
-
-4. 返回新对象：如果构造函数没有显式返回一个对象，则 `new` 操作符会自动返回新创建的对象。
-
-下面是一个使用 `new` 操作符创建对象实例的示例：
-
+**手动实现new：**
 ```javascript
-function Person(name, age) {
-  this.name = name;
-  this.age = age;
+function myNew(Constr, ...args) {
+    // 1. 创建空对象
+    let obj = {}
+    
+    // 2. 设置原型
+    obj.__proto__ = Constr.prototype
+    
+    // 3. 执行构造函数
+    let result = Constr.apply(obj, args)
+    
+    // 4. 返回对象
+    return result instanceof Object ? result : obj
 }
-
-// 使用 new 操作符创建一个 Person 的实例
-const person1 = new Person("Alice", 30);
-
-console.log(person1.name); // 输出 "Alice"
-console.log(person1.age); // 输出 30
 ```
+
+**面试重点问题：**
+1. new操作符返回什么？
+   - 构造函数返回基本类型：忽略，返回新对象
+   - 构造函数返回对象：返回这个对象
+
+2. 不用new调用构造函数会怎样？
+   - this指向window（非严格模式）或undefined（严格模式）
+   - 不会创建新对象，相当于普通函数调用
+
+3. 箭头函数能用new吗？
+   - 不能！箭头函数没有自己的this，也没有prototype
+
+**常见面试题：**
+```javascript
+function Person() {
+    this.name = '张三'
+    return { name: '李四' }
+}
+let p = new Person()
+console.log(p.name) // '李四'，因为返回了对象
+```
+
+**记忆要点：**
+- new就是创建对象+设置原型+绑定this+返回对象
+- 重点理解返回值的处理逻辑
+- 箭头函数不能用new是高频考点！
 
 
 ### 10、对 this 的理解
 
-在 JavaScript 中，`this` 是一个特殊关键字，它代表当前执行上下文中的对象。`this` 的值取决于它在哪里被使用，通常有以下几种情况：
+this是JS中最容易混淆的概念，但掌握了规则就很简单：
 
-1. **全局上下文中的 `this`：** 在全局作用域中，`this` 指向全局对象，通常是浏览器环境中的 `window` 对象。
+**this指向的核心原则：**
+谁调用this，this就指向谁！（箭头函数除外）
 
-2. **函数内部的 `this`：** 在函数内部，`this` 取决于函数的调用方式。以下是一些常见情况：
+**各种情况下的this：**
 
-   - **作为普通函数调用：** 如果函数是作为普通函数调用的，`this` 将指向全局对象（浏览器环境中通常是 `window`）。
-   - **作为对象方法调用：** 如果函数作为对象的方法调用，`this` 将指向调用该方法的对象。
-   - **使用构造函数：** 如果函数作为构造函数使用（使用 `new` 关键字），`this` 将指向新创建的对象。
-   - **使用 `call` 或 `apply` 方法：** 可以使用 `call` 或 `apply` 方法来显式指定函数内部的 `this` 值。
+1. **全局调用** - 指向全局对象
+   ```javascript
+   function fn() { console.log(this) } 
+   fn() // window（非严格模式）
+   ```
 
-3. **箭头函数中的 `this`：** 箭头函数没有自己的 `this`，它会继承外部函数的 `this` 值。这使得箭头函数在回调函数等情况下非常有用，因为它们不会改变 `this` 的指向。
+2. **对象方法调用** - 指向调用对象
+   ```javascript
+   let obj = { 
+       name: '张三',
+       say() { console.log(this.name) }
+   }
+   obj.say() // '张三'
+   ```
+
+3. **构造函数调用** - 指向新创建的对象
+   ```javascript
+   function Person() { this.name = '李四' }
+   let p = new Person()
+   ```
+
+4. **call/apply/bind调用** - 指向指定对象
+   ```javascript
+   fn.call(obj) // this指向obj
+   fn.apply(obj) // this指向obj
+   fn.bind(obj)() // this指向obj
+   ```
+
+5. **箭头函数** - 没有自己的this，继承外层
+   ```javascript
+   let obj = {
+       name: '王五',
+       say: () => console.log(this.name) // 这里的this不是obj
+   }
+   ```
+
+**面试经典问题：**
+1. setTimeout中的this为什么指向window？
+   - setTimeout是全局方法，普通函数调用时this指向全局
+
+2. 如何改变this指向？
+   - call/apply/bind
+   - 用箭头函数
+   - 用that = this缓存
+
+3. 严格模式下的this？
+   - 全局函数调用时this是undefined，不是window
+
+**实用技巧：**
+- 对象方法用普通函数（this指向对象）
+- 回调函数用箭头函数（避免this丢失）
+- 想强制指向谁用bind
+
+**记忆口诀：**
+普通调用看全局，对象调用看左边，new调用是新对象，箭头函数看外层，call/bind说了算！
 
 ### 11、防抖和节流
 
-防抖（Debouncing）和节流（Throttling）都是用于控制事件触发频率的技术，通常在 Web 前端开发中用来提高性能和用户体验。
+这是性能优化的核心手段，面试几乎必问，手写代码是重点：
 
-1. 防抖（Debouncing）：
+**防抖（Debounce）：**
+- **原理**：事件触发后等一会，如果在这段时间内又触发了，就重新计时
+- **生活比喻**：电梯门，有人进来就重新等一会关门
+- **应用场景**：搜索框输入、按钮防止重复点击、窗口resize
 
-   - 防抖是在事件被触发后，会等待一段时间（例如 100ms），如果在这段时间内没有再次触发事件，那么才会执行事件处理函数；如果在这段时间内事件又被触发，则重新开始计时。
-   - 主要用于防止短时间内多次触发的事件导致过多的资源消耗，例如输入框输入时的搜索功能，只有在用户停止输入一段时间后才触发搜索请求。
+**节流（Throttle）：**
+- **原理**：固定时间间隔执行，不管触发多频繁，都按固定频率执行
+- **生活比喻**：水龙头拧到一半，水流稳定流出
+- **应用场景**：滚动事件、鼠标移动、游戏射击
 
-   JavaScript 中的一个简单防抖函数示例：
+**手写防抖（重点）：**
+```javascript
+function debounce(func, delay) {
+    let timer
+    return function(...args) {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            func.apply(this, args)
+        }, delay)
+    }
+}
+```
 
-   ```javascript
-   function debounce(func, delay) {
-     let timer;
-     return function () {
-       clearTimeout(timer);
-       timer = setTimeout(() => {
-         func.apply(this, arguments);
-       }, delay);
-     };
-   }
-   ```
+**手写节流（重点）：**
+```javascript
+function throttle(func, delay) {
+    let timer = null
+    return function(...args) {
+        if (!timer) {
+            timer = setTimeout(() => {
+                func.apply(this, args)
+                timer = null
+            }, delay)
+        }
+    }
+}
+```
 
-2. 节流（Throttling）：
+**面试常问题：**
+1. 防抖和节流的区别？
+   - 防抖：重置计时，只执行最后一次
+   - 节流：固定频率执行，第一次必定执行
 
-   - 节流是在一段时间内只允许执行一次事件处理函数，即使事件在这段时间内被触发多次，也只会执行一次事件处理函数。
-   - 与防抖不同，节流不会重新开始计时，而是固定间隔执行事件处理函数。
-   - 主要用于频繁触发的事件，以控制事件处理函数的执行频率，例如滚动事件，每隔一定时间触发一次滚动事件处理函数，而不是每次滚动都触发。
+2. 防抖的立即执行版本？
+   - 可以加个参数控制是否立即执行
 
-   JavaScript 中的一个简单节流函数示例：
+3. 节流的时间戳版本？
+   - 用时间戳判断是否超过间隔
 
-   ```javascript
-   function throttle(func, delay) {
-     let timer;
-     return function () {
-       if (!timer) {
-         timer = setTimeout(() => {
-           func.apply(this, arguments);
-           timer = null;
-         }, delay);
-       }
-     };
-   }
-   ```
+**实际项目应用：**
+- 搜索防抖：用户输入停止后再发送请求
+- 滚动节流：页面滚动时按固定频率加载更多
 
-需要注意的是，防抖和节流的具体实现方式可以根据具体的需求和场景进行调整和扩展。选择合适的技术来控制事件触发频率可以提高网页性能，减少不必要的资源消耗。
+**记忆技巧：**
+- 防抖 = 延迟执行 + 重置计时
+- 节流 = 时间间隔 + 节制执行
 
-### 12、0.1+0.2 ! == 0.3？
+### 12、0.1+0.2 != 0.3？为什么？
 
-1. **原因分析**
-   - 在计算机中，十进制的小数（如0.1和0.2）会被转换为二进制来进行计算。0.1的二进制表示是一个无限循环小数，0.2也是。
-   - 当计算机对这两个二进制小数进行相加时，会产生舍入误差。相加后的结果的二进制再转换回十进制就不是精确的0.3，而是`0.30000000000000004`。
-2. **解决方法**
-   - 在JavaScript等编程语言中，如果要比较浮点数是否相等，可以设置一个误差范围。例如：
-   ```javascript
-   function approximatelyEqual(a, b, tolerance = 0.00001) {
-       return Math.abs(a - b) < tolerance;
-   }
-   console.log(approximatelyEqual(0.1 + 0.2, 0.00001)); 
-   ```
-   - 这样就可以在一定程度上解决浮点数比较的问题。这种误差是由于计算机底层存储和计算浮点数的机制导致的，几乎所有编程语言都会遇到这个问题。
+这个经典问题考察对浮点数精度的理解：
 
-### 13、Ts 和 Js 有哪些区别
+**为什么会这样？**
+- 计算机用二进制存储数字，0.1和0.2在二进制中是无限循环小数
+- 就像10进制中1/3=0.3333...一样，无法精确表示
+- 存储时会有精度丢失，计算时会产生误差
 
-1. **类型系统**
-   - **JavaScript（Js）**：是一种动态类型语言。这意味着变量的类型在运行时才确定，并且可以在运行过程中改变类型。例如：
-   ```javascript
-   let variable = 1;
-   variable = "string";
-   ```
-   - **TypeScript（Ts）**：是JavaScript的超集，具有静态类型系统。在代码编写阶段就需要确定变量、函数参数、返回值等的类型。例如：
-   ```typescript
-   let variable: number = 1;
-   variable = "string"; // 会报错，因为类型不匹配
-   ```
-   - 静态类型系统有助于在开发阶段发现更多错误，提高代码的健壮性和可维护性。
-2. **编译过程**
-   - **Js**：可以直接在浏览器或Node.js环境中运行，不需要额外的编译步骤。
-   - **Ts**：需要先编译成JavaScript才能运行。编译器会检查类型错误并将Ts代码转换为兼容的Js代码。例如，使用`tsc`（TypeScript编译器）命令来编译`.ts`文件：
-   ```
-   tsc yourFile.ts
-   ```
-3. **语言特性和语法糖**
-   - **Ts**：提供了一些JavaScript中没有的语法特性，如接口（interface）、枚举（enum）、泛型（generic）等。
-   - 接口用于定义对象的形状，例如：
-   ```typescript
-   interface Person {
-       name: string;
-       age: number;
-   }
-   let person: Person = {
-       name: "John",
-       age: 30
-   };
-   ```
-   - 枚举用于定义一组命名常量，例如：
-   ```typescript
-   enum Color {
-       Red,
-       Green,
-       Blue
-   }
-   let myColor: Color = Color.Green;
-   ```
-   - 泛型可以创建可复用的代码，适用于多种类型，例如：
-   ```typescript
-   function identity<T>(arg: T): T {
-       return arg;
-   }
-   let result = identity<string>("string value");
-   ```
-4. **开发工具支持**
-   - **Ts**：由于其静态类型系统，集成开发环境（IDE）可以提供更好的代码自动补全、导航和错误检查功能。而JavaScript在这方面相对较弱。
+**具体过程：**
+- 0.1 → 二进制：0.00011001100110011...
+- 0.2 → 二进制：0.00110011001100110...
+- 相加后存储的精度有限，导致结果是0.30000000000000004
+
+**解决方案：**
+
+1. **误差范围判断（最常用）：**
+```javascript
+function equal(a, b, tolerance = 0.00001) {
+    return Math.abs(a - b) < tolerance
+}
+equal(0.1 + 0.2, 0.3) // true
+```
+
+2. **转换为整数计算：**
+```javascript
+(0.1 * 10 + 0.2 * 10) / 10 // 0.3
+```
+
+3. **使用toFixed格式化：**
+```javascript
+(0.1 + 0.2).toFixed(1) // "0.3"
+```
+
+**面试扩展问题：**
+1. 为什么只有有些小数有这个问题？
+   - 分母是2的幂次方的数可以精确表示（如0.5、0.25）
+
+2. 其他语言也有这个问题吗？
+   - 基本都有，这是浮点数存储机制导致的
+
+3. 项目中如何避免？
+   - 涉及金额计算用整数（分）
+   - 或者使用专门的数学库（如big.js）
+
+**记忆要点：**
+- 这是浮点数精度问题，不是JS特有
+- 用误差范围或转整数的方式解决
+- 涉及金钱计算要特别注意！
+
+### 13、TypeScript vs JavaScript 区别
+
+现在企业级项目基本都用TS，这个对比很重要：
+
+**核心区别：**
+- JS是动态类型，运行时才知道类型错误
+- TS是静态类型，写代码时就能发现类型错误
+- TS是JS的超集，所有JS代码都是有效的TS代码
+
+**类型系统对比：**
+
+**JS（动态类型）：**
+```javascript
+let a = 1
+a = 'hello' // 完全可以，但可能出bug
+```
+
+**TS（静态类型）：**
+```typescript
+let a: number = 1
+a = 'hello' // 编译时报错，类型不匹配
+```
+
+**TS带来的好处：**
+1. **开发阶段发现错误** - 不用等运行时才报错
+2. **更好的IDE支持** - 代码补全、重构、导航
+3. **代码可读性更好** - 接口定义清楚数据结构
+4. **大型项目维护性** - 类型约束让代码更稳定
+
+**TS特有功能：**
+- **接口（interface）** - 定义对象结构
+- **枚举（enum）** - 定义常量集合
+- **泛型** - 创建可复用组件
+- **类型注解** - 明确函数参数和返回值
+- **联合类型、交叉类型** - 更灵活的类型组合
+
+**实际项目影响：**
+- **开发效率**：短期JS快，长期TS效率更高
+- **代码质量**：TS明显优于JS
+- **团队协作**：TS更有利于大型团队
+- **学习成本**：TS需要额外学习
+
+**什么时候用TS：**
+- 大型项目、多人协作
+- 对代码质量要求高
+- 项目生命周期长
+
+**面试回答要点：**
+1. TS是静态类型，JS是动态类型
+2. TS提供更好的开发体验和代码质量
+3. TS是超集，渐进式采用
+4. 现代前端趋势是TS化
+
+记住：TS = JS + 类型系统 + 工具支持！
+
+### 14、事件循环 Event Loop
+
+事件循环是JS的核心机制，面试必问，一定要搞懂：
+
+**为什么需要事件循环？**
+JS是单线程的，为了不阻塞主线程，用异步处理耗时操作
+
+**执行顺序（重点）：**
+1. **同步代码** → 立即执行
+2. **微任务** → 同步代码执行完后立即执行
+3. **宏任务** → 微任务执行完后执行
+
+**哪些是微任务？**
+- Promise.then/catch/finally
+- async/await（本质是Promise语法糖）
+- process.nextTick（Node.js）
+- MutationObserver（浏览器）
+
+**哪些是宏任务？**
+- setTimeout/setInterval
+- I/O操作
+- UI渲染
+- requestAnimationFrame
+
+**经典面试题：**
+```javascript
+setTimeout(() => console.log('timeout'), 0)
+Promise.resolve().then(() => console.log('promise'))
+console.log('start')
+// 输出：start → promise → timeout
+```
+
+**执行过程：**
+1. 先执行同步：console.log('start')
+2. 检查微任务队列：执行promise的then
+3. 检查宏任务队列：执行setTimeout
+
+**浏览器 vs Node.js：**
+- 浏览器：多个宏任务队列，按时间排序
+- Node.js：分阶段处理，Timer、Poll、Check等阶段
+
+**记忆口诀：**
+同步先执行，微任务紧跟着，宏任务最后来，一轮一轮转！
+
+
+
+**面试重点：**
+- let/const vs var的区别
+- 箭头函数this指向
+- 解构赋值的应用场景
+- 新增数据结构的使用
+
+记住：现代前端开发必须掌握ES6+，这是基本功！

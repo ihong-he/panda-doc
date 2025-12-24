@@ -3,579 +3,373 @@ outline: deep
 ---
 ## 目录表
 [[toc]]
-## 一、Vue
+## 一、Vue基础
 
-### 1、对MVVM的理解
+### 1、MVVM是什么？Vue怎么实现的？
 
-`MVVM`是`Model-View-ViewModel`缩写，也就是把`MVC`中的`Controller`演变成`ViewModel`。`Model`层代表数据模型，`View`代表UI组件，`ViewModel`是View和Model层的桥梁，viewModel层并自动将绑定的数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
+**通俗理解**：MVVM就是数据模型(Model)、视图(View)、视图模型(ViewModel)三层架构。
 
-### 2、双向绑定的原理
+- **Model**：数据层，就是咱们定义的数据
+- **View**：视图层，就是用户看到的页面
+- **ViewModel**：连接层，Vue做的就是这事，让数据变化自动更新视图
 
-> Vue 2 和 Vue 3 实现双向绑定的原理有一些不同，以下是它们各自的简要说明：
-
-![An image](/img/vue1.png)
-
-- Vue 2 的双向绑定原理：
-
-Vue 2 使用 **数据劫持** 和 **发布-订阅模式** 来实现双向绑定。具体过程如下：
-1. **数据劫持**：Vue 通过 `Object.defineProperty` 方法将数据对象的每个属性转换为 getter 和 setter。当数据发生变化时，setter 会被触发。
-2. **依赖收集**：当组件渲染时，Vue 会在 getter 中收集所有依赖（如组件的 DOM）。每个依赖（如组件中的模板）会被注册为这个属性的观察者。
-3. **发布-订阅**：当数据改变时，setter 会通知所有依赖的更新，触发相应的 DOM 更新，实现双向绑定。
-
-这种方式通过 `v-model` 实现输入框和数据的双向绑定。
-
-- Vue 3 的双向绑定原理：
-
-Vue 3 使用 **Proxy** 来替代 Vue 2 中的 `Object.defineProperty`，这是 Vue 3 引入的一个新特性。原理如下：
-1. **Proxy 代理**：Vue 3 使用 `Proxy` 来代理数据对象。通过 `Proxy`，Vue 可以劫持数据对象的操作（如读取、设置、删除属性）。
-2. **依赖收集与响应式**：当组件访问某个属性时，`Proxy` 会触发 `get` 操作，Vue 会将该组件视为依赖，注册到该属性的依赖列表中。类似地，`set` 操作会通知相关依赖更新。
-3. **更高效的性能**：`Proxy` 允许对对象的所有操作进行拦截，因此 Vue 3 可以更加灵活和高效地实现数据绑定。
-
-总结：
-- Vue 2 依赖于 `Object.defineProperty` 和 getter/setter 来进行双向绑定。
-- Vue 3 使用 `Proxy` 提供更强大的功能和更高效的性能。
-
-两者都通过数据变化触发视图更新，但 Vue 3 在性能和灵活性上做了优化。
-
-### 3、Vue3和Vue2的区别
-
-以下是 Vue3 和 Vue2 的主要区别：
-- **响应式原理**：
-  - Vue2 使用 `Object.defineProperty` 对数据属性进行劫持，新增属性需使用 `Vue.set` 或 `this.$set` 才能实现响应式。
-  - Vue3 采用 `Proxy` 实现响应式，可代理整个对象，动态添加新属性也自动为响应式。
-- **组件 API**：
-  - Vue2 主要使用 选项式（Options API）API，将组件的逻辑按选项分类（如 `data`、`methods`、`computed` 等）放在一个对象中。
-  - Vue3 除 选项式（Options API） API外，还提供 组合式（omposition API）API，可将逻辑按功能组织，通过 `setup` 函数实现，更利于代码复用和维护。
-- **性能**：
-  - Vue2 对静态节点和动态节点更新无区分，性能稍逊一筹。
-  - Vue3 通过静态标记等优化，能更高效地更新，可跳过静态节点更新，性能更好。
-- **全局 API**：
-  - Vue2 有多个全局 API，如 `Vue.use`、`Vue.component` 等，会影响全局状态。
-  - Vue3 引入应用实例 `app`，使用 `app.use`、`app.component` 等，更模块化，减少全局状态干扰。
-- **Fragment 支持**：
-  - Vue2 组件必须有一个根元素。
-  - Vue3 支持 `Fragment`，允许组件有多个根元素，可直接写多个元素而无需包裹元素。
-- **Teleport 组件**：
-  - Vue3 新增 `Teleport` 组件，可将组件内容传送到 DOM 其他位置，Vue2 没有。
-
-### 4、Vue常用的指令
-
-Vue.js提供了一些常用的指令（Directives），用于操作DOM、数据绑定以及控制应用程序的行为。以下是一些常见的Vue指令以及示例：
-
-1. **v-bind**：用于动态绑定HTML元素的属性。
-
-2. **v-model**：用于实现双向数据绑定，将表单元素的值与数据模型关联。
-
-3. **v-for**：用于循环渲染列表数据。
-
-
-4. **v-if / v-else**：用于条件性地渲染元素。
-
-5. **v-show**：类似于v-if，但是通过CSS样式来控制元素的显示和隐藏。
-
-6. **v-on**：用于监听DOM事件，并触发相应的方法。
-
-7. **v-pre**：跳过元素和其子元素的编译过程，用于静态内容。
-
-8. **v-cloak**：用于防止页面闪烁，通常与CSS一起使用。
-
-9. **v-once**：只渲染元素和组件一次，不再进行响应式更新。
-
-这些是Vue.js中一些常用的指令。每个指令都有不同的用途，可根据需要选择使用。指令使Vue应用程序更具交互性和动态性，能够根据数据的变化来更新页面内容。
-
-### 5、v-if VS v-show
-
-1. **渲染方式**：
-   - `v-if` 是**按需渲染**，条件为 `false` 时，DOM 元素不会存在于页面中。
-   - `v-show` 是**显示/隐藏**，通过修改元素的 `display` 样式（`display: none`）来控制可见性，元素始终存在于 DOM 中。
-
-2. **性能**：
-   - `v-if` 适用于**条件变化频率较低**的场景，因为每次切换都会销毁和重新创建 DOM。
-   - `v-show` 适用于**需要频繁切换显示状态**的场景，因为切换只涉及样式操作。
-
-3. **使用场景**：
-   - `v-if`：适合动态加载或初始状态为 `false` 的组件。
-   - `v-show`：适合需要频繁显示和隐藏的组件。
-
-**Vue 3 补充**：  
-Vue 3 中，`v-if` 和 `v-show` 的基本行为没有改变，但性能更佳，尤其在模板编译和响应式渲染的优化上。
-
-### 6、data为什么是一个函数
-
-在 Vue 2 中，组件的 `data` 必须是一个函数，而在根实例中可以是一个对象。原因如下：  
-
-1. **组件复用时的独立性**：  
-   如果 `data` 是一个对象，所有组件实例将共享这一个对象，导致数据之间互相影响。  
-   使用函数返回对象，可以确保每个组件实例都有独立的 `data` 副本，避免互相干扰。  
-
-   ```javascript
-   data() {
-       return {
-           message: "Hello, Vue!"
-       };
-   }
-   ```
-
-2. **根实例不需要复用**：  
-   根实例只创建一次，因此 `data` 可以直接是一个对象，不存在数据共享问题。  
-
-
-### 7、生命周期
-
-**Vue 2 的生命周期函数：**
-
-1. **创建阶段**：
-   - `beforeCreate`：实例初始化之后，数据观察和事件配置尚未完成。
-   - `created`：实例已创建完成，数据已响应式处理，但未挂载 DOM。
-
-2. **挂载阶段**：
-   - `beforeMount`：模板编译完成，尚未挂载到 DOM。
-   - `mounted`：实例已挂载到 DOM，DOM 可被访问。
-
-3. **更新阶段**（数据变化触发）：
-   - `beforeUpdate`：数据更新时调用，DOM 尚未更新。
-   - `updated`：数据更新后调用，DOM 已同步更新。
-
-4. **销毁阶段**：
-   - `beforeDestroy`：实例销毁前调用，仍可访问实例。
-   - `destroyed`：实例已销毁，所有事件监听和响应数据均被清理。
+**Vue3实现原理**：通过Proxy代理数据对象，当数据变化时自动更新视图。你改数据，页面自动跟着变，不用手动操作DOM。
 
 ---
 
-**Vue 3 的生命周期函数**：
+### 2、Vue3和Vue2核心区别（面试重点）
 
-Vue 3 中生命周期函数与 Vue 2 基本一致，但提供了基于 **组合式 API** 的钩子函数替代选项，例如：  
-- `onBeforeMount()` 对应 `beforeMount`
-- `onMounted()` 对应 `mounted`
-- `onBeforeUpdate()` 对应 `beforeUpdate`
-- `onUpdated()` 对应 `updated`
-- `onBeforeUnmount()` 对应 `beforeDestroy`
-- `onUnmounted()` 对应 `destroyed`
+**响应式原理**（必考点）：
+- Vue2用`Object.defineProperty`，只能监听已有属性，新增属性要`Vue.set`
+- Vue3用`Proxy`，能监听整个对象，新增属性自动响应式
 
-**Vue 3 新增**：  
-- `onRenderTracked` 和 `onRenderTriggered`：调试响应式数据依赖时使用。  
-- `onErrorCaptured`：用于捕获子组件的错误。  
+**写法变化**：
+- Vue2主要是选项式API（data、methods分开写）
+- Vue3推荐组合式API（setup语法糖），相关逻辑放一起，代码更清爽
 
-每个生命周期都有明确的作用，可以根据实际需求选择合适的钩子函数进行操作。
+**性能提升**：
+- Vue3编译优化更好，diff算法更智能，静态节点不重新渲染
+- 支持Tree-shaking，按需引入，打包体积更小
 
-### 8、组件通信
-
-**1. 父子组件通信：**
-
-- **父传子**：通过 `props` 向子组件传递数据。  
-  ```vue
-  <!-- 父组件 -->
-  <ChildComponent :message="parentMessage" />
-  <!-- 子组件 -->
-  props: ['message']
-  ```
-- **子传父**：通过事件 `$emit` 通知父组件，父组件通过监听事件接收数据。  
-  ```vue
-  <!-- 子组件 -->
-  this.$emit('eventName', data)
-  <!-- 父组件 -->
-  <ChildComponent @eventName="handleEvent" />
-  ```
+**新特性**：
+- 多根节点（不用套一层div）
+- Teleport组件（传送到DOM任意位置）
+- Composition API（逻辑复用更方便）
 
 ---
 
-**2. 非父子组件通信：**
+### 3、Vue双向绑定底层原理（高频题）
 
-- **事件总线 (Event Bus)**：使用一个空的 Vue 实例作为事件中心。  
-  ```javascript
-  // 创建事件总线
-  const EventBus = new Vue();
-  // 组件A
-  EventBus.$emit('eventName', data);
-  // 组件B
-  EventBus.$on('eventName', (data) => { ... });
-  ```
-  **注意**：在 Vue 3 中已不推荐这种方式。
+**Vue2（Object.defineProperty）**：
+- 把数据属性转成getter/setter
+- 读取数据时收集依赖（哪个组件用了这数据）
+- 修改数据时通知依赖的组件更新
 
-- **状态管理工具（如 Vuex 或 Pinia）**：管理全局状态，适合复杂项目。  
-  - Vuex 示例：
-    ```javascript
-    // 存储数据
-    this.$store.commit('mutationName', payload);
-    // 访问数据
-    this.$store.state.propertyName;
-    ```
+**Vue3（Proxy）**：
+- 用Proxy代理整个对象
+- 读取时get操作收集依赖
+- 修改时set操作触发更新
+- 比Vue2更强大，能监听数组、新增属性等
+
+**一句话总结**：数据变化时自动更新视图，Vue2靠defineProperty，Vue3靠Proxy。
 
 ---
 
-**3. 跨层级组件通信：**
+### 4、Vue常用指令（记住这几个就够了）
 
-- **`provide` 和 `inject`**：
-  - 父级组件提供数据，子孙组件注入数据，适合层级较深的场景。
-  ```javascript
-  // 父组件
-  provide: { key: value }
-  // 子组件
-  inject: ['key']
-  ```
+**必知指令**：
+- `v-bind`：缩写`:`，绑定属性（如`:class="active"`）
+- `v-on`：缩写`@`，绑定事件（如`@click="handleClick"`）
+- `v-model`：双向绑定，表单用得多
+- `v-for`：循环渲染（记得加`:key`）
+- `v-if`/`v-else`：条件渲染
+- `v-show`：显示隐藏（display:none）
 
----
-
-**4. 全局事件或全局状态：**
-
-- **Vue.prototype** (Vue 2)：挂载方法或数据到 Vue 的原型。
-- **`mitt` (Vue 3 推荐)**：轻量事件总线库。
+**不常用但要知道**：
+- `v-once`：只渲染一次
+- `v-pre`：跳过编译
+- `v-cloak`：防止页面闪烁
 
 ---
 
-**Vue 3 补充**：
+### 5、v-if和v-show的区别（经典面试题）
 
-- **组合式 API + `ref` 和 `reactive`**：通过共享响应式数据实现通信。
-  ```javascript
-  import { ref } from 'vue';
-  const sharedData = ref('value');
-  export default sharedData;
-  ```  
+**核心区别**：
+- `v-if`：false时DOM中真没有这个元素，是销毁/创建
+- `v-show`：false时DOM还在，只是`display:none`隐藏
 
-根据实际场景选择合适的通信方式，注重性能和可维护性。
+**选择原则**：
+- 频繁切换用`v-show`（成本小）
+- 条件基本不变用`v-if`（初始渲染成本低）
 
-### 9、v-for中key值的作用
-
-在 `v-for` 中使用 `key` 的作用主要是帮助 Vue 跟踪每个节点的身份，优化虚拟 DOM 的渲染过程。
-
- **作用**：
-1. **性能优化**：  
-   Vue 使用 `key` 来标识每个元素，当数据变化时，Vue 能够通过 `key` 精确地识别哪个元素被更改、插入或移除，从而减少不必要的 DOM 操作，提高渲染性能。
-
-2. **避免重用元素**：  
-   如果没有 `key`，Vue 默认会通过索引来标识每个元素。这样可能会导致元素的状态（如输入框的值）在位置变化时被错误地复用，出现不一致的现象。
-
-**例子**：
-```vue
-<!-- 正确用法 -->
-<ul>
-  <li v-for="item in items" :key="item.id">{{ item.name }}</li>
-</ul>
-```
-- 在上面的例子中，`item.id` 作为 `key` 帮助 Vue 更精确地识别每个列表项。
-
-**总结**：`key` 有助于提高渲染效率，并确保元素状态的正确性。
-
-
-### 10、Computed VS Watch
-
-**区别总结**：
-
-1. **用途**：  
-   - **Computed（计算属性）**：用于基于已有数据计算出新的值，适合涉及复杂逻辑的值，且具备**缓存**功能。  
-   - **Watch（侦听器）**：用于**监听某个数据的变化**，适合执行一些**副作用操作**（如异步请求、手动 DOM 操作等）。  
-
-2. **触发时机**：  
-   - **Computed**：依赖的数据发生变化时，会自动重新计算，但只在被访问时触发计算。  
-   - **Watch**：数据变化时立即执行回调函数。  
-
-3. **是否有缓存**：  
-   - **Computed**：有缓存，只有依赖数据发生变化时才重新计算，性能更优。  
-   - **Watch**：没有缓存，每次数据变化都会触发回调。  
-
-4. **写法**：
-   - **Computed**：只需定义计算逻辑，适合返回一个值。  
-   - **Watch**：需要显式定义回调函数，可以执行复杂操作。  
+**面试加分**：`v-if`有更高的切换开销，`v-show`有更高的初始渲染开销。
 
 ---
 
-**代码示例**：
+### 6、组件data为什么必须是函数
 
-**Computed**：  
+**核心原因**：保证每个组件实例都有独立的数据对象。
+
+**举例说明**：
+- 如果data是对象，所有组件实例共享同一个对象，一个改了都受影响
+- 如果data是函数，每次创建实例都执行函数返回新对象，数据独立
+
+**Vue3 setup语法糖中**：
+- 不用写data函数了，直接写`const count = ref(0)`
+- 但原理一样，每个组件实例都有自己的响应式数据
+
+---
+
+### 7、Vue生命周期（背会这些就行）
+
+**Vue2时期**（了解即可）：
+- created：数据有了，DOM还没挂载
+- mounted：DOM挂载完了
+- updated：数据更新了，DOM也更新了
+- destroyed：组件销毁了
+
+**Vue3重点**（setup语法糖写法）：
 ```javascript
-computed: {
-  fullName() {
-    return this.firstName + ' ' + this.lastName;
+import { onMounted, onUpdated, onUnmounted } from 'vue'
+
+// 挂载完
+onMounted(() => {
+  // 获取DOM、发请求
+})
+
+// 更新完
+onUpdated(() => {
+  // DOM更新后的操作
+})
+
+// 销毁前
+onUnmounted(() => {
+  // 清理定时器、解绑事件
+})
+```
+
+**使用场景**：
+- `onMounted`：获取DOM元素、发ajax请求
+- `onUnmounted`：清理定时器、取消事件监听
+
+---
+
+### 8、组件通信方式（Vue3重点）
+
+**父子通信**（最常用）：
+- 父传子：`props`
+- 子传父：`emit`
+
+**跨层级通信**：
+- `provide`/`inject`：爷孙组件通信
+- EventBus（Vue3不推荐）
+
+**全局状态管理**：
+- 小项目：创建一个响应式对象导出
+- 大项目：用Pinia（官方推荐）
+
+**Vue3 setup语法糖写法**：
+```javascript
+// 子组件
+const props = defineProps(['msg'])
+const emit = defineEmits(['update'])
+
+// 发送事件
+emit('update', newValue)
+```
+
+---
+
+### 9、v-for中的key为什么重要
+
+**key的作用**：帮Vue识别哪个元素是哪个，提高diff性能。
+
+**没有key的问题**：
+- Vue默认用下标作为key
+- 数组变化时，可能出现DOM复用混乱
+- 典型问题：输入框内容错乱
+
+**怎么选key**：
+- 最好用唯一且稳定的值（如id）
+- 不要用数组下标
+- 不要用随机数
+
+**一句话总结**：key给每个元素发身份证，避免认错人。
+
+---
+
+### 10、computed和watch的区别（必考）
+
+**computed（计算属性）**：
+- 有缓存，依赖不变就不重新计算
+- 必须有返回值
+- 适合根据现有数据计算新数据
+
+**watch（监听器）**：
+- 没缓存，数据变就执行
+- 可以执行异步操作
+- 适合数据变化时做副作用（发请求、DOM操作）
+
+**Vue3新增**：
+- `watchEffect`：自动收集依赖，不用手动指定监听谁
+- `computed`写法更简洁：`const doubleCount = computed(() => count.value * 2)`
+
+**选择原则**：
+- 想缓存、有返回值用computed
+- 想做副作用、异步操作用watch
+
+---
+
+### 11、keep-alive是什么，怎么用
+
+**作用**：缓存组件，避免重复渲染，提升性能。
+
+**使用场景**：
+- tab切换页面
+- 列表进入详情再返回
+- 任何需要保持状态的页面切换
+
+**基本用法**：
+```vue
+<keep-alive :include="['User', 'Post']" :max="10">
+  <router-view />
+</keep-alive>
+```
+
+**生命周期钩子**：
+- `activated`：组件被激活时
+- `deactivated`：组件被缓存时
+
+**面试重点**：缓存后的组件不会触发`mounted`，而是触发`activated`。
+
+---
+
+### 12、nextTick的作用和使用
+
+**作用**：等DOM更新完成后再执行代码。
+
+**为什么需要**：Vue更新DOM是异步的，数据改完DOM不会马上更新。
+
+**Vue3用法**：
+```javascript
+import { nextTick } from 'vue'
+
+const updateData = async () => {
+  count.value++
+  await nextTick()
+  // 这里DOM已经更新完了
+  console.log(divRef.value.textContent)
+}
+```
+
+**典型场景**：
+- 数据更新后获取最新的DOM内容
+- 操作依赖数据更新后的DOM
+
+---
+
+## 二、Vue生态
+
+### 1、Vue Router传参数方式
+
+**路径参数**（动态路由）：
+```javascript
+// 配置：{ path: '/user/:id', component: User }
+// 访问：/user/123
+// 获取：route.params.id
+```
+
+**查询参数**（URL问号后）：
+```javascript
+// 访问：/search?q=vue&page=1
+// 获取：route.query.q
+```
+
+**props传参**（解耦$router）：
+```javascript
+// 配置：{ path: '/user/:id', component: User, props: true }
+// 组件内直接用props接收：props: ['id']
+```
+
+**Vue3 setup写法**：
+```javascript
+import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()  // 获取路由信息
+const router = useRouter() // 跳转路由
+```
+
+---
+
+### 2、路由守卫（权限控制核心）
+
+**全局守卫**：
+```javascript
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isLogin) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+```
+
+**路由独享守卫**：
+```javascript
+{
+  path: '/admin',
+  component: Admin,
+  beforeEnter: (to, from, next) => {
+    // 只有这个路由的守卫
   }
 }
 ```
 
-**Watch**：  
+**组件内守卫**：
 ```javascript
-watch: {
-  firstName(newVal, oldVal) {
-    console.log('firstName changed:', newVal);
-    this.fetchData(newVal); // 执行副作用操作
-  }
-}
+// setup语法糖中用不了，了解即可
+beforeRouteEnter // 进入前
+beforeRouteUpdate // 参数更新时
+beforeRouteLeave // 离开前
 ```
 
+**实际应用**：登录验证、权限控制、页面离开提醒。
+
 ---
 
-**Vue 3 补充**：
+### 3、hash模式和history模式选择
 
-- Vue 3 中的 `ref` 和 `reactive` 配合 `computed` 和 `watch` 使用。  
-- 新增了 **`watchEffect`**，可以自动收集依赖并立即执行回调，适合更简单的场景。  
+**hash模式**（`#/home`）：
+- 兼容性好，不用服务器配置
+- URL丑，有#号
+- SEO不友好
 
-**`watchEffect` 示例**：  
+**history模式**（`/home`）：
+- URL美观，符合常规认知
+- 需要服务器配置（刷新404问题）
+- SEO友好
+
+**怎么选**：
+- 简单项目、演示用hash
+- 正式项目、要求SEO用history
+- 配合nginx等服务器解决刷新问题
+
+**Vue3中配置**：`createWebHashHistory()`或`createWebHistory()`
+
+---
+
+### 4、Vuex vs Pinia（状态管理）
+
+**Vuex**（传统方案）：
+- State、Getter、Mutation、Action、Module
+- Mutation必须同步，Action可以异步
+- 配置相对复杂
+
+**Pinia**（Vue3推荐）：
+- 更简洁，没有Mutation
+- 完美支持TypeScript
+- 支持DevTools
+- 模块化更自然
+
+**Pinia基本用法**：
 ```javascript
-import { ref, watchEffect } from 'vue';
-
-const count = ref(0);
-watchEffect(() => {
-  console.log(`Count is: ${count.value}`);
-});
-```
-
-### 11、对 `keep-alive` 的理解
-
-**`keep-alive` 简要总结**：
-
-1. **功能**：  
-   - `keep-alive` 是 Vue 提供的内置组件，用于**缓存**组件状态，防止组件在切换过程中反复销毁和重建，提升性能。  
-
-2. **使用场景**：  
-   - 适用于**多视图切换**（如路由组件）或需要保留组件状态的场景。  
-   - 比如：分页表单、标签页切换等。  
-
-3. **主要属性**：  
-   - **`include`**：字符串或正则，指定哪些组件需要被缓存。  
-   - **`exclude`**：字符串或正则，指定哪些组件不需要被缓存。  
-   - **`max`**：数字，限制缓存组件的最大数量，超出后会根据 LRU（最近最少使用）策略移除。  
-
-4. **生命周期**：  
-   - **`activated`**：组件被激活时触发。  
-   - **`deactivated`**：组件被移出缓存时触发。  
-   - 与 `mounted` 和 `destroyed` 配合使用，管理逻辑更加灵活。  
-
----
-
-**代码示例**：
-
-```vue
-<template>
-  <keep-alive include="ComponentA" max="5">
-    <router-view></router-view>
-  </keep-alive>
-</template>
-```
-
----
-
-**注意事项**：  
-- `keep-alive` 只能缓存**动态组件**或**路由组件**。
-- 不适用于每次都需要重新加载的场景，比如实时更新的数据展示。
-
----
-
-### 12、`nextTick` 的作用
-
-1. **主要功能**：  
-   - `Vue.nextTick` 或组件实例的 `$nextTick` 用于在**下次 DOM 更新完成后**立即执行指定的回调函数。  
-
-2. **使用场景**：  
-   - 在数据变化后立即获取更新后的 DOM（因为 Vue 的 DOM 更新是异步的）。  
-   - 解决数据变化后需要基于最新 DOM 状态执行操作的问题。  
-
-3. **核心原理**：  
-   - `nextTick` 将回调延迟到**下一个事件循环**，确保在 DOM 更新完成后再执行。  
-
----
-
-**代码示例**：
-
-```javascript
-export default {
-  data() {
-    return { count: 0 };
+// store/user.js
+export const useUserStore = defineStore('user', {
+  state: () => ({ name: '张三' }),
+  getters: {
+    fullName: (state) => state.name + '先生'
   },
-  methods: {
-    increment() {
-      this.count++;
-      this.$nextTick(() => {
-        // 在这里 DOM 已更新，可以安全获取最新的 DOM 状态
-        console.log(this.$refs.counter.textContent);
-      });
+  actions: {
+    async login() {
+      // 可以写异步
     }
   }
-};
+})
+
+// 组件中使用
+const userStore = useUserStore()
 ```
 
-```vue
-<template>
-  <div ref="counter">{{ count }}</div>
-  <button @click="increment">Increment</button>
-</template>
-```
-
----
-**Vue 3 补充**：  
-- 在 Vue 3 中，`nextTick` 直接从 Vue 导入使用，无需依赖组件实例：  
-  ```javascript
-  import { nextTick } from 'vue';
-
-  nextTick(() => {
-    console.log('DOM updated!');
-  });
-  ```
-
-
-## 二、VueRouter&Vuex
-
-### 1、路由传递参数的方式
-
-1. **路径参数（Path Params）**：
-   - **描述**：通过 URL 中的路径部分传递参数，通常用于动态路由匹配。  
-   - **使用方式**：在路由配置中使用 `:param` 占位符，访问时通过 URL 传递参数。  
-   
-   **例子**：
-   ```javascript
-   const routes = [
-     { path: '/user/:id', component: User }
-   ];
-   ```
-
-   访问时：  
-   ```javascript
-   <router-link to="/user/123">Go to User 123</router-link>
-   ```
-   
-   获取参数：  
-   ```javascript
-   this.$route.params.id;  // '123'
-   ```
-
-2. **查询参数（Query Params）**：
-   - **描述**：通过 URL 的查询字符串传递参数，适用于非强制性参数。  
-   - **使用方式**：通过 `?key=value` 的形式传递参数。  
-   
-   **例子**：
-   ```javascript
-   const routes = [
-     { path: '/search', component: Search }
-   ];
-   ```
-
-   访问时：  
-   ```javascript
-   <router-link to="/search?query=vue">Search</router-link>
-   ```
-
-   获取参数：  
-   ```javascript
-   this.$route.query.query;  // 'vue'
-   ```
-
-3. **路由元数据（Route Meta）**：
-   - **描述**：通过路由配置中的 `meta` 字段传递额外信息，通常用于存储非 URL 相关的参数。  
-   - **使用方式**：通过 `meta` 字段在路由定义时传递参数。  
-   
-   **例子**：
-   ```javascript
-   const routes = [
-     { path: '/profile', component: Profile, meta: { requiresAuth: true } }
-   ];
-   ```
-
-   获取参数：  
-   ```javascript
-   this.$route.meta.requiresAuth;  // true
-   ```
-
-4. **props 传递（通过组件的 props）**：
-   - **描述**：将路由参数作为 `props` 传递给组件，适用于在组件中直接获取路由参数而不依赖于 `this.$route`。  
-   - **使用方式**：在路由配置中设置 `props: true`，即可将路径参数作为组件的 props。  
-   
-   **例子**：
-   ```javascript
-   const routes = [
-     { path: '/user/:id', component: User, props: true }
-   ];
-   ```
-
-   获取参数：  
-   ```javascript
-   props: ['id']
-   ```
-
----
-
-**Vue 3 补充**：
-- Vue 3 中的路由传递参数方式与 Vue 2 基本相同。  
-- 但 Vue 3 路由组件支持 **Composition API**，可以通过 `useRoute()` 钩子函数获取当前路由信息：  
-  ```javascript
-  import { useRoute } from 'vue-router';
-
-  const route = useRoute();
-  console.log(route.params.id);
-  ```
-
-### 2、路由守卫有哪些
-
-1. **全局守卫**：
-   - **`beforeEach`**：在路由切换前触发，适用于全局认证、权限校验等。
-   - **`afterEach`**：在路由切换后触发，通常用于日志记录等副作用操作。
-
-   **例子**：
-   ```javascript
-   router.beforeEach((to, from, next) => {
-     // 例如：检查用户是否登录
-     if (to.meta.requiresAuth && !isLoggedIn) {
-       next('/login');
-     } else {
-       next();
-     }
-   });
-
-   router.afterEach((to, from) => {
-     console.log(`Navigated from ${from.path} to ${to.path}`);
-   });
-   ```
-
-2. **路由独享守卫**：
-   - **`beforeEnter`**：在进入某个特定路由时触发，可以用于路由级别的权限控制或数据预加载等。
-
-3. **组件内守卫**：
-   - **`beforeRouteEnter`**：进入组件之前触发，不能访问 `this`，但是可以通过回调函数访问组件实例。
-   - **`beforeRouteUpdate`**：在当前路由修改时触发，适用于同一路由下的参数变化。
-   - **`beforeRouteLeave`**：离开组件时触发，可以用于阻止离开或保存数据。
-
----
-
-**Vue 3 补充**：
-- Vue 3 中的路由守卫与 Vue 2 基本相同，但配合 **Composition API** 使用时，可以通过 `useRouter()` 和 `useRoute()` 钩子访问路由对象，从而处理路由相关操作。
-
-### 3、hash VS history
-
-1. **Hash 模式**：
-   - **原理**：通过 URL 中的 `#` 符号来模拟不同的页面路径，浏览器不会重新加载页面。URL 形式为 `http://example.com/#/path`。
-   - **特点**：
-     - 不会触发页面刷新，性能较好。
-     - 由于 `#` 后的内容不被发送到服务器，适合静态文件托管。
-     - 对 SEO 支持较差，不利于搜索引擎优化。
-   - **适用场景**：不需要服务器配置的单页面应用，适合快速开发和小型项目。
-
-2. **History 模式**：
-   - **原理**：使用 HTML5 的 History API，通过 `pushState` 和 `replaceState` 来改变浏览器历史记录，URL 形式为 `http://example.com/path`。
-   - **特点**：
-     - URL 更加干净和自然，不包含 `#`。
-     - 支持更好的 SEO，因为 URL 是常规的路径。
-     - 需要服务器支持，如果刷新时直接访问 URL，服务器需要返回正确的 HTML 文件（一般配置重定向）。
-   - **适用场景**：需要更好 SEO 或者在支持服务器端渲染的应用中使用。
-
----
-**总结**：
-
-- **Hash 模式**：依赖 `#`，无需后端配置，适合静态资源托管。
-- **History 模式**：依赖 HTML5 History API，更干净的 URL，需要服务器支持。
-
-
-### 4、Vuex是什么？
-
-Vuex 是 Vue.js 的**状态管理模式**，用于集中管理和维护组件之间共享的状态。它的核心思想是通过一个全局的 **store（仓库）** 来管理应用的所有状态，并遵循单向数据流。
-
-**核心概念：**
-
-1. **State**: 用于存储共享的状态。
-2. **Getter**: 类似于计算属性，用于派生状态。
-3. **Mutation**: 唯一可以直接更改状态的方法，必须是同步的。
-4. **Action**: 用于提交 Mutation，通过`commit`方法，可以包含异步操作。
-5. **Module**: 将 store 分成多个模块，提高可维护性。
-
-**Vue 3 的替代方案：**
-
-在 Vue 3 中，推荐使用 **Pinia** 作为状态管理工具，它是 Vuex 的更轻量和现代化的替代品，但 Vuex 4 依然兼容 Vue 3。
-
-简单总结：Vuex 是 Vue 应用的“全局状态管理工具”，解决了组件间状态共享和复杂场景下的状态管理问题。
-
-- 拓展：[pinia用法](/project/ggzx/index3.html#_3-pinia-共享数据)
+**选择建议**：
+- Vue3新项目直接用Pinia
+- 老项目继续用Vuex
+- 小项目可以用简单的响应式对象
