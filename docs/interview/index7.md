@@ -1,46 +1,74 @@
 ---
 outline: deep
 ---
-## 目录表
+
+# 💻 笔试实战指南
+
+::: tip 📚 面试小贴士
+本文档涵盖JavaScript核心知识点和手写代码面试题，帮你快速掌握企业面试重点！重点理解原理，结合代码实例加深记忆。
+:::
+
+## 📑 目录表
 [[toc]]
-## 一、面试实战
+## 🚀 一、面试实战
 
 ### 1、前端性能优化
 
-前端性能优化的方式包括：
+::: danger 🔥 高频考点
+前端性能优化是面试必考题，需要从多个维度进行全面回答！
+:::
 
-1. **减少HTTP请求**：合并文件（JS、CSS、图片），使用雪碧图。
-2. **资源压缩和代码优化**：压缩JS、CSS文件，使用Tree Shaking去除未用代码。
-3. **异步加载资源**：懒加载图片，异步加载JS和CSS。
-4. **缓存优化**：合理使用浏览器缓存和Service Worker。
-5. **图片优化**：选择合适格式和压缩图片（如WebP）。
-6. **减少DOM操作**：优化DOM更新，减少重排和重绘。
-7. **使用CDN**：将静态资源放在CDN上，减少加载时间。
-8. **代码分割**：使用Webpack/Vite进行代码分割，按需加载。
-9. **预加载和预连接**：使用`<link rel="preload">`和`<link rel="dns-prefetch">`。
-10. **虚拟列表**：对于长列表使用虚拟滚动，只渲染可视区域元素。
+**⚡ 性能优化策略：**
 
-这些方法结合使用能显著提升页面加载速度和性能。
+| 类别 | 具体方法 | 核心原理 |
+|------|----------|----------|
+| **🌐 网络优化** | 减少HTTP请求、合并文件 | 减少网络往返次数 |
+| **📦 资源优化** | 压缩JS/CSS、Tree Shaking | 减小文件体积 |
+| **⏱️ 加载优化** | 懒加载、异步加载 | 优化加载时机 |
+| **💾 缓存优化** | 浏览器缓存、Service Worker | 利用缓存机制 |
+| **🖼️ 图片优化** | 格式选择、WebP压缩 | 减少图片资源大小 |
+| **🎯 渲染优化** | 减少DOM操作、虚拟列表 | 优化渲染性能 |
+| **🌍 CDN优化** | 静态资源CDN | 就近访问，降低延迟 |
+| **🔧 代码优化** | 代码分割、按需加载 | 精细化资源管理 |
+
+::: info 💡 记忆口诀
+**网络请求要减少，资源压缩很重要，懒加载和异步好，缓存CDN不能少！**
+:::
 
 ### 2、Promise
 
-`Promise` 是 JavaScript 中用于处理异步操作的对象。它代表一个尚未完成但预期将来会完成的操作，可以处于以下三种状态之一：
+::: warning 🔑 核心概念
+Promise是JavaScript异步编程的基石，必须掌握其状态机制和常用方法！
+:::
 
-1. **Pending（待定）**：初始状态，表示操作尚未完成。
-2. **Fulfilled（已完成）**：操作成功完成，返回一个值。
-3. **Rejected（已拒绝）**：操作失败，返回一个错误。
+**🔄 Promise状态流转：**
+```
+Pending（待定）
+    ↓
+Fulfilled（已完成） ← ─ ─ → Rejected（已拒绝）
+```
 
-通过 `.then()` 和 `.catch()` 方法，可以处理成功和失败的回调，`Promise` 使得异步代码更加易于理解和维护。
+**📊 三种状态详解：**
+- **Pending** ⏳：初始状态，操作进行中
+- **Fulfilled** ✅：操作成功，`resolve(value)` 
+- **Rejected** ❌：操作失败，`reject(error)`
 
-**相关面试热点：**
-- **async/await**：Promise的语法糖，让异步代码看起来像同步代码
-- **Promise.all()**：并行执行多个Promise，全部成功才返回
-- **Promise.race()**：多个Promise竞争，最先完成的结果返回
-- **Promise.allSettled()**：不管成功失败，返回所有结果
-- **错误处理**：.then().catch() 和 try/catch 的区别
-- **手写Promise**：面试常考，理解其内部实现原理
+::: tip 💡 记忆技巧
+**Promise就像点外卖：下单（Pending）→ 外卖送到（Fulfilled）→ 外卖丢了（Rejected）**
+:::
 
-**企业实战题：**
+**🔥 面试热点清单：**
+
+| 方法名 | 作用 | 使用场景 |
+|------|------|----------|
+| **async/await** | Promise语法糖 | 让异步代码像同步 |
+| **Promise.all()** | 并行执行全部成功 | 多个接口同时请求 |
+| **Promise.race()** | 赛跑最先完成 | 请求超时处理 |
+| **Promise.allSettled()** | 返回所有结果 | 不关心成败的情况 |
+| **Promise.finally()** | 无论成败都执行 | 清理工作、关闭loading |
+
+**🏗️ 企业实战 - 并发请求控制：**
+
 ```javascript
 // 并发请求控制 - 限制同时进行的请求数量
 class RequestQueue {
@@ -76,51 +104,32 @@ class RequestQueue {
 }
 ```
 
-## 二、手写代码
+::: details 💼 实际应用场景
+- 图片批量上传（限制并发数，避免浏览器卡死）
+- API接口批量请求（防止服务器压力过大）
+- 文件批量处理（控制内存使用）
+:::
 
-### 0、ES6新特性（面试热点）
+## ✍️ 二、手写代码
 
-**箭头函数与普通函数的区别**
-
-```javascript
-// 普通函数
-function normal() {
-  console.log(this); // 取决于调用方式
-}
-
-// 箭头函数
-const arrow = () => {
-  console.log(this); // 继承外层this，无法改变
-};
-
-// 关键区别：
-// 1. 箭头函数没有自己的this，继承外层
-// 2. 箭头函数不能用作构造函数
-// 3. 箭头函数没有arguments对象
-// 4. 箭头函数不能使用yield命令
-```
-
-**解构赋值技巧**
-
-```javascript
-// 数组解构
-const [a, b, ...rest] = [1, 2, 3, 4, 5];
-
-// 对象解构
-const {name, age, city = '北京'} = user;
-
-// 重命名解构
-const {name: userName} = user;
-
-// 函数参数解构
-const greet = ({name, age}) => `你好，${name}今年${age}岁`;
-```
 
 ### 1、数组去重
 
-数组去重是面试高频题，记住这几种方法就够了！
+::: danger 🔥 面试必考
+数组去重是JavaScript面试中的高频基础题，必须掌握多种实现方式！
+:::
 
-**方法 1：使用 Set（最推荐）**
+#### **🎯 方法对比与选择**
+
+| 方法 | 时间复杂度 | 空间复杂度 | 推荐指数 | 特点 |
+|------|------------|------------|----------|------|
+| **Set方法** | O(n) | O(n) | ⭐⭐⭐⭐⭐ | 最简洁，ES6+首选 |
+| **filter+indexOf** | O(n²) | O(n) | ⭐⭐⭐ | 兼容性好，性能较差 |
+| **for循环** | O(n²) | O(n) | ⭐⭐⭐ | 基础实现，易于理解 |
+
+---
+
+#### **✅ 方法 1：使用 Set（最推荐）**
 
 ```javascript
 function uniqueArray(arr) {
@@ -130,22 +139,28 @@ function uniqueArray(arr) {
 // 测试
 console.log(uniqueArray([1, 2, 2, 3, 4, 4])); // [1, 2, 3, 4]
 ```
-**口诀：** Set天生去重，扩展运算符转数组
+
+::: tip 💡 记忆口诀
+**Set天生去重，扩展运算符转数组**
+:::
 
 ---
 
-**方法 2：使用 filter + indexOf**
+#### **🔍 方法 2：使用 filter + indexOf**
 
 ```javascript
 function uniqueArray(arr) {
     return arr.filter((item, index) => arr.indexOf(item) === index);
 }
 ```
-**口诀：** 过滤首次出现，相同项只留第一个
+
+::: info 💡 原理说明
+**过滤首次出现，相同项只留第一个**。indexOf只返回第一个匹配项的索引。
+:::
 
 ---
 
-**方法 3：传统 for 循环**
+#### **🔄 方法 3：传统 for 循环**
 
 ```javascript
 function uniqueArray(arr) {
@@ -158,11 +173,15 @@ function uniqueArray(arr) {
     return result;
 }
 ```
-**口诀：** 遍历检查是否存在，不存在就push
+
+::: info 💡 原理说明
+**遍历检查是否存在，不存在就push**。最基础的实现方式。
+:::
 
 ---
 
-**面试加分项：对象数组去重**
+#### **🚀 面试加分项：对象数组去重**
+
 ```javascript
 function uniqueObjects(arr, key) {
     return [...new Map(arr.map(item => [item[key], item])).values()];
@@ -178,9 +197,18 @@ console.log(uniqueObjects(users, 'id'));
 // [{id: 1, name: '张三'}, {id: 2, name: '李四'}]
 ```
 
+::: tip 🎯 核心技巧
+使用Map的键唯一性，将指定字段作为key，去重后提取value数组！
+:::
+
 ### 2、冒泡排序
 
-冒泡排序就像气泡一样，大的往上冒，小的往下沉！
+::: info 🫧 排序基础
+冒泡排序是最基础的排序算法，理解其原理对掌握其他排序算法很有帮助！
+:::
+
+#### **🌊 核心原理**
+冒泡排序就像气泡一样，**大的往上冒，小的往下沉**！
 
 ```javascript
 function bubbleSort(arr) {
@@ -207,25 +235,43 @@ console.log('排序前：', array);
 console.log('排序后：', bubbleSort(array));
 ```
 
-**口诀记忆：**
-- 外层循环控制轮次，内层循环比较相邻
-- 大的往后换，小的往前移
-- 一轮下来最大值沉底
-- swapped标志优化，有序提前停
+#### **🧠 记忆口诀**
 
-**时间复杂度：**
-- 最好：O(n) - 本来就有序
-- 最坏：O(n²) - 完全倒序
-- 平均：O(n²)
+```
+外层循环控制轮次，内层循环比较相邻
+大的往后换，小的往前移
+一轮下来最大值沉底
+swapped标志优化，有序提前停
+```
 
-**面试要点：**
-- 稳定性：稳定的排序算法（相等元素顺序不变）
-- 适用场景：数据量小，基本有序的情况
+#### **📊 性能分析**
+
+| 复杂度类型 | 时间复杂度 | 说明 |
+|------------|------------|------|
+| **最好情况** | O(n) | 数组已经有序，只需一轮比较 |
+| **最坏情况** | O(n²) | 数组完全倒序 |
+| **平均情况** | O(n²) | 随机数据 |
+| **空间复杂度** | O(1) | 原地排序 |
+
+#### **⭐ 面试要点**
+
+- ✅ **稳定性**：稳定的排序算法（相等元素顺序不变）
+- 🎯 **适用场景**：数据量小，基本有序的情况
+- 💡 **优化关键**：swapped标志位，避免无效轮次
+
+::: warning ⚠️ 面试陷阱
+一定要记得加上swapped标志位优化，这是面试加分项！
+:::
 
 
 ### 3、快速排序
 
-快速排序：选个基准，左边小右边大，递归搞定！
+::: danger 🚀 高频考点
+快速排序是面试中最常考的排序算法，必须掌握分治思想！
+:::
+
+#### **⚡ 核心思想**
+**选个基准，左边小右边大，递归搞定！**
 
 ```javascript
 function quickSort(arr) {
@@ -261,27 +307,80 @@ console.log('排序前：', array);
 console.log('排序后：', quickSort(array));
 ```
 
-**四步口诀：**
-1. 选基准（pivot）- 找个数当裁判
-2. 分三组 - 小的、大的、相等的
-3. 递归调用 - 左右两边继续排
-4. 合并结果 - 左+中+右搞定
+#### **🎯 四步口诀**
 
-**时间复杂度：**
-- 最好：O(n log n) - 基准选得好
-- 最坏：O(n²) - 基准选得差（比如数组已排序）
-- 平均：O(n log n)
+1. **选基准（pivot）** - 找个数当裁判
+2. **分三组** - 小的、大的、相等的  
+3. **递归调用** - 左右两边继续排
+4. **合并结果** - 左+中+右搞定
 
-**面试要点：**
-- 不稳定排序（相等元素可能改变顺序）
-- 空间复杂度：O(log n) - 递归栈空间
-- 原地排序版本（面试加分手写）
+#### **📊 性能分析**
+
+| 复杂度类型 | 时间复杂度 | 说明 |
+|------------|------------|------|
+| **最好情况** | O(n log n) | 基准选得好，每次都能平分数组 |
+| **最坏情况** | O(n²) | 基准选得差（如数组已排序） |
+| **平均情况** | O(n log n) | 随机数据 |
+| **空间复杂度** | O(log n) | 递归栈空间 |
+
+#### **⭐ 面试要点**
+
+- ❌ **稳定性**：不稳定排序（相等元素可能改变顺序）
+- 💾 **空间复杂度**：O(log n) - 递归栈空间
+- 🚀 **原地排序版本**：面试加分手写题
+
+::: tip 💡 基准选择技巧
+- 随机选择：避免最坏情况
+- 三数取中：首、中、末的中位数
+- 实际应用：更多使用内置排序方法
+:::
+
+::: details 🏗️ 原地排序版本（加分项）
+```javascript
+function quickSortInPlace(arr, left = 0, right = arr.length - 1) {
+  if (left >= right) return;
+  
+  const pivotIndex = partition(arr, left, right);
+  quickSortInPlace(arr, left, pivotIndex - 1);
+  quickSortInPlace(arr, pivotIndex + 1, right);
+}
+
+function partition(arr, left, right) {
+  const pivot = arr[right];
+  let i = left;
+  
+  for (let j = left; j < right; j++) {
+    if (arr[j] <= pivot) {
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      i++;
+    }
+  }
+  [arr[i], arr[right]] = [arr[right], arr[i]];
+  return i;
+}
+```
+:::
 
 ### 4、浅拷贝和深拷贝
 
-一句话区分：浅拷贝只复制表面，深拷贝复制到底！
+::: warning 🎯 核心区别
+一句话区分：**浅拷贝只复制表面，深拷贝复制到底！**
+:::
 
-**浅拷贝 - 只复制一层**
+#### **📋 对比表格**
+
+| 特性 | 浅拷贝 | 深拷贝 |
+|------|--------|--------|
+| **复制深度** | 只复制一层属性 | 递归复制所有层级 |
+| **引用类型** | 复制引用（共享内存） | 创建新对象（独立内存） |
+| **修改影响** | 影响原对象 | 不影响原对象 |
+| **性能开销** | 小 | 大 |
+| **实现复杂度** | 简单 | 复杂 |
+
+---
+
+#### **🔍 浅拷贝 - 只复制一层**
+
 ```javascript
 // 方法1：Object.assign()
 const shallowCopy = (obj) => Object.assign({}, obj);
@@ -296,11 +395,15 @@ copy.b.c = 99;  // 修改copy，原对象也会变！
 console.log(obj.b.c); // 99 - 这就是浅拷贝的问题
 ```
 
+::: danger ⚠️ 浅拷贝陷阱
+引用类型（对象、数组）仍然是共享的，修改会影响原对象！
+:::
+
 ---
 
-**深拷贝 - 完全独立**
+#### **💪 深拷贝 - 完全独立**
 
-**方法1：JSON方法（最简单，有限制）**
+#### **方法1：JSON方法（最简单，有限制）**
 ```javascript
 const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
 
@@ -313,7 +416,15 @@ const obj = {
 const copy = deepCopy(obj); // fn和date会丢失或类型错误
 ```
 
-**方法2：递归实现（面试常考）**
+| 支持类型 | 不支持类型 |
+|----------|------------|
+| ✅ 基本类型 | ❌ 函数 |
+| ✅ 简单对象 | ❌ Date对象 |
+| ✅ 数组 | ❌ RegExp对象 |
+| ✅ null | ❌ undefined |
+| | ❌ 循环引用 |
+
+#### **方法2：递归实现（面试常考）**
 ```javascript
 const deepCopy = (obj) => {
   // 基本类型和null直接返回
@@ -337,23 +448,48 @@ const deepCopy = (obj) => {
 };
 ```
 
-**方法3：structuredClone（现代浏览器首选）**
+#### **方法3：structuredClone（现代浏览器首选）**
 ```javascript
 const deepCopy = (obj) => structuredClone(obj);
 // 支持大部分类型，包括循环引用！
 ```
 
-**面试要点：**
-- 浅拷贝：只复制引用，修改影响原对象
-- 深拷贝：完全独立，修改不影响原对象
-- 手写递归：记住边界条件判断（null、基本类型、特殊对象）
-- 性能考虑：深拷贝比浅拷贝开销大
+#### **🎯 面试要点**
+
+- 🧠 **理解原理**：浅拷贝复制引用，深拷贝复制值
+- ✍️ **手写递归**：记住边界条件判断
+- ⚡ **性能考虑**：深拷贝比浅拷贝开销大
+- 🛠️ **选择标准**：根据实际需求选择合适方法
+
+::: tip 💡 记忆技巧
+**浅拷贝 = 复制地址，深拷贝 = 复制内容**
+:::
 
 ### 5、数组扁平化
 
-数组扁平化就是把嵌套数组拍平成一维数组，面试常考！
+::: danger 🔥 面试高频
+数组扁平化是JavaScript面试中的经典算法题，考察递归思维和数组操作能力！
+:::
 
-**方法1：递归实现（最直观）**
+#### **🎯 核心概念**
+数组扁平化就是把嵌套数组拍平成一维数组：
+```
+[1, [2, [3, 4], 5], 6] → [1, 2, 3, 4, 5, 6]
+```
+
+#### **📊 方法对比**
+
+| 方法 | 实现难度 | 时间复杂度 | 可读性 | 推荐指数 |
+|------|----------|------------|--------|----------|
+| **递归实现** | 中等 | O(n) | 高 | ⭐⭐⭐⭐⭐ |
+| **reduce递归** | 较难 | O(n) | 中 | ⭐⭐⭐⭐ |
+| **ES6 flat()** | 简单 | O(n) | 极高 | ⭐⭐⭐⭐⭐ |
+| **toString技巧** | 简单 | O(n) | 中 | ⭐⭐ |
+
+---
+
+#### **🔄 方法1：递归实现（最直观）**
+
 ```javascript
 function flattenArray(arr) {
   let result = [];
@@ -375,7 +511,14 @@ const nestedArray = [1, [2, [3, 4], 5], 6];
 console.log(flattenArray(nestedArray)); // [1, 2, 3, 4, 5, 6]
 ```
 
-**方法2：reduce + 递归（更简洁）**
+::: tip 💡 核心思路
+**是数组就继续递归，不是数组就收集结果**
+:::
+
+---
+
+#### **⚡ 方法2：reduce + 递归（函数式风格）**
+
 ```javascript
 const flatten = arr => 
   arr.reduce((acc, cur) => 
@@ -386,14 +529,30 @@ const flatten = arr =>
 console.log(flatten([1, [2, [3, 4], 5], 6])); // [1, 2, 3, 4, 5, 6]
 ```
 
-**方法3：ES6 flat()（最简单）**
+::: info 🎨 亮点
+使用reduce展示函数式编程能力，代码更简洁！
+:::
+
+---
+
+#### **🚀 方法3：ES6 flat()（生产环境首选）**
+
 ```javascript
 // 指定深度，Infinity表示无限深度
 const result = [1, [2, [3, 4], 5], 6].flat(Infinity);
 console.log(result); // [1, 2, 3, 4, 5, 6]
 ```
 
-**方法4：toString + split（巧解，有局限）**
+| 参数 | 说明 |
+|------|------|
+| **flat(1)** | 扁平化一层 |
+| **flat(2)** | 扁平化两层 |
+| **flat(Infinity)** | 完全扁平化 |
+
+---
+
+#### **🎭 方法4：toString + split（巧解，有局限）**
+
 ```javascript
 function flattenByString(arr) {
   return arr.toString().split(',').map(item => +item || item);
@@ -403,24 +562,52 @@ function flattenByString(arr) {
 console.log(flattenByString([1, [2, [3, 4], 5], 6])); // [1, 2, 3, 4, 5, 6]
 ```
 
-**面试要点：**
-- 递归是核心思路，必须掌握
-- reduce版本展示函数式编程能力
-- 了解ES6的flat()方法
-- 注意边界情况：空数组、非数组元素、循环引用
+::: warning ⚠️ 使用限制
+- 只适用于纯数字数组
+- 会丢失数字类型信息（转为字符串再转回数字）
+- 不适合包含字符串的数组
+:::
 
-**记忆口诀：**
-- 递归思想：是数组就继续，不是就收集
-- reduce思路：累积器+递归，简洁高效
-- toString技巧：转字符串再分割，偷懒解法
+#### **🎯 面试要点**
+
+- 🧠 **递归思维**：必须掌握递归思路
+- 🎨 **函数式编程**：reduce版本展示编程素养  
+- 📚 **ES6特性**：了解flat()方法的使用
+- 🔍 **边界情况**：空数组、非数组元素、循环引用
+
+#### **💡 记忆口诀**
+
+- **递归思想**：是数组就继续，不是就收集
+- **reduce思路**：累积器+递归，简洁高效  
+- **toString技巧**：转字符串再分割，偷懒解法
+
+::: tip 🚀 推荐策略
+面试用手写递归，生产环境用flat()！
+:::
 
 ### 6、防抖和节流
 
-防抖和节流都是控制函数执行频率的方法，面试必考！
+::: danger 🔥 面试必考
+防抖和节流是性能优化的核心手段，理解其区别和应用场景是面试必备技能！
+:::
 
-#### **防抖（Debounce）- 等你停手了再执行**
+#### **🎯 核心概念对比**
 
+| 特性 | 🛡️ 防抖 (Debounce) | ⏱️ 节流 (Throttle) |
+|------|-------------------|-------------------|
+| **执行时机** | 停止触发后延迟执行 | 固定时间间隔执行 |
+| **触发次数** | 可能只执行1次 | 会执行多次 |
+| **核心思想** | 延迟执行，重置计时 | 频率控制，定期执行 |
+| **经典场景** | 搜索框、resize事件 | 滚动加载、按钮防连点 |
+| **生活比喻** | 等你停手了再发送 | 水龙头滴水的频率 |
+
+---
+
+#### **🛡️ 防抖（Debounce）- 等你停手了再执行**
+
+::: tip 💡 生活比喻
 防抖就像打字时的延迟发送，你不停输入，就一直等，停了才发送。
+:::
 
 ```javascript
 function debounce(func, delay) {
@@ -445,14 +632,21 @@ searchInput.addEventListener('input', debounce((e) => {
 }, 500));
 ```
 
+**🎯 适用场景：**
+- 🔍 **搜索框输入**：用户停止输入再发送请求
+- 📱 **手机号验证**：输入完成后验证
+- 🪟 **窗口resize**：用户调整完窗口大小再计算
+
 ---
 
-#### **节流（Throttle）- 固定时间间隔执行**
+#### **⏱️ 节流（Throttle）- 固定时间间隔执行**
 
+::: tip 💡 生活比喻  
 节流就像水龙头，不管你怎么拧，水滴都是固定频率流出来的。
+:::
 
+#### **方法1：定时器版本（推荐）**
 ```javascript
-// 方法1：定时器版本
 function throttle(func, delay) {
   let timer = null;
   
@@ -465,8 +659,10 @@ function throttle(func, delay) {
     }
   };
 }
+```
 
-// 方法2：时间戳版本
+#### **方法2：时间戳版本**
+```javascript
 function throttleTimestamp(func, delay) {
   let lastTime = 0;
   
@@ -486,39 +682,53 @@ window.addEventListener('scroll', throttle(() => {
 }, 100));
 ```
 
+**🎯 适用场景：**
+- 📜 **页面滚动**：固定时间更新滚动位置
+- 🖱️ **鼠标移动**：限制事件触发频率
+- 🔘 **按钮防连点**：避免快速重复点击
+
 ---
 
-#### **对比记忆**
+#### **🔍 实现对比**
 
-| 特性 | 防抖 | 节流 |
-|------|------|------|
-| **执行时机** | 停止触发后延迟执行 | 固定时间间隔执行 |
-| **触发次数** | 可能只执行1次 | 会执行多次 |
-| **经典场景** | 搜索框、resize | 滚动、按钮防连点 |
+| 实现方式 | 优点 | 缺点 |
+|----------|------|------|
+| **定时器版** | 保证首次触发 | 可能有延迟 |
+| **时间戳版** | 立即执行 | 最后一次可能不执行 |
 
-**面试要点：**
-- 都要正确处理this指向（使用apply/call）
-- 防抖适合：搜索框、表单验证、resize事件
-- 节流适合：滚动加载、按钮防连点、鼠标移动
-- 知道两种节流实现方式的区别
+---
 
-**记忆口诀：**
-- 防抖：等你停了再动
-- 节流：定时来一次，不管你怎么折腾
+#### **⭐ 面试要点**
+
+- 🎯 **this指向**：都要正确处理this指向（使用apply/call）
+- 🎨 **参数传递**：使用rest参数确保所有参数都能传递
+- 📚 **场景区分**：理解各自的适用场景
+- 🧠 **原理理解**：防抖是"延迟执行"，节流是"频率控制"
+
+#### **💡 记忆口诀**
+
+- **防抖**：等你停了再动 ⏳
+- **节流**：定时来一次，不管你怎么折腾 ⏱️
+
+::: tip 🚀 进阶技巧
+面试时可以讨论**立即执行版防抖**和**节流防抖结合**的高级用法！
+:::
 
 ### 7、JS对象转为树形结构
 
-将一个扁平的 JavaScript 对象数组转化为树形结构，可以按照以下思路实现：  
+::: info 🌳 数据结构转换
+扁平数组转树形结构是前端开发中的常见需求，特别适用于菜单、目录、组织架构等场景！
+:::
 
-1. **确定数据结构**  
-   - 每个对象有一个唯一标识 `id`。
-   - 每个对象有一个父级标识 `parentId`，顶级节点的 `parentId` 为 `null` 或其他特殊值。
+#### **🎯 核心思路**
 
-2. **实现步骤**  
-   - 创建一个哈希表以便快速查找。
-   - 遍历数据，将对象挂载到其父节点的 `children` 数组中。
+将扁平数据转换为树形结构的关键是：**建立父子关系映射**！
 
-以下是具体实现代码：  
+| 步骤 | 操作 | 目的 |
+|------|------|------|
+| **1** | 创建Map映射 | O(1)时间复杂度查找节点 |
+| **2** | 遍历建立关系 | 将子节点挂载到父节点 |
+| **3** | 提取根节点 | 获取最终的树形结构 |
 
 ```javascript
 function buildTree(data) {
@@ -547,7 +757,11 @@ function buildTree(data) {
 
   return tree;
 }
+```
 
+#### **📋 测试数据与结果**
+
+```javascript
 // 测试数据
 const input = [
   { id: 1, name: '根节点', parentId: null },
@@ -561,7 +775,7 @@ const tree = buildTree(input);
 console.log(JSON.stringify(tree, null, 2));
 ```
 
-**输出结果**
+::: details 🌲 输出结果展示
 
 ```json
 [
@@ -601,22 +815,44 @@ console.log(JSON.stringify(tree, null, 2));
 ]
 ```
 
-**说明**
-1. **时间复杂度：**  
-   - 哈希表初始化：O(n)  
-   - 遍历数据构建树：O(n)  
-   总体复杂度为 O(n)。
+:::
 
-2. **特点：**  
-   - `children` 数组在每个节点中表示其子节点。  
-   - 顶级节点存储在 `tree` 数组中。
+#### **📊 算法分析**
 
-这样可以轻松构建树形结构，适用于菜单、目录等场景。
+| 指标 | 复杂度 | 说明 |
+|------|--------|------|
+| **时间复杂度** | O(n) | 两次遍历，Map查找O(1) |
+| **空间复杂度** | O(n) | Map存储和结果数组 |
+| **稳定性** | 稳定 | 保持原始数据顺序 |
+
+#### **⭐ 面试要点**
+
+- 🧠 **Map的优势**：O(1)查找，比数组遍历更高效
+- 🎯 **边界情况**：处理不存在的父节点、循环引用
+- 🛠️ **实际应用**：菜单渲染、权限树、目录结构
+- 🔄 **反向操作**：树形结构转扁平数组
+
+#### **💡 应用场景**
+
+| 场景 | 数据特点 | 应用举例 |
+|------|----------|----------|
+| **🗂️ 菜单系统** | 有层级关系 | 导航菜单、右键菜单 |
+| **📁 文件系统** | 递归嵌套 | 资源管理器、目录树 |
+| **🏢 组织架构** | 上下级关系 | 部门架构、员工层级 |
+| **🔧 分类系统** | 多级分类 | 商品分类、标签体系 |
+
+::: tip 🚀 进阶技巧
+可以扩展支持**排序**、**过滤**、**搜索**等高级功能！
+:::
 
 
 ### 8、提取 URL 参数
 
-以下是提取 URL 中的 GET 查询参数并将其存储为 JSON 结构的实现代码：  
+::: info 🔗 URL解析
+提取URL参数是前端开发中的常见需求，处理路由、API请求等场景必备技能！
+:::
+
+#### **🎯 核心实现**
 
 ```javascript
 function parseQueryParams(url) {
@@ -642,114 +878,365 @@ const result = parseQueryParams(url);
 console.log(result);
 ```
 
-**输出结果**
+#### **📋 解析结果**
+
 ```json
 {
   "name": "John",
-  "age": "30",
+  "age": "30", 
   "city": "New York"
 }
 ```
 
----
+#### **🔍 解析步骤详解**
 
-**代码说明**
-1. **分割 URL 和查询字符串**  
-   使用 `split('?')` 提取 URL 中 `?` 后面的部分。
+| 步骤 | 操作 | 示例 | 结果 |
+|------|------|------|------|
+| **1** | `split('?')` | `url.split('?')` | `['https://example.com/page', 'name=John&age=30&city=New%20York']` |
+| **2** | `split('&')` | `'name=John&age=30'.split('&')` | `['name=John', 'age=30', 'city=New%20York']` |
+| **3** | `split('=')` | `'name=John'.split('=')` | `['name', 'John']` |
+| **4** | `decodeURIComponent()` | `'New%20York'` | `'New York'` |
 
-2. **拆分键值对**  
-   使用 `split('&')` 将查询字符串按 `&` 拆分为每个键值对。
+#### **💡 关键要点**
 
-3. **解析键和值**  
-   使用 `split('=')` 将每个键值对拆分成键和值，同时使用 `decodeURIComponent` 解码 URL 编码的字符。
+- ✅ **URL解码**：必须使用`decodeURIComponent()`处理特殊字符
+- 🛡️ **边界处理**：处理无参数、空值、未编码字符等情况  
+- 🔧 **扩展功能**：可以支持数组参数、嵌套对象等复杂场景
 
-4. **处理空值**  
-   如果键没有对应的值，默认值为 `''`。
+#### **🚀 进阶版本**
+
+::: details 点击查看增强版实现
+
+```javascript
+function parseQueryParamsAdvanced(url) {
+  const queryString = url.split('?')[1];
+  if (!queryString) return {};
+
+  const params = {};
+  const pairs = queryString.split('&');
+
+  pairs.forEach(pair => {
+    let [key, value] = pair.split('=');
+    key = decodeURIComponent(key);
+    value = value ? decodeURIComponent(value) : '';
+
+    // 处理数组参数：key[]
+    if (key.endsWith('[]')) {
+      const arrayKey = key.slice(0, -2);
+      if (!params[arrayKey]) params[arrayKey] = [];
+      params[arrayKey].push(value);
+    }
+    // 处理嵌套对象：key[subKey]
+    else if (key.includes('[')) {
+      const [mainKey, subKey] = key.match(/([^[]+)\[(.+)\]/).slice(1);
+      if (!params[mainKey]) params[mainKey] = {};
+      params[mainKey][subKey] = value;
+    }
+    // 普通参数
+    else {
+      params[key] = value;
+    }
+  });
+
+  return params;
+}
+
+// 测试复杂场景
+const complexUrl = 'https://example.com?name=John&tags[]=tag1&tags[]=tag2&user[age]=25&user[city]=Beijing';
+console.log(parseQueryParamsAdvanced(complexUrl));
+```
+
+:::
+
+#### **⭐ 面试要点**
+
+- 🧠 **核心原理**：字符串分割与URL解码
+- 🛡️ **安全性**：防范XSS攻击，注意参数验证
+- 📚 **现代API**：`URLSearchParams`、`new URL()`等浏览器原生API
+- ⚡ **性能考虑**：大数据量时的处理策略
+
+::: tip 🎯 实际应用
+- 🛒 **电商网站**：商品筛选、分页参数
+- 🔍 **搜索功能**：关键词、过滤条件
+- 📊 **数据分析**：UTM参数、统计标识
+:::
 
 ---
 
 ### 9、交换a,b的值
 
-以下是几种方法在不使用临时变量的情况下交换两个变量 `a` 和 `b` 的值：
+::: tip 🔄 变量交换
+不使用临时变量交换两个值是面试中的基础算法题，考察对位运算和ES6特性的理解！
+:::
 
-**1. 使用数组解构**
+#### **📊 方法对比**
+
+| 方法 | 可读性 | 性能 | 安全性 | 推荐指数 |
+|------|--------|------|--------|----------|
+| **数组解构** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **加减法** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| **异或运算** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+---
+
+#### **✅ 方法1：数组解构（推荐）**
+
 ```javascript
 let a = 5, b = 3;
 
-[a, b] = [b, a];
+[a, b] = [b, a]; // ES6解构赋值，一行搞定
 
 console.log(a, b); // 输出：3, 5
 ```
 
-**2. 使用加减法**
+::: tip 🌟 优势
+- 代码简洁，可读性最好
+- 支持所有数据类型
+- 现代JavaScript首选方法
+:::
+
+---
+
+#### **➕ 方法2：加减法**
+
 ```javascript
 let a = 5, b = 3;
 
-a = a + b; // a = 8
-b = a - b; // b = 5
-a = a - b; // a = 3
+a = a + b; // a = 8 (5+3)
+b = a - b; // b = 5 (8-3) 
+a = a - b; // a = 3 (8-5)
 
 console.log(a, b); // 输出：3, 5
 ```
 
-**3. 使用异或（XOR）运算**
+::: warning ⚠️ 注意事项
+- **数值溢出**：大数相加可能超出安全范围
+- **类型限制**：只适用于数字类型
+- **精度问题**：浮点数可能有精度损失
+:::
+
+---
+
+#### **🔀 方法3：异或（XOR）运算**
+
 ```javascript
 let a = 5, b = 3;
 
 a = a ^ b; // a = 6 (0101 ^ 0011 = 0110)
-b = a ^ b; // b = 5 (0110 ^ 0011 = 0101)
+b = a ^ b; // b = 5 (0110 ^ 0011 = 0101)  
 a = a ^ b; // a = 3 (0110 ^ 0101 = 0011)
 
 console.log(a, b); // 输出：3, 5
 ```
 
-**推荐方法**
-- **使用数组解构** 是最直观且安全的现代方法。
-- **加减法** 和 **异或** 适合对性能要求高的场景，但需注意溢出问题。
+::: info 💡 异或原理
+异或运算满足交换律和结合律：
+- `a ^ a = 0`（相同为0）
+- `a ^ 0 = a`（与0异或不变）
+- `(a ^ b) ^ a = b`（可逆性）
+
+**三步原理：**
+1. `a = a ^ b` （存储异或结果）
+2. `b = a ^ b` = `(a ^ b) ^ b` = `a` （还原a）
+3. `a = a ^ b` = `(a ^ b) ^ a` = `b` （还原b）
+:::
+
+---
+
+#### **🎯 面试要点**
+
+| 考察点 | 重点说明 |
+|--------|----------|
+| **ES6特性** | 解构赋值的灵活应用 |
+| **位运算** | 异或运算的理解和应用 |
+| **边界情况** | 数值溢出、类型限制、精度问题 |
+| **性能对比** | 不同方法的执行效率 |
+
+#### **💡 选择建议**
+
+| 场景 | 推荐方法 |
+|------|----------|
+| **日常开发** | 🌟 数组解构 |
+| **算法竞赛** | ⚡ 加减法或异或 |
+| **面试展示** | 🎚️ 全部掌握，对比分析 |
+
+::: tip 🚀 进阶技巧
+可以讨论**对象属性交换**、**数组元素交换**等扩展场景！
+:::
 
 ### 10、1到100求和
 
-1到100求和，多种方法任你选！
+::: info 🔢 数学基础
+1到100求和看似简单，但能考察多种编程思想和算法复杂度分析能力！
+:::
+
+#### **📊 方法对比分析**
+
+| 方法 | 时间复杂度 | 空间复杂度 | 可读性 | 面试亮点 |
+|------|------------|------------|--------|----------|
+| **循环求和** | O(n) | O(1) | ⭐⭐⭐⭐⭐ | 基础扎实 |
+| **数学公式** | O(1) | O(1) | ⭐⭐⭐⭐⭐ | 数学思维 |
+| **递归求和** | O(n) | O(n) | ⭐⭐⭐ | 递归理解 |
+| **reduce函数** | O(n) | O(1) | ⭐⭐⭐⭐ | 函数式编程 |
+
+---
+
+#### **🔄 方法一：普通循环（最基础）**
 
 ```javascript
-// 方法一：普通循环（最基础）
 let sum = 0;
 for (let i = 1; i <= 100; i++) {
   sum += i;
 }
 console.log("循环求和:", sum); // 5050
+```
 
-// 方法二：数学公式（最优雅）
+::: tip 💡 优点
+- 思路清晰，易于理解
+- 适用性广，可处理任意范围
+- 内存占用低，空间复杂度O(1)
+:::
+
+---
+
+#### **⚡ 方法二：数学公式（最优解）**
+
+```javascript
 // 高斯求和公式：(首项 + 末项) × 项数 ÷ 2
 const sumFormula = (1 + 100) * 100 / 2;
 console.log("公式求和:", sumFormula); // 5050
+```
 
-// 方法三：递归（展示递归思维）
+::: danger 🎯 面试重点
+**时间复杂度O(1)**，这是最优解！必须记住高斯求和公式：
+```
+S = n(a₁ + aₙ) / 2
+```
+:::
+
+#### **📐 公式推导**
+```
+1 + 2 + 3 + ... + 100
+100 + 99 + 98 + ... + 1
+------------------------
+101 + 101 + 101 + ... + 101 (100个)
+= 100 × 101 / 2 = 5050
+```
+
+---
+
+#### **🔄 方法三：递归（展示递归思维）**
+
+```javascript
 function sumRecursive(n) {
   if (n === 1) return 1;  // 递归出口
   return n + sumRecursive(n - 1);  // 递归公式
 }
 console.log("递归求和:", sumRecursive(100)); // 5050
+```
 
-// 方法四：reduce（函数式编程）
+::: warning ⚠️ 注意事项
+- **栈溢出风险**：大数字可能导致栈溢出
+- **性能较差**：相比循环有额外的函数调用开销
+- **面试价值**：展示递归思维能力
+
+**递归分析：**
+- 时间复杂度：O(n)
+- 空间复杂度：O(n) - 递归栈
+:::
+
+---
+
+#### **🎨 方法四：reduce（函数式编程）**
+
+```javascript
 const sumReduce = Array.from({length: 100}, (_, i) => i + 1)
   .reduce((acc, cur) => acc + cur, 0);
 console.log("reduce求和:", sumReduce); // 5050
 ```
 
-**面试加分项：**
-- 数学公式：O(1)时间复杂度，最优解
-- 递归：展示算法思维，但要注意栈溢出
-- reduce：展示函数式编程能力
+::: tip 🌟 亮点
+- **函数式编程**：展示现代JavaScript编程风格
+- **链式调用**：代码简洁优雅
+- **扩展性强**：易于添加过滤、映射等操作
+
+::: details 🔍 reduce方法详解
+
+```javascript
+// 创建数组：[1, 2, 3, ..., 100]
+Array.from({length: 100}, (_, i) => i + 1)
+  .reduce((accumulator, currentValue) => {
+    return accumulator + currentValue;
+  }, 0); // 初始值为0
+```
+
+- `accumulator`：累积器，上一次返回的值
+- `currentValue`：当前处理的元素
+- `0`：初始值
+:::
+
+---
+
+#### **⭐ 面试要点**
+
+| 考察维度 | 重点关注 |
+|----------|----------|
+| **算法思维** | 数学公式的理解和应用 |
+| **复杂度分析** | 时间和空间复杂度的计算 |
+| **编程范式** | 命令式vs函数式编程 |
+| **边界处理** | 大数处理、异常情况 |
+
+#### **🚀 扩展思考**
+
+```javascript
+// 通用求和函数
+function rangeSum(start, end) {
+  if (start > end) [start, end] = [end, start]; // 交换确保start <= end
+  
+  // 数学公式：等差数列求和
+  return (end - start + 1) * (start + end) / 2;
+}
+
+console.log(rangeSum(1, 100));    // 5050
+console.log(rangeSum(50, 150));   // 7625  
+console.log(rangeSum(100, 1));    // 5050（自动处理）
+```
+
+::: tip 💡 记忆技巧
+**面试时优先说数学公式，然后说其他方法展示编程多样性！**
+:::
 
 ---
 
 ### 11、函数柯里化（面试高阶题）
 
-柯里化就是把一个多参数函数，转换成一系列单参数函数的调用。
+::: danger 🎓 高阶函数
+函数柯里化是JavaScript面试中的高阶题目，考察函数式编程思想和闭包理解！
+:::
+
+#### **🎯 核心概念**
+
+柯里化就是把一个多参数函数，转换成一系列单参数函数的调用：
 
 ```javascript
-// 基础柯里化实现
+// 原函数：add(1, 2, 3) → 6
+// 柯里化后：curriedAdd(1)(2)(3) → 6
+```
+
+#### **📋 柯里化 vs 偏函数**
+
+| 特性 | 柯里化 | 偏函数 |
+|------|--------|--------|
+| **参数处理** | 每次只接收一个参数 | 可以接收多个参数 |
+| **调用方式** | `f(a)(b)(c)` | `f(a, b)(c)` |
+| **返回值** | 总是返回函数 | 参数够了返回结果 |
+| **复杂度** | 较高 | 较低 |
+
+---
+
+#### **🔧 基础柯里化实现**
+
+```javascript
 function curry(fn) {
   return function curried(...args) {
     if (args.length >= fn.length) {
@@ -773,52 +1260,201 @@ console.log(curriedAdd(1, 2)(3)); // 6
 console.log(curriedAdd(1)(2, 3)); // 6
 ```
 
-**实用场景：**
+::: info 💡 核心原理
+- **闭包机制**：保持对原函数和累积参数的引用
+- **参数累积**：通过`args.concat(args2)`收集所有参数
+- **递归调用**：直到参数数量满足要求才执行原函数
+:::
+
+---
+
+#### **🎨 实用场景**
+
+#### **场景1：创建专用函数**
 ```javascript
-// 柯里化的应用：创建专用函数
+// 通用加法函数
 const add10 = curriedAdd(10);
 console.log(add10(5)(5)); // 20
+console.log(add10(20));    // 30
 
-// 表单验证
+// 乘法柯里化
+const multiply = curry((a, b) => a * b);
+const double = multiply(2);  // 乘以2的专用函数
+console.log(double(5));      // 10
+```
+
+#### **场景2：表单验证**
+```javascript
 const validate = (rules) => (value) => {
   return rules.every(rule => rule(value));
 };
 
+// 创建专用验证函数
 const validateEmail = validate([
   v => v.includes('@'),
-  v => v.includes('.')
+  v => v.includes('.'),
+  v => v.length > 5
+]);
+
+const validatePhone = validate([
+  v => /^\d{11}$/.test(v),
+  v => v.startsWith('1')
 ]);
 
 console.log(validateEmail('test@example.com')); // true
+console.log(validatePhone('13800138000'));     // true
 ```
+
+#### **场景3：数据处理管道**
+```javascript
+// 数据处理柯里化
+const process = curry((fn1, fn2, fn3, data) => 
+  fn3(fn2(fn1(data)))
+);
+
+const toUpper = s => s.toUpperCase();
+const trim = s => s.trim();
+const addPrefix = prefix => s => prefix + s;
+
+const processName = process(trim, toUpper, addPrefix('Hello, '));
+console.log(processName('  john  ')); // "Hello, JOHN"
+```
+
+---
+
+#### **🚀 进阶柯里化实现**
+
+::: details 点击查看完整版本
+
+```javascript
+// 支持占位符的柯里化
+function curryAdvanced(fn, placeholder = '_') {
+  return function curried(...args) {
+    const realArgs = args.filter(arg => arg !== placeholder);
+    const placeholdersCount = args.length - realArgs.length;
+    
+    if (realArgs.length >= fn.length && placeholdersCount === 0) {
+      return fn.apply(this, args);
+    }
+    
+    return function (...args2) {
+      const newArgs = [];
+      let argIndex = 0;
+      
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === placeholder) {
+          newArgs.push(args2[argIndex++]);
+        } else {
+          newArgs.push(args[i]);
+        }
+      }
+      
+      newArgs.push(...args2.slice(argIndex));
+      return curried.apply(this, newArgs);
+    };
+  };
+}
+
+// 使用占位符
+const curriedAddAdvanced = curryAdvanced((a, b, c) => a + b + c);
+
+console.log(curriedAddAdvanced('_', 2, 3)(1));  // 6
+console.log(curriedAddAdvanced(1, '_', 3)(2));  // 6
+console.log(curriedAddAdvanced('_', '_')(1, 2, 3)); // 6
+```
+
+:::
+
+---
+
+#### **⭐ 面试要点**
+
+| 考察点 | 重点内容 |
+|--------|----------|
+| **闭包理解** | 函数作用域链和参数保持 |
+| **递归思维** | 参数收集和递归调用 |
+| **函数式编程** | 高阶函数的概念和应用 |
+| **实际应用** | 参数复用、延迟执行、函数组合 |
+
+#### **💡 核心优势**
+
+- 🔄 **参数复用**：创建专用的配置化函数
+- ⏱️ **延迟执行**：函数配置与执行分离
+- 🎨 **函数组合**：构建复杂的数据处理管道
+- 🧹 **代码复用**：提高代码的可维护性
+
+::: tip 🚀 记忆技巧
+**柯里化 = 分步骤收集参数 + 闭包保持状态 + 递归调用执行**
+:::
 
 ---
 
 ### 12、Promise手写实现（面试高频）
 
+::: danger 🔥 面试必考
+Promise手写实现是JavaScript面试中的经典高难度题目，必须掌握其核心原理和实现细节！
+:::
+
+#### **🎯 Promise核心概念**
+
+| 状态 | 说明 | 转换方向 |
+|------|------|----------|
+| **Pending** ⏳ | 初始状态，等待结果 | → Fulfilled / Rejected |
+| **Fulfilled** ✅ | 成功完成，有结果 | ← Pending（不可逆） |
+| **Rejected** ❌ | 失败完成，有原因 | ← Pending（不可逆） |
+
+#### **🏗️ 核心设计要点**
+
+```mermaid
+graph TD
+    A[创建Promise] --> B[状态: Pending]
+    B --> C{执行executor}
+    C -->|resolve| D[状态: Fulfilled]
+    C -->|reject| E[状态: Rejected]
+    C -->|异常| E
+    D --> F[执行成功回调]
+    E --> G[执行失败回调]
+    F --> H[返回新Promise]
+    G --> H
+```
+
+---
+
+#### **💻 Promise完整实现**
+
 ```javascript
-// 简化版Promise实现
 class MyPromise {
   constructor(executor) {
+    // 初始化状态和值
     this.state = 'pending';
     this.value = undefined;
     this.reason = undefined;
+    
+    // 回调队列
     this.onResolvedCallbacks = [];
     this.onRejectedCallbacks = [];
 
+    // resolve函数
     const resolve = (value) => {
       if (this.state === 'pending') {
         this.state = 'fulfilled';
         this.value = value;
-        this.onResolvedCallbacks.forEach(fn => fn());
+        // 异步执行所有成功回调
+        setTimeout(() => {
+          this.onResolvedCallbacks.forEach(fn => fn());
+        });
       }
     };
 
+    // reject函数
     const reject = (reason) => {
       if (this.state === 'pending') {
         this.state = 'rejected';
         this.reason = reason;
-        this.onRejectedCallbacks.forEach(fn => fn());
+        // 异步执行所有失败回调
+        setTimeout(() => {
+          this.onRejectedCallbacks.forEach(fn => fn());
+        });
       }
     };
 
@@ -830,32 +1466,40 @@ class MyPromise {
   }
 
   then(onFulfilled, onRejected) {
+    // 参数可选性处理
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+    onRejected = typeof onRejected === 'function' ? onRejected : reason => { throw reason; };
+
     return new MyPromise((resolve, reject) => {
-      const handleResolve = () => {
+      // 处理成功状态
+      const handleFulfilled = () => {
         try {
-          const result = onFulfilled ? onFulfilled(this.value) : this.value;
+          const result = onFulfilled(this.value);
           resolve(result);
         } catch (error) {
           reject(error);
         }
       };
 
-      const handleReject = () => {
+      // 处理失败状态
+      const handleRejected = () => {
         try {
-          const result = onRejected ? onRejected(this.reason) : this.reason;
-          reject(result);
+          const result = onRejected(this.reason);
+          resolve(result);
         } catch (error) {
           reject(error);
         }
       };
 
+      // 根据当前状态执行相应操作
       if (this.state === 'fulfilled') {
-        handleResolve();
+        setTimeout(handleFulfilled);
       } else if (this.state === 'rejected') {
-        handleReject();
+        setTimeout(handleRejected);
       } else {
-        this.onResolvedCallbacks.push(handleResolve);
-        this.onRejectedCallbacks.push(handleReject);
+        // pending状态，加入回调队列
+        this.onResolvedCallbacks.push(handleFulfilled);
+        this.onRejectedCallbacks.push(handleRejected);
       }
     });
   }
@@ -863,22 +1507,115 @@ class MyPromise {
   catch(onRejected) {
     return this.then(null, onRejected);
   }
-}
 
-// 使用示例
+  // 静态方法：resolve
+  static resolve(value) {
+    return new MyPromise(resolve => resolve(value));
+  }
+
+  // 静态方法：reject
+  static reject(reason) {
+    return new MyPromise((_, reject) => reject(reason));
+  }
+}
+```
+
+---
+
+#### **🔍 关键实现细节**
+
+#### **1. 状态管理**
+```javascript
+// 状态只能从pending改变，且不可逆
+if (this.state === 'pending') {
+  this.state = 'fulfilled'; // 或 'rejected'
+  this.value = value;       // 或 this.reason = reason
+}
+```
+
+#### **2. 异步执行**
+```javascript
+// 使用setTimeout模拟异步，确保then回调在下一轮事件循环执行
+setTimeout(() => {
+  this.onResolvedCallbacks.forEach(fn => fn());
+});
+```
+
+#### **3. 链式调用**
+```javascript
+// then方法返回新的Promise实例
+return new MyPromise((resolve, reject) => {
+  // 处理回调，决定新Promise的状态
+});
+```
+
+#### **4. 错误处理**
+```javascript
+try {
+  const result = callback(value);
+  resolve(result);
+} catch (error) {
+  reject(error);
+}
+```
+
+---
+
+#### **⭐ 面试要点**
+
+| 考察点 | 重点内容 |
+|--------|----------|
+| **状态机制** | 三种状态转换，不可逆特性 |
+| **异步执行** | 为什么需要setTimeout异步执行回调 |
+| **链式调用** | then方法如何返回新Promise |
+| **错误处理** | 异常捕获和传递机制 |
+| **回调队列** | pending状态时的回调管理 |
+
+#### **🎯 核心优势**
+
+- 🔄 **异步流程控制**：避免回调地狱
+- ✅ **错误统一处理**：统一的错误处理机制
+- ⛓️ **链式调用**：流畅的代码组织方式
+- 🛡️ **异常安全**：完善的错误捕获机制
+
+---
+
+#### **📋 使用示例**
+
+```javascript
+// 基本使用
 const promise = new MyPromise((resolve, reject) => {
   setTimeout(() => resolve('成功！'), 1000);
 });
 
-promise.then(
-  value => console.log(value),
-  reason => console.log(reason)
-);
+promise
+  .then(value => {
+    console.log(value); // "成功！"
+    return '下一步';
+  })
+  .then(value => {
+    console.log(value); // "下一步"
+  })
+  .catch(reason => {
+    console.log('错误:', reason);
+  });
+
+// 静态方法使用
+MyPromise.resolve('直接成功')
+  .then(value => console.log(value));
+
+MyPromise.reject('直接失败')
+  .catch(reason => console.log(reason));
 ```
 
-**Promise核心要点：**
-- 三种状态：pending → fulfilled/rejected
-- 状态不可逆：一旦改变就不能再变
-- 链式调用：then方法返回新Promise
-- 异常处理：catch和try/catch
+::: tip 💡 记忆要点
+**Promise = 状态机 + 回调队列 + 异步执行 + 链式调用**
+:::
+
+::: warning ⚠️ 面试陷阱
+- **异步执行**：回调必须异步执行（用setTimeout）
+- **状态不可逆**：pending只能改变一次
+- **参数校验**：then的回调参数可能是非函数
+- **错误穿透**：catch的本质是then(null, onRejected)
+:::
 

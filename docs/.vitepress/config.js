@@ -130,8 +130,8 @@ export default withMermaid({
             { text: 'Vue', link: '/interview/index4' },
             { text: '小程序及大屏', link: '/interview/index5' },
             { text: 'React&Electron', link: '/interview/index6' },
-            { text: '综合&手写代码', link: '/interview/index7' },
-            { text: '项目相关', link: '/interview/index8' },
+            { text: '笔试实战', link: '/interview/index7' },
+            { text: '项目实现', link: '/interview/index8' },
           ]
         },
         {
@@ -145,6 +145,13 @@ export default withMermaid({
             { text: 'APEC', link: '/interview/project/apec' },
             { text: '浙江解纷码', link: '/interview/project/jfm' },
             { text: '小U智选', link: '/interview/project/ushop' },
+          ]
+        },
+        {
+          text: '介绍',
+          collapsed: true,
+          items: [
+            { text: '自我介绍', link: '/interview/introduction/index' },
           ]
         }
       ],
