@@ -138,9 +138,9 @@ export default withMermaid({
           text: '项目',
           collapsed: true,
           items: [
-            { text: '极客园后台系统', link: '/interview/project/jky-pc' },
             { text: '博欣信息管理系统', link: '/interview/project/ims' },
-            { text: '试剂管理系统', link: '/interview/project/reagent' },
+            { text: '无人化试剂管理系统', link: '/interview/project/reagent' },
+            { text: '博欣项目管理系统', link: '/interview/project/task' },
             { text: '行政诉讼E监督', link: '/interview/project/e-supervise' },
             { text: 'APEC', link: '/interview/project/apec' },
             { text: '浙江解纷码', link: '/interview/project/jfm' },
@@ -148,7 +148,7 @@ export default withMermaid({
           ]
         },
         {
-          text: '介绍',
+          text: '其它',
           collapsed: true,
           items: [
             { text: '自我介绍', link: '/interview/introduction/index' },
