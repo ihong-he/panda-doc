@@ -2,11 +2,12 @@
 outline: deep
 ---
 
-# Web前端面试必备
+# HTML && CSS
 
-::: tip 📚 面试小贴士
-本文档专为准备Web前端开发工程师面试的同学打造，覆盖企业最常问的核心面试题，帮你快速掌握关键知识点！
+::: tip 💡 面试小贴士
+本章节涵盖HTML/CSS核心概念、布局技巧、性能优化等面试必备知识点，助你轻松应对前端技术面试！
 :::
+
 
 ## 📑 目录表
 [[toc]]
@@ -51,17 +52,13 @@ outline: deep
 :::
 
 **🔄 简单来说的渲染流程**：
-```mermaid
-graph LR
-    A[解析HTML] --> B[构建DOM树]
-    C[解析CSS] --> D[构建CSSOM树]
-    B --> E[合并DOM和CSSOM]
-    D --> E
-    E --> F[生成渲染树]
-    F --> G[布局Layout]
-    G --> H[绘制Paint]
-    H --> I[合成Composite]
-```
+
+1. **解析HTML** → 构建DOM树
+2. **解析CSS** → 构建CSSOM树
+3. **合并DOM和CSSOM** → 生成渲染树
+4. **布局Layout** → 计算每个节点的几何信息
+5. **绘制Paint** → 填充像素，将元素的视觉样式（颜色、边框、阴影等）绘制到位图中
+6. **合成Composite** → 将各个绘制好的图层按照正确的顺序合成到最终的屏幕画面上
 
 **⚡ 关键优化点**：
 - CSS阻塞渲染，JS会阻塞HTML解析
@@ -106,7 +103,7 @@ HTML5带来了革命性变化，这些是面试官最喜欢问的：
 
 **📝 表单增强**：
 - 新的input类型：`email`、`date`、`number`、`tel`等
-- 新属性：`placeholder`、`required`、`pattern`等
+- 新属性：`placeholder`、`required`、`pattern`（正则表达式验证）等
 - 内置验证功能，减少JavaScript代码
 
 **🎨 图形和存储**：
@@ -195,14 +192,9 @@ CSS选择器优先级，这个必须背下来！
 
 ### 3、盒模型是什么？box-sizing怎么用？
 
-> 📦 **盒模型就是网页元素的"包装盒"**，每个元素都是一个矩形盒子，包含：
+> 📦 **盒模型就是网页元素的"包装盒"**，每个元素都是一个矩形盒子，从外到内包含：
 
-```mermaid
-graph TB
-    A[外边距 Margin] --> B[边框 Border]
-    B --> C[内边距 Padding]
-    C --> D[内容区 Content]
-```
+**外边距（Margin）** → **边框（Border）** → **内边距（Padding）** → **内容区（Content）**
 
 1. **📝 内容区（Content）**：实际内容所在
 2. **📏 内边距（Padding）**：内容到边框的距离
@@ -229,47 +221,9 @@ graph TB
 
 > ✅ **为什么推荐border-box**：计算更直观，不会因为加了padding和border而意外撑大容器。
 
-### 4、CSS3新特性，这些是重点！
+### 4、CSS3新特性
 
-::: danger 🔥 重点内容
-CSS3新特性，这些是重点！
-:::
 
-**🔄 Flexbox弹性布局**（现在最常用）：
-- 一维布局系统，特别适合移动端
-- `display: flex` + `justify-content` + `align-items`
-- 解决了很多经典布局难题
-
-**🎯 Grid网格布局**（二维布局）：
-- `display: grid`，最强大的布局系统
-- 适合复杂页面布局，如后台管理系统
-- 响应式设计的利器
-
-**✨ 视觉增强**：
-- `border-radius`圆角
-- `box-shadow`阴影
-- 渐变背景（linear-gradient, radial-gradient）
-- `transition`过渡动画
-- `transform`变形（旋转、缩放、位移）
-- `@keyframes`关键帧动画
-
-**🔍 选择器增强**：
-- `:nth-child()`、`:nth-of-type()`结构伪类
-- `:not()`否定伪类
-- 属性选择器 `[attr^="value"]`
-
-**📱 响应式设计**：
-- 媒体查询 `@media`
-- 相对单位 `vw`、`vh`、`rem`
-
-**🚀 现代特性**：
-- CSS变量 `--main-color`
-- `filter`滤镜效果
-- `backdrop-filter`毛玻璃效果
-
-::: tip 💬 面试重点
-重点说Flexbox和Grid，因为现在项目中使用频率最高。
-:::
 
 ### 5、px、em、rem有什么区别？怎么选？
 
@@ -424,7 +378,7 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
 说明问题产生的原因，提出1-2种具体解决方案。
 :::
 
-### 9、重绘和重排的区别？如何优化？
+### 9、重绘和重排的区别？
 
 | 类型 | 🔄 重排（Reflow/回流） | 🎨 重绘（Repaint） |
 |------|---------------------|-------------------|
@@ -433,154 +387,8 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
 | **影响范围** | 重新计算整个页面的布局 | 只需要重新绘制受影响的区域 |
 | **性能消耗** | 消耗很大，要尽量避免 | 消耗相对较小 |
 
-**⚡ 优化策略**：
 
-**1. 📦 批量操作DOM**：
-```css
-/* 不要这样 - 触发多次重排 */
-element.style.width = '100px';
-element.style.height = '100px';
-element.style.margin = '10px';
-
-/* 应该这样 - 一次性修改 */
-element.className = 'new-style';
-```
-
-**2. 🚀 使用transform和opacity**：
-- 这两个属性由合成线程处理，不会触发重排
-- 动画优先使用`transform: translate()`而不是改变`left/top`
-
-**3. ⚠️ 避免频繁读取布局信息**：
-```javascript
-// 不要在循环中读取offsetWidth
-for(let i = 0; i < 1000; i++) {
-    console.log(element.offsetWidth); // 每次都触发重排
-}
-```
-
-**4. ⚡ 使用will-change优化**：
-```css
-.element {
-    will-change: transform, opacity;
-}
-```
-
-::: tip 💡 面试技巧
-强调重排比重绘更耗性能，给出具体的优化代码示例。
-:::
-
-### 10、CSS性能优化有哪些方法？
-
-**1. 选择器优化**：
-- 避免过深的嵌套：`.nav .item .link .text`（太深）
-- 使用类选择器代替标签选择器：`.header`比`div.header`好
-- 避免通配选择器`*`
-
-**2. 减少重排重绘**：
-- 使用transform和opacity做动画
-- 批量修改样式
-- 使用DocumentFragment批量添加DOM
-
-**3. CSS加载优化**：
-- 关键CSS内联，非关键CSS异步加载
-- 使用CSS压缩工具
-- 合理使用`@import`（会阻塞渲染）
-
-**4. 现代CSS技巧**：
-- 使用CSS变量减少重复代码
-- 合理使用contain属性
-- 利用GPU加速：`transform: translateZ(0)`
-
-**5. 代码组织**：
-- 按模块组织CSS
-- 避免冗余样式
-- 使用CSS-in-JS或原子化CSS减少体积
-
-面试时说：CSS优化主要是从选择器性能、渲染性能、加载性能三个方面入手。
-
-### 11、Flexbox布局完全指南
-
-Flexbox现在是响应式布局的首选方案，面试官经常问具体用法：
-
-**核心概念**：
-- **容器（flex container）**：设置`display: flex`的父元素
-- **项目（flex items）**：容器的直接子元素
-- **主轴（main axis）**：默认水平方向
-- **交叉轴（cross axis）**：默认垂直方向
-
-**容器属性**（父元素）：
-```css
-.flex-container {
-    display: flex;
-    
-    /* 主轴方向 */
-    flex-direction: row | row-reverse | column | column-reverse;
-    
-    /* 换行 */
-    flex-wrap: nowrap | wrap | wrap-reverse;
-    
-    /* 主轴对齐 */
-    justify-content: flex-start | flex-end | center | space-between | space-around;
-    
-    /* 交叉轴对齐 */
-    align-items: stretch | flex-start | flex-end | center | baseline;
-    
-    /* 多行对齐 */
-    align-content: flex-start | flex-end | center | space-between | space-around;
-}
-```
-
-**项目属性**（子元素）：
-```css
-.flex-item {
-    /* 排序 */
-    order: 1;
-    
-    /* 放大比例 */
-    flex-grow: 1;
-    
-    /* 缩小比例 */
-    flex-shrink: 0;
-    
-    /* 基础大小 */
-    flex-basis: 200px;
-    
-    /* 简写：flex: flex-grow flex-shrink flex-basis */
-    flex: 1 0 200px;
-    
-    /* 单独对齐 */
-    align-self: flex-start | flex-end | center;
-}
-```
-
-**常见布局场景**：
-
-**水平垂直居中**：
-```css
-.center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-```
-
-**两栏布局（左边固定，右边自适应）**：
-```css
-.container {
-    display: flex;
-}
-.left {
-    width: 200px;
-    flex-shrink: 0;
-}
-.right {
-    flex: 1;
-}
-```
-
-**面试重点**：能说出`justify-content`和`align-items`的区别，以及`flex: 1`的作用。
-
-### 12、响应式设计实战技巧
+### 10、响应式设计实战技巧
 
 **媒体查询基础**：
 ```css
@@ -645,10 +453,10 @@ html {
 }
 .left, .right {
     width: 200px;
-    flex-shrink: 0;
+    flex-shrink: 0; /* 禁止收缩，保持固定宽度 */
 }
 .main {
-    flex: 1;
+    flex: 1; /* 自动占据剩余空间 */
 }
 ```
 
