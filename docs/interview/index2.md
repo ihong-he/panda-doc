@@ -32,7 +32,7 @@ JS有8种数据类型，记住7个基本类型+1个引用类型就行：
 - **Object**：对象，包括数组、函数、日期等复杂类型
 
 ::: warning 🎯 面试重点
-基本类型是值传递，引用类型是引用传递，这是面试高频考点！
+基本类型是值传递，引用类型是引用传递（传递内存中的地址），这是面试高频考点！
 :::
 
 ### 2、如何检测数据类型
@@ -67,34 +67,20 @@ JS有8种数据类型，记住7个基本类型+1个引用类型就行：
 
 ### 3、null vs undefined
 
-> 💡 **一句话总结**：undefined 是"还没赋值"，null 是"主动设为空"
-
-**undefined 的情况：**
-- 变量声明了但没赋值
-- 对象属性不存在
-- 函数没有返回值
-- 函数参数没传值
-
-**null 的情况：**
-- 程序员主动设置成null
-- 表示"这里应该有个对象，但现在是空的"
-- 比如DOM获取不到元素时返回null
+**核心区别：**
+- `undefined` - 被动的：变量未赋值、属性不存在、函数无返回值
+- `null` - 主动的：程序员显式设置为空，表示"本该有对象但现在是空的"
 
 ::: warning ⚠️ 重要区别
-记住这个面试技巧：
-- typeof undefined 是 "undefined"
-- typeof null 是 "object"（JS历史bug）
-- undefined == null 是true，但 undefined === null 是false
+- `typeof undefined` → `"undefined"`
+- `typeof null` → `"object"`（JS历史bug）
+- `undefined == null` → `true`，但 `undefined === null` → `false`
 :::
 
 **实际应用：**
-- 初始化变量用 null（表示将来会放对象）
-- 判断变量是否声明用 typeof variable !== "undefined"
-- 判断对象是否存在用 obj != null
-
-::: tip 💬 面试回答技巧
-一个是被动的（undefined），一个是主动的（null）！
-:::
+- 初始化对象变量用 `null`
+- 判断变量是否声明用 `typeof variable !== "undefined"`
+- 判断对象是否存在用 `obj != null`
 
 ### 4、数组基本方法
 
@@ -324,16 +310,6 @@ for (var i = 0; i < 3; i++) {
 - `__proto__` - 对象的属性，指向构造函数的原型
 - `constructor` - 原型对象的属性，指回构造函数
 
-**经典关系图：**
-```
-function Person() {}
-let p = new Person()
-
-p.__proto__ === Person.prototype
-Person.prototype.constructor === Person
-Person.prototype.__proto__ === Object.prototype
-Object.prototype.__proto__ === null
-```
 
 **面试常问题：**
 1. 如何实现继承？
@@ -342,9 +318,6 @@ Object.prototype.__proto__ === null
 2. instanceOf原理？
    - 就是沿着原型链查找构造函数的prototype属性
 
-3. hasOwnProperty和in的区别？
-   - hasOwnProperty只检查自身属性
-   - in会检查整个原型链
 
 ::: tip 🧠 记忆技巧
 - 函数有prototype，对象有__proto__
@@ -383,8 +356,8 @@ function myNew(Constr, ...args) {
 
 **面试重点问题：**
 1. new操作符返回什么？
-   - 构造函数返回基本类型：忽略，返回新对象
-   - 构造函数返回对象：返回这个对象
+   - 构造函数返回数字、字符串等基本值：不管它，返回新对象
+   - 构造函数返回对象或数组：就返回这个对象/数组
 
 2. 不用new调用构造函数会怎样？
    - this指向window（非严格模式）或undefined（严格模式）
@@ -466,6 +439,7 @@ this是JS中最容易混淆的概念，但掌握了规则就很简单：
 
 3. 严格模式下的this？
    - 全局函数调用时this是undefined，不是window
+   - 严格模式就是在文件开头加 `'use strict'`，让JS更严格、更安全
 
 **实用技巧：**
 - 对象方法用普通函数（this指向对象）
@@ -488,7 +462,7 @@ this是JS中最容易混淆的概念，但掌握了规则就很简单：
 
 **节流（Throttle）：**
 - **原理**：固定时间间隔执行，不管触发多频繁，都按固定频率执行
-- **生活比喻**：水龙头拧到一半，水流稳定流出
+- **生活比喻**：地铁进站，固定时间一班，人再多也按这个节奏发车
 - **应用场景**：滚动事件、鼠标移动、游戏射击
 
 **手写防抖（重点）：**
@@ -556,22 +530,28 @@ function throttle(func, delay) {
 
 **解决方案：**
 
-1. **误差范围判断（最常用）：**
+1. **转换为整数计算（最常用）：**
 ```javascript
+let result = (0.1 * 10 + 0.2 * 10) / 10
+console.log(result) // 0.3
+```
+
+2. **使用toFixed格式化：**
+```javascript
+let result = (0.1 + 0.2).toFixed(1) // 返回字符串 "0.3"
+console.log(result) // "0.3"
+// 如果需要数字类型
+console.log(parseFloat(result)) // 0.3
+```
+
+3. **误差范围判断（仅用于比较）：**
+```javascript
+// 这个方案仅用于判断两个浮点数是否"在误差范围内相等"
+// 如果需要精确的计算结果，请用上面方案1或方案2
 function equal(a, b, tolerance = 0.00001) {
     return Math.abs(a - b) < tolerance
 }
 equal(0.1 + 0.2, 0.3) // true
-```
-
-2. **转换为整数计算：**
-```javascript
-(0.1 * 10 + 0.2 * 10) / 10 // 0.3
-```
-
-3. **使用toFixed格式化：**
-```javascript
-(0.1 + 0.2).toFixed(1) // "0.3"
 ```
 
 **面试扩展问题：**

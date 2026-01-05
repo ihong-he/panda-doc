@@ -2,7 +2,7 @@
 outline: deep
 ---
 
-# HTML && CSS
+# HTML & CSS
 
 ::: tip 💡 面试小贴士
 本章节涵盖HTML/CSS核心概念、布局技巧、性能优化等面试必备知识点，助你轻松应对前端技术面试！
@@ -141,7 +141,7 @@ HTML5让Web应用变得更强大，减少了对第三方插件的依赖。
 
 ## 二、CSS核心知识
 
-### 1、CSS选择器优先级，这个必须背下来！
+### 1、CSS选择器优先级
 
 ::: warning 📚 必背知识点
 CSS选择器优先级，这个必须背下来！
@@ -221,7 +221,42 @@ CSS选择器优先级，这个必须背下来！
 
 > ✅ **为什么推荐border-box**：计算更直观，不会因为加了padding和border而意外撑大容器。
 
-### 4、CSS3新特性
+### 4、CSS3有哪些新特性
+
+::: danger 🔥 高频考点
+CSS3带来了革命性变化，按类别记忆更清晰!
+:::
+
+**🎨 视觉特效类**：
+- **圆角边框** `border-radius` - 告别图片切角,支持圆形
+- **盒阴影** `box-shadow` - 卡片阴影效果,参数:水平/垂直偏移 模糊半径 颜色
+- **渐变** `linear-gradient`/`radial-gradient` - 背景渐变,不再依赖图片
+
+**🔄 变换与过渡类**：
+- **2D/3D变换** `transform` - 旋转/缩放/平移/倾斜,用transform做动画性能更好
+- **过渡** `transition` - 属性平滑过渡,语法:`property duration timing-function`
+- **关键帧动画** `@keyframes` - 复杂动画序列,支持多阶段状态
+
+**🎭 选择器增强**：
+- **属性选择器** `[type="text"]`、`a[href^="https"]` - 根据属性值选择
+- **结构伪类** `:first-child`、`:nth-child(2n)` - 按位置选择元素
+- **UI状态伪类** `:hover`、`:focus`、`:checked`、`:disabled` - 交互状态
+- **否定伪类** `:not(.active)` - 排除特定元素
+
+**📱 布局增强**：
+- **Flexbox弹性布局** - 一维布局,主轴/交叉轴对齐,`justify-content`/`align-items`
+- **Grid网格布局** - 二维布局,行列控制,`grid-template-columns`/`grid-template-areas`
+
+**🌈 其他实用特性**：
+- **RGBA/HSLA颜色** - 支持透明度
+- **滤镜** `filter` - 模糊/灰度/亮度调整
+- **视口单位** `vw`/`vh` - 相对视口尺寸
+- **媒体查询** `@media` - 响应式设计基础
+- **多背景图** - 一个元素可叠加多个背景
+
+::: tip 💡 面试回答技巧
+按类别回答：视觉特效(圆角/阴影/渐变) + 动画过渡(transform/transition/@keyframes) + 布局(flex/grid) + 选择器增强，这样层次清晰，容易记忆。
+:::
 
 
 
@@ -308,7 +343,7 @@ html {
 
 ### 7、BFC到底是什么？什么时候用？
 
-> 🌍  **BFC（块级格式化上下文）** 简单理解就是一个独立的"小宇宙"：
+> 🌍  **BFC（Block Formatting Context，块级格式化上下文）** 是Web页面中一个独立的渲染区域，拥有独立的布局规则：
 
 ```mermaid
 graph LR
@@ -338,7 +373,7 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
 
 ### 8、移动端1px边框问题怎么解决？
 
-> ❓ **问题原因**：移动设备像素比(DPR) > 1时，CSS的1px在设备上会显示成多个物理像素，显得很粗。
+> ❓ **问题原因**：现在的手机屏幕像素密度很高（比如Retina屏），CSS的1px在手机上实际占用了好几个物理像素，所以看起来会变粗。
 
 **🛠️ 常见解决方案**：
 
@@ -355,7 +390,7 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
     width: 100%;
     height: 1px;
     background: #ddd;
-    transform: scaleY(0.5);
+    transform: scaleY(0.5); /* 在2倍屏上将1px缩小为0.5px，实际渲染为1物理像素 */
     transform-origin: 0 0;
 }
 ```
@@ -366,9 +401,12 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
 
 **3. 📺 使用媒体查询**：
 ```css
+/* 适配2倍屏（Retina屏）：设备像素比≥2时，1px逻辑像素渲染为2物理像素，需缩小到0.5倍 */
 @media (-webkit-min-device-pixel-ratio: 2) {
     .border-1px::after { transform: scaleY(0.5); }
 }
+
+/* 适配3倍屏（部分高端安卓/iPhone）：设备像素比≥3时，1px逻辑像素渲染为3物理像素，需缩小到0.33倍 */
 @media (-webkit-min-device-pixel-ratio: 3) {
     .border-1px::after { transform: scaleY(0.33); }
 }
@@ -431,12 +469,7 @@ html {
 })();
 ```
 
-**现代CSS技术**：
-- **CSS Grid**：复杂响应式布局
-- **CSS自定义属性**：动态主题切换
-- **Container Queries**：基于容器而非视口的响应式
-
-**面试回答技巧**：重点说rem方案和媒体查询，能提到Grid和Container Queries会加分。
+**面试回答技巧**：重点说rem方案和媒体查询。
 
 ## 三、实战面试题
 
@@ -482,6 +515,7 @@ html {
     --text-color: #333;
 }
 
+/* 检测系统是否处于深色模式（dark mode），如果是则应用以下样式 */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-color: #1a1a1a;
