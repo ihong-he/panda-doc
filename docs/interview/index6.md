@@ -234,6 +234,7 @@ key属性帮助React识别哪些元素发生了变化，在列表渲染中尤为
 :::
 
 **📡 1. 父子通信（props + 回调）：**
+
 最基础的通信方式，父组件通过props向下传递数据，子组件通过回调函数向上传递数据。
 
 ```jsx
@@ -255,7 +256,8 @@ function Child({ message, setMessage }) {
 ```
 
 **🌉 2. 跨层级通信（Context）：**
-解决props drilling问题，适合全局状态管理（主题、语言等）。
+
+解决props drilling（属性钻取）问题，适合全局状态管理（主题、语言等）。
 
 ```jsx
 // 创建Context
@@ -376,128 +378,366 @@ function TodoList() {
 - 支持时间旅行调试
 - 适用于大型复杂应用
 
----
 
 ## ⚡ 二、Electron
 
-### 1、Electron是什么？它的主要组成部分有哪些？
+### 1、什么是Electron？它的核心架构是什么？
 
-::: info 🖥️ 跨平台桌面应用
-Electron是一个使用Web技术（HTML、CSS、JavaScript）构建跨平台桌面应用程序的框架。
+::: info 💡 核心概念
+Electron是一个使用JavaScript、HTML和CSS构建跨平台桌面应用程序的开源框架，它允许前端开发者使用Web技术开发桌面应用。
 :::
 
-**🏗️ 主要组成部分：**
-- **主进程（Main Process）**：应用程序的入口点，管理应用生命周期
-- **渲染进程（Renderer Process）**：显示UI的进程，每个窗口独立运行
-- **预加载脚本（Preload Script）**：安全地在渲染进程中访问Node.js API
+**🏗️ 核心架构（多进程模型）：**
 
-### 2、Electron的主进程和渲染进程有什么区别？
+Electron采用了多进程架构，主要由两个核心进程组成：
 
-::: tip 🔄 进程架构
-理解主进程和渲染进程的区别是掌握Electron的关键！
+| 进程类型 | 作用 | 特点 |
+|---------|------|------|
+| **主进程** | 管理应用生命周期、创建渲染进程、处理系统级API | 每个应用只有一个主进程，可以使用Node.js所有API |
+| **渲染进程** | 负责渲染Web页面，运行前端代码 | 每个窗口对应一个渲染进程，运行在沙箱环境中 |
+
+**🔄 进程间通信（IPC）：**
+- **主进程 → 渲染进程**：通过`webContents.send()`发送消息
+- **渲染进程 → 主进程**：通过`ipcRenderer.send()`发送消息
+- **双向通信**：使用`ipcMain`和`ipcRenderer`
+
+::: tip 💬 理解要点
+可以把Electron想象成"浏览器壳"包装了你的Web应用，主进程是操作系统和Web应用之间的桥梁！
 :::
 
-| 特性 | 主进程 | 渲染进程 |
-|------|--------|----------|
-| **数量** | 只有一个 | 可以有多个（每个窗口一个） |
-| **权限** | 完全访问Node.js API | 默认受限，需要预加载脚本 |
-| **职责** | 应用生命周期、窗口管理 | 界面渲染、用户交互 |
-| **通信** | 通过ipcMain接收消息 | 通过ipcRenderer发送消息 |
+---
 
-### 3、Electron中如何进行进程间通信（IPC）？
+### 2、Electron和Vue/Vite如何集成？
 
-::: warning 📡 通信机制
-IPC是Electron的核心功能，理解进程间通信是开发Electron应用的基础！
+::: danger 🔥 高频考点
+这是Vue技术栈开发者必问的问题，需要掌握完整的集成流程！
 :::
 
-**📤 渲染进程 → 主进程：**
+**🚀 手动集成Vite + Electron：**
+
 ```javascript
-// 渲染进程
-const { ipcRenderer } = require('electron');
-ipcRenderer.send('message-to-main', data);
+// vite.config.js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
 
-// 主进程
-const { ipcMain } = require('electron');
-ipcMain.on('message-to-main', (event, data) => {
-  console.log('收到消息:', data);
-});
+export default defineConfig({
+  plugins: [vue()],
+  base: './', // Electron需要相对路径
+  build: {
+    outDir: 'dist'
+  }
+})
 ```
 
-**📥 主进程 → 渲染进程：**
 ```javascript
-// 主进程
-window.webContents.send('message-to-renderer', data);
+// electron/main.js（主进程入口）
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
 
-// 渲染进程
-ipcRenderer.on('message-to-renderer', (event, data) => {
-  console.log('收到消息:', data);
-});
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: true, // 允许在渲染进程使用Node.js
+      contextIsolation: false // 关闭上下文隔离
+    }
+  })
+
+  // 开发环境加载Vite开发服务器，生产环境加载打包后的文件
+  if (process.env.NODE_ENV === 'development') {
+    win.loadURL('http://localhost:5173')
+    win.webContents.openDevTools()
+  } else {
+    win.loadFile(path.join(__dirname, '../dist/index.html'))
+  }
+}
+
+app.whenReady().then(createWindow)
 ```
-
-### 4、什么是预加载脚本？它的作用是什么？
-
-::: info 🔐 安全桥梁
-预加载脚本是在渲染进程加载网页之前运行的脚本，用于安全地暴露API给渲染进程。
-:::
-
-**🛡️ 作用：**
-- 安全地在渲染进程中暴露Node.js功能
-- 避免直接暴露整个Node.js API
-- 提供可控的API接口
-
-**💻 示例：**
-```javascript
-// preload.js
-const { contextBridge, ipcRenderer } = require('electron');
-
-contextBridge.exposeInMainWorld('electronAPI', {
-  openFile: () => ipcRenderer.invoke('dialog:openFile')
-});
-
-// 渲染进程中使用
-window.electronAPI.openFile();
-```
-
-> 💡 **安全提示**：永远不要直接暴露整个Node.js API给渲染进程，使用contextBridge按需暴露！
-
-### 5、如何打包和分发Electron应用？
-
-::: tip 📦 应用分发
-打包是将Electron应用分发给用户的关键步骤！
-:::
-
-**🔧 常用打包工具：**
-- **electron-builder**：功能丰富，支持自动更新
-- **electron-packager**：简单易用
-- **electron-forge**：官方推荐的脚手架工具
-
-**📋 打包流程：**
-1. 安装打包工具
-2. 配置package.json中的构建脚本
-3. 执行打包命令
-4. 生成可执行文件
-
-::: details 点击查看示例配置
 
 ```json
+// package.json
 {
-  "build": {
-    "appId": "com.example.myapp",
-    "productName": "MyApp",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ]
-  },
   "scripts": {
-    "dist": "electron-builder"
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "electron .",
+    "electron:build": "electron-builder"
   }
 }
 ```
 
+::: tip 💬 面试要点
+关键点：`nodeIntegration: true`允许在Vue组件中使用Node.js API，`contextIsolation: false`关闭隔离以便直接使用Electron API。
 :::
 
+---
 
+### 3、主进程和渲染进程如何通信？（IPC）
+
+::: warning 📡 核心考点
+进程间通信是Electron最重要的话题，必须掌握双向通信的各种场景！
+:::
+
+**🎯 渲染进程 → 主进程（单向通信）：**
+
+```javascript
+// electron/preload.js（预加载脚本）
+const { contextBridge, ipcRenderer } = require('electron')
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
+  sendNotification: (title, body) => ipcRenderer.send('show-notification', title, body)
+})
+
+// electron/main.js（主进程）
+const { ipcMain } = require('electron')
+
+ipcMain.handle('read-file', async (event, filePath) => {
+  const fs = require('fs').promises
+  return await fs.readFile(filePath, 'utf-8')
+})
+
+ipcMain.on('show-notification', (event, title, body) => {
+  const { Notification } = require('electron')
+  new Notification({ title, body }).show()
+})
+
+// Vue组件中使用
+// const handleReadFile = async () => {
+//   const content = await window.electronAPI.readFile('./data.txt')
+//   console.log(content)
+// }
+```
+
+**🔄 主进程 → 渲染进程（单向通信）：**
+
+```javascript
+// electron/main.js（主进程）
+// 发送消息到特定窗口
+win.webContents.send('update-data', { count: 100 })
+
+// electron/preload.js
+contextBridge.exposeInMainWorld('electronAPI', {
+  onUpdateData: (callback) => ipcRenderer.on('update-data', callback)
+})
+
+// Vue组件中监听
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  window.electronAPI.onUpdateData((event, data) => {
+    console.log('收到更新:', data.count)
+  })
+})
+```
+
+**💡 双向通信（invoke/handle模式）：**
+
+```javascript
+// 主进程
+ipcMain.handle('get-system-info', async () => {
+  return {
+    platform: process.platform,
+    version: process.version,
+    arch: process.arch
+  }
+})
+
+// 渲染进程
+const systemInfo = await window.electronAPI.getSystemInfo()
+```
+
+---
+
+### 4、Electron中的安全注意事项有哪些？
+
+::: danger ⚠️ 安全重点
+Electron安全是面试高频考点，必须了解常见的安全风险和防护措施！
+:::
+
+**🛡️ 关键安全配置：**
+
+| 配置项 | 作用 | 推荐值 |
+|-------|------|--------|
+| `nodeIntegration` | 是否允许在渲染进程使用Node.js API | `false` |
+| `contextIsolation` | 是否启用上下文隔离 | `true` |
+| `enableRemoteModule` | 是否启用remote模块 | `false` |
+| `sandbox` | 是否启用沙箱模式 | `true` |
+
+**✅ 安全最佳实践：**
+
+```javascript
+// electron/main.js
+function createWindow() {
+  const win = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: false,        // 禁用Node集成
+      contextIsolation: true,         // 启用上下文隔离
+      sandbox: true,                  // 启用沙箱
+      preload: path.join(__dirname, 'preload.js') // 使用预加载脚本
+    }
+  })
+}
+
+// electron/preload.js
+const { contextBridge, ipcRenderer } = require('electron')
+
+// 通过contextBridge安全暴露API
+contextBridge.exposeInMainWorld('electronAPI', {
+  readFile: (path) => ipcRenderer.invoke('read-file', path)
+})
+
+// Vue组件中只能访问暴露的API
+const content = await window.electronAPI.readFile('./file.txt')
+```
+
+**⚠️ 常见安全风险：**
+1. **XSS攻击**：不要直接渲染用户提供的内容
+2. **原型污染**：谨慎使用JSON.parse
+3. **远程代码执行**：不要`eval`用户输入
+
+::: tip 💬 面试要点
+重点记住：`contextIsolation: true` + `preload.js` + `contextBridge`是安全通信的黄金组合！
+:::
+
+---
+
+### 5、Electron应用如何打包和发布？
+
+::: info 📦 发布流程
+使用electron-builder可以将Electron应用打包成安装包，支持Windows、macOS、Linux多平台。
+:::
+
+**🚀 配置electron-builder：**
+
+```json
+// package.json
+{
+  "name": "my-electron-app",
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.example.myapp",
+    "productName": "我的应用",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32"]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
+```
+
+**📋 打包命令：**
+
+```bash
+# 打包所有平台
+npm run dist
+
+# 仅打包Windows
+npm run dist:win
+
+# 仅打包macOS
+npm run dist:mac
+
+# 仅打包Linux
+npm run dist:linux
+```
+
+::: tip 💬 面试要点
+关键配置：`files`指定要打包的文件，`target`指定打包格式（Windows用nsis，macOS用dmg，Linux用AppImage）。
+:::
+
+---
+
+### 6、Electron常见问题及解决方案？
+
+::: danger 🐛 面试高频
+了解Electron常见问题及解决方案，体现实际项目经验！
+:::
+
+**❓ 常见问题清单：**
+
+| 问题 | 原因 | 解决方案 |
+|-----|------|---------|
+| **应用白屏** | 资源加载失败 | 检查文件路径、确认devtools报错 |
+| **热更新失效** | Vite配置问题 | 检查`base: './'`配置 |
+| **Node.js API不可用** | nodeIntegration: false | 使用preload + contextBridge |
+| **内存泄漏** | 事件监听未清理 | 组件销毁时移除监听器 |
+| **窗口闪烁** | 窗口初始化问题 | 使用`show: false`，加载完成后再显示 |
+| **打包体积过大** | 未开启Tree Shaking | 配置生产构建、排除依赖 |
+
+**✅ 解决方案示例：**
+
+```javascript
+// 问题1：窗口闪烁解决方案
+const win = new BrowserWindow({
+  show: false, // 先不显示窗口
+  width: 1200,
+  height: 800
+})
+
+// 等页面加载完成再显示
+win.once('ready-to-show', () => {
+  win.show()
+})
+
+// 问题2：内存泄漏解决方案
+import { onUnmounted } from 'vue'
+
+const cleanup = () => {
+  window.electronAPI.removeListener('update-data', handleUpdate)
+}
+
+onUnmounted(cleanup)
+
+// 问题3：热更新失效解决方案
+// vite.config.js
+export default defineConfig({
+  base: './', // 重要：使用相对路径
+  server: {
+    port: 5173,
+    strictPort: true
+  }
+})
+```
+
+::: tip 💬 面试技巧
+回答问题时，结合具体项目场景描述问题及其解决过程，更能体现实战经验！
+:::

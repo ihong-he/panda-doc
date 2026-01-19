@@ -67,20 +67,18 @@ JS有8种数据类型，记住7个基本类型+1个引用类型就行：
 
 ### 3、null vs undefined
 
+**区别：**
+- `undefined`：变量声明了但没赋值，或者函数没有返回值（被动产生）
+- `null`：主动设置为空值，表示"没有对象"（主动设置）
+
 **核心区别：**
-- `undefined` - 被动的：变量未赋值、属性不存在、函数无返回值
-- `null` - 主动的：程序员显式设置为空，表示"本该有对象但现在是空的"
+1. `typeof undefined` 是 `"undefined"`，`typeof null` 是 `"object"`（历史遗留问题）
+2. `null == undefined` 是 `true`，`null === undefined` 是 `false`
+3. `Number(undefined)` 是 `NaN`，`Number(null)` 是 `0`
 
-::: warning ⚠️ 重要区别
-- `typeof undefined` → `"undefined"`
-- `typeof null` → `"object"`（JS历史bug）
-- `undefined == null` → `true`，但 `undefined === null` → `false`
-:::
-
-**实际应用：**
-- 初始化对象变量用 `null`
-- 判断变量是否声明用 `typeof variable !== "undefined"`
-- 判断对象是否存在用 `obj != null`
+**使用建议：**
+- 变量默认不赋值就是 `undefined`
+- 需要明确表示"空对象"时用 `null`
 
 ### 4、数组基本方法
 
@@ -89,21 +87,21 @@ JS有8种数据类型，记住7个基本类型+1个引用类型就行：
 :::
 
 **改变原数组的方法（会修改原数组）：**
-- push/pop - 尾部添加/删除
-- unshift/shift - 头部添加/删除  
-- splice - 增删改全能选手
-- sort - 排序
-- reverse - 反转
+- `push/pop` - 尾部添加/删除
+- `unshift/shift` - 头部添加/删除  
+- `splice` - 截取，增删改全能选手
+- `sort` - 排序
+- `reverse` - 反转
 
 **不改变原数组的方法（返回新数组）：**
-- concat - 合并数组
-- slice - 切片，不包含结束位置
-- join - 拼接成字符串
-- toString - 转字符串
+- `concat` - 合并数组
+- `slice` - 切片，不包含结束位置
+- `join` - 拼接成字符串
+- `toString` - 转字符串
 
 **查找方法：**
-- indexOf/lastIndexOf - 查找索引，找不到返回-1
-- includes - ES6新增，判断是否包含，返回true/false
+- `indexOf/lastIndexOf` - 查找索引，找不到返回-1
+- `includes` - ES6新增，判断是否包含，返回true/false
 
 ::: danger 🎯 面试重点
 splice方法最强大：
@@ -128,25 +126,25 @@ splice方法最强大：
 :::
 
 **遍历但不改变数组（纯遍历）：**
-- forEach() - 就是为了遍历，没返回值，不改变原数组
+- `forEach()` - 就是为了遍历，没返回值，不改变原数组
 - 注意：forEach不能用break，需要用for...of
 
 **遍历并返回新数组：**
-- map() - 最常用，一对一转换，返回新数组
-- filter() - 过滤，返回符合条件的元素组成的新数组
-
-**遍历并返回单个值：**
-- reduce() - 累计算器，最终返回一个值
-- 用法：reduce(callback, initialValue)
-- 常见场景：求和、求乘积、数组转对象
+- `map()` - 最常用，一对一转换，返回新数组
+- `filter()` - 过滤，返回符合条件的元素组成的新数组
 
 **遍历并返回布尔值：**
-- some() - 有一项满足条件就返回true
-- every() - 所有项都满足条件才返回true
+- `some()` - 有一项满足条件就返回true
+- `every()` - 所有项都满足条件才返回true
 
 **查找元素：**
-- find() - 返回第一个满足条件的元素
-- findIndex() - 返回第一个满足条件的元素索引
+- `find()` - 返回第一个满足条件的元素
+- `findIndex()` - 返回第一个满足条件的元素索引
+
+**遍历并返回单个值：**
+- `reduce()` - 累计算器，最终返回一个值
+- 用法：reduce(callback, initialValue)
+- 常见场景：求和、求乘积、数组转对象
 
 ::: warning 🎯 面试高频问题
 1. forEach和map的区别？
@@ -175,26 +173,26 @@ splice方法最强大：
 :::
 
 **查找相关：**
-- indexOf/lastIndexOf - 查找位置，找不到返回-1
-- includes() - ES6新增，判断是否包含，返回true/false
-- startsWith/endsWith() - ES6新增，判断开头/结尾
+- `indexOf/lastIndexOf` - 查找位置，找不到返回-1
+- `includes()` - ES6新增，判断是否包含，返回true/false
+- `startsWith/endsWith()` - ES6新增，判断开头/结尾
 
 **取子串：**
-- slice(start, end) - 最常用，包头不包尾
-- substring(start, end) - 和slice类似，但参数为负数时处理不同
-- substr(start, length) - 已废弃，不建议用
+- `slice(start, end)` - 最常用，包头不包尾
+- `substring(start, end)` - 和slice类似，但参数为负数时处理不同
+- `substr(start, length)` - 已废弃，不建议用
 
 **替换和分割：**
-- replace() - 替换，默认只替换第一个
-- replaceAll() - ES2021新增，替换所有
-- split() - 字符串转数组
+- `replace()` - 替换，默认只替换第一个
+- `replaceAll()` - ES2021新增，替换所有
+- `split()` - 字符串转数组
 
 **修改大小写：**
-- toUpperCase()/toLowerCase() - 转 大写/小写
+- `toUpperCase()/toLowerCase()` - 转 大写/小写
 
 **去除空格：**
-- trim() - 去除首尾空格
-- trimStart()/trimEnd() - ES6新增，分别去除开头/结尾空格
+- `trim()` - 去除首尾空格
+- `trimStart()/trimEnd()` - ES6新增，分别去除开头/结尾空格
 
 ::: danger 🎯 面试重点
 1. slice和substring的区别？
@@ -221,8 +219,6 @@ splice方法最强大：
 闭包是JS的核心概念，面试必问，理解透彻很重要：
 :::
 
-> 闭包就是函数能记住并访问它的词法作用域，即使函数在其词法作用域之外执行。
-
 💬 **白话解释**：
 内部函数能访问外部函数的变量，而且外部函数执行完后，这些变量还不会被销毁，因为内部函数还在引用它们。
 
@@ -236,6 +232,10 @@ splice方法最强大：
 2. **模块化** - 避免全局污染
 3. **私有变量** - JS没有真正的私有变量，用闭包模拟
 4. **事件处理** - 保存状态
+
+**闭包的优缺点：**
+- 优点：变量持久化、避免全局污染、实现封装
+- 缺点：内存泄漏风险（变量不会被回收）
 
 **经典面试题：**
 ```javascript
@@ -270,10 +270,6 @@ for (var i = 0; i < 3; i++) {
 - 让每个 `setTimeout` 回调函数**记住自己专属的值**
 - 变量 `j` 不会被销毁，因为回调函数还在引用它
 - 形成了3个独立的闭包，每个闭包保存不同的值
-
-**闭包的优缺点：**
-- 优点：变量持久化、避免全局污染、实现封装
-- 缺点：内存泄漏风险（变量不会被回收）
 
 ::: tip 💬 面试回答技巧
 1. 先说概念定义
@@ -354,18 +350,6 @@ function myNew(Constr, ...args) {
 }
 ```
 
-**面试重点问题：**
-1. new操作符返回什么？
-   - 构造函数返回数字、字符串等基本值：不管它，返回新对象
-   - 构造函数返回对象或数组：就返回这个对象/数组
-
-2. 不用new调用构造函数会怎样？
-   - this指向window（非严格模式）或undefined（严格模式）
-   - 不会创建新对象，相当于普通函数调用
-
-3. 箭头函数能用new吗？
-   - 不能！箭头函数没有自己的this，也没有prototype
-
 **常见面试题：**
 ```javascript
 function Person() {
@@ -378,7 +362,6 @@ console.log(p.name) // '李四'，因为返回了对象
 
 **记忆要点：**
 - new就是创建对象+设置原型+绑定this+返回对象
-- 重点理解返回值的处理逻辑
 - 箭头函数不能用new是高频考点！
 
 ### 10、对 this 的理解
@@ -493,17 +476,6 @@ function throttle(func, delay) {
 }
 ```
 
-**面试常问题：**
-1. 防抖和节流的区别？
-   - 防抖：重置计时，只执行最后一次
-   - 节流：固定频率执行，第一次必定执行
-
-2. 防抖的立即执行版本？
-   - 可以加个参数控制是否立即执行
-
-3. 节流的时间戳版本？
-   - 用时间戳判断是否超过间隔
-
 **实际项目应用：**
 - 搜索防抖：用户输入停止后再发送请求
 - 滚动节流：页面滚动时按固定频率加载更多
@@ -544,14 +516,18 @@ console.log(result) // "0.3"
 console.log(parseFloat(result)) // 0.3
 ```
 
-3. **误差范围判断（仅用于比较）：**
+3. **误差范围判断返回精确值：**
 ```javascript
-// 这个方案仅用于判断两个浮点数是否"在误差范围内相等"
-// 如果需要精确的计算结果，请用上面方案1或方案2
-function equal(a, b, tolerance = 0.00001) {
-    return Math.abs(a - b) < tolerance
+// 使用误差范围判断并返回精确值
+function add(a, b, tolerance = 0.00001) {
+    let result = a + b
+    // 判断结果是否接近某个精度 Math.round()四舍五入到整数
+    let rounded = Math.round(result / tolerance) * tolerance
+    return rounded
 }
-equal(0.1 + 0.2, 0.3) // true
+let result = add(0.1, 0.2)
+console.log(result) // 0.3
+console.log(result === 0.3) // true
 ```
 
 **面试扩展问题：**
@@ -572,61 +548,64 @@ equal(0.1 + 0.2, 0.3) // true
 
 ### 13、TypeScript vs JavaScript 区别
 
-::: info 🆚 现代开发对比
-现在企业级项目基本都用TS，这个对比很重要：
+::: danger 🔥 面试必问
+TS vs JS 是前端面试常问问题，需要从多个维度回答！
 :::
 
 **核心区别：**
-- JS是动态类型，运行时才知道类型错误
-- TS是静态类型，写代码时就能发现类型错误
-- TS是JS的超集，所有JS代码都是有效的TS代码
 
-**类型系统对比：**
+| 维度 | JavaScript | TypeScript |
+|------|-----------|------------|
+| 类型 | 动态弱类型 | 静态强类型 |
+| 编译 | 解释执行 | 需要编译成JS再执行 |
+| 错误检查 | 运行时发现 | 编译时发现 |
+| 语法 | ES规范 | 超集，包含ES所有特性 + 类型系统 |
+| 代码提示 | 有限 | 完整的智能提示和类型推断 |
+| 维护性 | 难以维护大型项目 | 更适合大型项目 |
 
-**JS（动态类型）：**
-```javascript
-let a = 1
-a = 'hello' // 完全可以，但可能出bug
-```
+**TS的优势：**
 
-**TS（静态类型）：**
-```typescript
-let a: number = 1
-a = 'hello' // 编译时报错，类型不匹配
-```
+1. **类型安全**
+   - 编译时捕获错误，减少运行时bug
+   - 提供类型检查，避免类型不匹配
+   ```typescript
+   // TypeScript 会在编译时报错
+   let num: number = 'hello' // ❌ Type 'string' is not assignable to type 'number'
+   ```
 
-**TS带来的好处：**
-1. **开发阶段发现错误** - 不用等运行时才报错
-2. **更好的IDE支持** - 代码补全、重构、导航
-3. **代码可读性更好** - 接口定义清楚数据结构
-4. **大型项目维护性** - 类型约束让代码更稳定
+2. **更好的代码提示**
+   - IDE能提供完整的类型提示
+   - 重构更安全（自动更新所有引用）
 
-**TS特有功能：**
-- **接口（interface）** - 定义对象结构
-- **枚举（enum）** - 定义常量集合
-- **泛型** - 创建可复用组件
-- **类型注解** - 明确函数参数和返回值
-- **联合类型、交叉类型** - 更灵活的类型组合
+3. **更好的可维护性**
+   - 类型即文档，代码自解释
+   - 团队协作更高效
+   - 大型项目易于维护
 
-**实际项目影响：**
-- **开发效率**：短期JS快，长期TS效率更高
-- **代码质量**：TS明显优于JS
-- **团队协作**：TS更有利于大型团队
-- **学习成本**：TS需要额外学习
+4. **支持新特性**
+   - TS支持更新的JS特性
+   - 编译时可指定目标版本
 
-**什么时候用TS：**
-- 大型项目、多人协作
-- 对代码质量要求高
-- 项目生命周期长
+5. **高级特性**
+   - 接口 Interface
+   - 泛型 Generics
+   - 装饰器 Decorators
+   - 枚举 Enum
+   - 命名空间 Namespace
 
-**面试回答要点：**
-1. TS是静态类型，JS是动态类型
-2. TS提供更好的开发体验和代码质量
-3. TS是超集，渐进式采用
-4. 现代前端趋势是TS化
+**TS的劣势：**
+- 学习成本较高
+- 开发时需要编译步骤
+- 配置复杂（tsconfig.json）
+- 文件体积略大（类型信息会被编译掉）
 
-::: tip 🎯 记住
-TS = JS + 类型系统 + 工具支持！
+**面试加分回答：**
+- 我在实际项目中使用TS开发，减少了约60%的运行时错误
+- 团队协作时，TS的类型系统让代码审查更高效
+- 对于小型项目，JS可能更灵活；但对于中大型项目，TS是更好的选择
+
+::: tip 🧠 记忆要点
+TS = JS + 类型系统，编译时检查错误，适合大型项目！
 :::
 
 ### 14、事件循环 Event Loop

@@ -16,7 +16,7 @@ outline: deep
 
 ### 1、DOCTYPE是什么？为什么必须要有？
 
-> 💡 **简单来说**，DOCTYPE就像是告诉浏览器"嘿，我用的是哪个版本的HTML来写这个网页"的声明。它必须放在HTML文档的最顶部，在`<html>`标签之前。
+> 💡 **简单来说**，DOCTYPE是告诉浏览器是哪个版本的HTML来写这个网页的声明。它必须放在HTML文档的最顶部，在`<html>`标签之前。
 
 **🎯 核心作用**：
 - 告诉浏览器用哪种标准来解析和渲染页面
@@ -29,7 +29,7 @@ outline: deep
 
 ### 2、什么是HTML语义化？为什么重要？
 
-> 📝 **定义**：语义化就是"用对标签做对事"——根据内容的含义选择合适的HTML标签，而不是只考虑外观效果。
+> 📝 **定义**：语义化就是根据内容的含义选择合适的HTML标签，而不是只考虑外观效果。
 
 **🔍 举个例子**：
 - 用`<header>`、`<footer>`、`<nav>`等标签来表示页面的不同部分
@@ -37,7 +37,7 @@ outline: deep
 
 **🏢 为什么企业这么重视语义化**：
 1. **🔍 SEO友好**：搜索引擎更容易理解页面结构，提升排名
-2. **♿ 可访问性好**：屏幕阅读器能更好地为视障用户朗读内容
+2. **♿ 有利于无障碍访问**：屏幕阅读器能更好地为视障用户朗读内容
 3. **🛠️ 代码维护性高**：团队协作时别人一看就懂每个区域的用途
 4. **🎨 样式与结构分离**：便于后期重构和样式调整
 
@@ -227,35 +227,34 @@ CSS选择器优先级，这个必须背下来！
 CSS3带来了革命性变化，按类别记忆更清晰!
 :::
 
-**🎨 视觉特效类**：
-- **圆角边框** `border-radius` - 告别图片切角,支持圆形
-- **盒阴影** `box-shadow` - 卡片阴影效果,参数:水平/垂直偏移 模糊半径 颜色
-- **渐变** `linear-gradient`/`radial-gradient` - 背景渐变,不再依赖图片
-
-**🔄 变换与过渡类**：
-- **2D/3D变换** `transform` - 旋转/缩放/平移/倾斜,用transform做动画性能更好
-- **过渡** `transition` - 属性平滑过渡,语法:`property duration timing-function`
-- **关键帧动画** `@keyframes` - 复杂动画序列,支持多阶段状态
-
 **🎭 选择器增强**：
 - **属性选择器** `[type="text"]`、`a[href^="https"]` - 根据属性值选择
 - **结构伪类** `:first-child`、`:nth-child(2n)` - 按位置选择元素
-- **UI状态伪类** `:hover`、`:focus`、`:checked`、`:disabled` - 交互状态
-- **否定伪类** `:not(.active)` - 排除特定元素
+- **状态伪类** `:hover`、`:focus`、`:checked`、`:disabled` - 交互状态
 
 **📱 布局增强**：
-- **Flexbox弹性布局** - 一维布局,主轴/交叉轴对齐,`justify-content`/`align-items`
-- **Grid网格布局** - 二维布局,行列控制,`grid-template-columns`/`grid-template-areas`
+- **Flexbox弹性布局** - 一维布局，主轴/交叉轴对齐，`justify-content`/`align-items`
+- **Grid网格布局** - 二维布局，行列控制，`grid-template-columns`/`grid-template-areas`
+
+**🎨 视觉特效类**：
+- **圆角边框** `border-radius` - 告别图片切角，支持圆形
+- **盒阴影** `box-shadow` - 卡片阴影效果，参数:水平/垂直偏移 模糊半径 颜色
+- **渐变** `linear-gradient`/`radial-gradient` - 背景渐变，不再依赖图片
+
+**🔄 变换与过渡类**：
+- **2D/3D变换** `transform` - 旋转/缩放/平移/倾斜，用transform做动画性能更好
+- **过渡** `transition` - 属性平滑过渡，语法:`property duration timing-function`
+- **关键帧动画** `@keyframes` - 复杂动画序列，支持多阶段状态
 
 **🌈 其他实用特性**：
-- **RGBA/HSLA颜色** - 支持透明度
-- **滤镜** `filter` - 模糊/灰度/亮度调整
-- **视口单位** `vw`/`vh` - 相对视口尺寸
 - **媒体查询** `@media` - 响应式设计基础
-- **多背景图** - 一个元素可叠加多个背景
+- **滤镜** `filter` - 模糊/灰度/亮度调整
+- **RGBA/HSLA颜色** - 支持透明度
+- **视口单位** `vw`/`vh` - 相对视口尺寸
+
 
 ::: tip 💡 面试回答技巧
-按类别回答：视觉特效(圆角/阴影/渐变) + 动画过渡(transform/transition/@keyframes) + 布局(flex/grid) + 选择器增强，这样层次清晰，容易记忆。
+按类别回答：选择器增强 + 布局(flex/grid) + 视觉特效(圆角/阴影/渐变) + 动画过渡(transform/transition/@keyframes)，这样层次清晰，容易记忆。
 :::
 
 
@@ -378,6 +377,9 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
 **🛠️ 常见解决方案**：
 
 **1. 🎯 使用transform缩放（推荐）**：
+
+核心思路：通过伪元素创建边框，用`transform: scaleY(0.5)`将边框缩小一半。
+
 ```css
 .border-1px {
     position: relative;
@@ -396,21 +398,21 @@ BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对
 ```
 
 **2. 📱 使用viewport + rem**：
-- 设置viewport的initial-scale为0.5
-- 所有尺寸都按2倍设计，用rem单位
 
-**3. 📺 使用媒体查询**：
-```css
-/* 适配2倍屏（Retina屏）：设备像素比≥2时，1px逻辑像素渲染为2物理像素，需缩小到0.5倍 */
-@media (-webkit-min-device-pixel-ratio: 2) {
-    .border-1px::after { transform: scaleY(0.5); }
-}
-
-/* 适配3倍屏（部分高端安卓/iPhone）：设备像素比≥3时，1px逻辑像素渲染为3物理像素，需缩小到0.33倍 */
-@media (-webkit-min-device-pixel-ratio: 3) {
-    .border-1px::after { transform: scaleY(0.33); }
-}
+- 设置`viewport`的`initial-scale`为0.5，将页面整体缩小一半
+- 所有尺寸按2倍设计稿开发，用rem单位适配不同屏幕
+::: code-group
+```html [HTML]
+<!-- HTML中设置viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=0.5, 
+    maximum-scale=0.5, user-scalable=no">
 ```
+```javascript [JS]
+// JS中动态设置rem基准值（以375px设计稿为例）
+document.documentElement.style.fontSize = window.innerWidth / 750 + 'px';
+// 使用时：1px = 0.01rem
+```
+:::
 
 ::: tip 💬 面试回答重点
 说明问题产生的原因，提出1-2种具体解决方案。
@@ -476,10 +478,12 @@ html {
 ### 1、如何实现一个三栏布局？
 
 ::: danger 🎯 必考题目
-面试时至少要会3种方法：
+面试时至少要会2种方法
 :::
 
 **1. 🌟 Flexbox方案（最推荐）**：
+
+使用 `display: flex` 创建弹性布局，左右两侧固定宽度，中间部分通过 `flex: 1` 自动占据剩余空间。
 ```css
 .container {
     display: flex;
@@ -494,6 +498,8 @@ html {
 ```
 
 **2. 🎯 Grid方案**：
+
+使用 `display: grid` 创建网格布局，通过 `grid-template-columns: 200px 1fr 200px` 定义三列，其中 `1fr`单位让中间列自动填充剩余空间。
 ```css
 .container {
     display: grid;
@@ -528,14 +534,6 @@ body {
     color: var(--text-color);
     transition: background 0.3s, color 0.3s;
 }
-```
-
-**⚡ JavaScript切换方案**：
-```javascript
-// 添加主题类
-document.body.classList.toggle('dark-theme');
-// 存储用户偏好
-localStorage.setItem('theme', 'dark');
 ```
 
 
