@@ -19,19 +19,17 @@ outline: deep
 微信小程序开发时会接触到这几种文件，记住它们的作用很重要：
 :::
 
-**文件类型详细说明：**
+**文件类型一览：**
 
-- **`.json` 配置文件** <Badge type="tip" text="配置" /> - 就像房子的装修图纸，`app.json`是全局配置，页面配置管单个页面，定义页面路径、窗口样式这些
+| 文件 | 类型 | 作用 | 说明 |
+|------|------|------|------|
+| `.json` | <Badge type="tip" text="配置" /> | 定义全局/页面配置 | `app.json`全局配置，页面配置管单个页面 |
+| `.wxml` | <Badge type="info" text="结构" /> | 页面结构层 | 类似HTML，支持数据绑定、条件判断 |
+| `.wxss` | <Badge type="info" text="样式" /> | 页面样式层 | 相当于CSS，支持微信特有写法 |
+| `.js` | <Badge type="warning" text="逻辑" /> | 业务逻辑层 | JavaScript代码，CommonJS规范 |
+| `.wxs` | <Badge type="warning" text="脚本" /> | 辅助计算脚本 | 轻量级JS，独立运行，性能更好 |
 
-- **`.wxml` 结构文件** <Badge type="info" text="结构" /> - 类似HTML，写页面结构的，支持数据绑定、条件判断、循环列表，小程序的"骨架"
-
-- **`.wxss` 样式文件** <Badge type="info" text="样式" /> - 相当于CSS，控制页面样式，比CSS多了点微信特有的写法
-
-- **`.js` 逻辑文件** <Badge type="warning" text="逻辑" /> - JavaScript代码，写业务逻辑、处理交互的，遵循CommonJS规范，用require导入模块
-
-- **`.wxs` 脚本文件** <Badge type="warning" text="脚本" /> - 可以理解成"轻量级JS"，专门处理复杂计算和逻辑，独立于页面运行，性能更好
-
-> 💡 **记忆口诀**：配置→结构→样式→逻辑，开发时按这个思路来就不会乱。
+> 💡 **记忆口诀**：配置→结构→样式→逻辑
 
 ### 2、小程序生命周期有哪些？什么时候触发？
 
@@ -172,7 +170,6 @@ onLoad: function(options) {
 - 🔄 **分包加载** <Badge type="tip" text="首选" /> - 主包只放核心页面，其他功能分包
 - 🖼️ **图片压缩** - 用tinypng压缩，支持webp就更好了
 - 📝 **代码复用** - 组件化开发，减少重复代码
-- 🗑️ **清理无用文件** - 定期检查删除不用代码和图片
 
 **🌐 请求优化（用户体验）：**
 
@@ -191,211 +188,7 @@ onLoad: function(options) {
 > 分包减体积、缓存提速度、懒加载省流量、setData要克制。
 :::
 
-### 6、小程序登录流程是怎样的？
-
-![An image](/img/wx-login.jpg)
-
-::: tip 🔐 登录流程
-登录流程就像进门验证身份，必须严格按照步骤来：
-:::
-
-**🔑 登录五步走：**
-
-```mermaid
-graph LR
-    A[前端调用wx.login] --> B[获取临时code]
-    B --> C[发送code给后端]
-    C --> D[后端换取openid]
-    D --> E[生成自定义token]
-    E --> F[前端存储token]
-```
-
-**📋 详细步骤：**
-
-1. 🔐 **获取临时凭证** - 调用`wx.login()`拿到code，<Badge type="danger" text="只能用一次" />
-2. 📡 **发送给服务器** - 通过`wx.request()`把code发给你的后端
-3. 🔄 **换取用户标识** - 后端用code向微信服务器换取openid和session_key
-4. 🎫 **生成自定义登录态** - 服务器生成token或session返回给小程序
-5. 💾 **存储登录状态** - 小程序存储token，后续请求带上这个token
-
-**⚠️ 关键点记住：**
-- code是**一次性**的，用完就废
-- openid是用户**唯一标识**，永久有效
-- session_key是**解密密钥**，要保存在服务器
-- 登录态管理用**token或session**
-
-::: warning ❓ 面试常问
-code过期了怎么办？重新调用`wx.login()`获取新code。
-:::
-
-### 7、怎么获取用户头像和昵称？（2025年最新）
-
-::: warning ⚠️ 政策变化
-微信政策一直在变，现在不能直接获取用户信息了，必须用户主动操作！
-:::
-
-**👤 头像获取（新版）：**
-
-<details>
-<summary>查看最新代码</summary>
-
-```html
-<button open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-  <image src="{{avatarUrl}}"></image>
-</button>
-```
-
-</details>
-
-用户点击选择头像后，通过`bindchooseavatar`事件获取头像临时路径。
-
-**✍️ 昵称获取（新版）：**
-
-<details>
-<summary>查看最新代码</summary>
-
-```html
-<input type="nickname" placeholder="请输入昵称" />
-```
-
-</details>
-
-input设置type为nickname，用户输入时微信会提供昵称建议。
-
-**📜 政策演变历史：**
-
-```mermaid
-timeline
-    section 2019-2021
-        自动获取时代 : wx.getUserInfo
-        : 一键授权获取信息
-        : 无需用户主动选择
-    section 2021-2022
-        过渡时期 : getUserProfile
-        : 按钮触发获取
-        : 需用户主动点击
-    section 2022-至今
-        用户自主时代 : open-type="chooseAvatar"
-        : 头像用户主动选择
-        : 昵称用户自主输入
-```
-
-::: danger 🔑 记住这个变化
-- ❌ 旧版：`wx.getUserInfo` → `getUserProfile` → 现在都不能用了
-- ✅ 新版：必须**用户主动操作**，不能再自动获取
-- 👤 头像要用户选择，昵称要用户输入
-:::
-
-::: tip 💬 面试加分项
-说清楚这个演变过程，体现你对技术发展的关注。
-:::
-
-### 8、小程序支付怎么实现？
-
-::: danger 💰 支付安全
-支付功能涉及资金，要特别注意安全和流程，这是企业级开发的核心！
-:::
-
-**🔄 完整支付流程：**
-
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant F as 前端
-    participant S as 服务器
-    participant W as 微信支付
-    
-    U->>F: 1. 点击支付
-    F->>S: 2. 创建订单
-    S->>W: 3. 获取支付参数
-    W-->>S: 4. 返回prepay_id
-    S->>S: 5. 生成签名
-    S-->>F: 6. 返回支付参数
-    F->>W: 7. 调起支付
-    W-->>U: 8. 用户确认支付
-```
-
-**💻 核心代码实现：**
-
-<details>
-<summary>查看支付代码</summary>
-
-```js
-wx.requestPayment({
-  timeStamp: '时间戳',
-  nonceStr: '随机字符串', 
-  package: 'prepay_id=xxxxx',
-  signType: 'MD5',
-  paySign: '签名',
-  success(res) {
-    // 支付成功，更新订单状态
-  },
-  fail(res) {
-    // 支付失败，处理错误
-  }
-})
-```
-
-</details>
-
-**🔒 安全要点：**
-
-- 🔐 **签名必须在服务器生成** <Badge type="danger" text="重要" /> - 前端不能有密钥
-- ✅ **支付结果要验证** - 防止伪造
-- ⚠️ **异常情况要处理** - 用户取消、网络超时等
-
-::: tip 💬 面试重点
-支付流程、签名生成、异常处理是必考内容！
-:::
-
-### 9、用户取消支付怎么办？
-
-::: warning ⚠️ 异常处理
-用户取消支付很常见，处理不好影响用户体验，这是面试必问的异常处理场景！
-:::
-
-**🔍 检测取消操作：**
-
-<details>
-<summary>查看处理代码</summary>
-
-```js
-wx.requestPayment({
-  // 支付参数...
-  fail(res) {
-    if (res.errMsg === "requestPayment:fail cancel") {
-      // 用户主动取消
-      wx.showToast({
-        title: '支付已取消',
-        icon: 'none'
-      })
-      // 提供重新支付选项
-    }
-  }
-})
-```
-
-</details>
-
-**🛠️ 需要处理的场景：**
-
-| 场景 | 处理方式 | 重要性 |
-|------|----------|--------|
-| 📋 订单状态回滚 | 标记为未支付 | ⭐⭐⭐⭐ |
-| 📦 库存恢复 | 恢复库存数量 | ⭐⭐⭐⭐ |
-| 🎫 优惠券恢复 | 退回优惠券 | ⭐⭐⭐ |
-| 🔄 重新支付 | 提供再次支付入口 | ⭐⭐⭐⭐ |
-| 💬 友好提示 | 不让用户觉得出错 | ⭐⭐⭐ |
-
-**✨ 最佳实践：**
-
-- 🔍 **支付前先确认** - 显示订单信息，让用户核对
-- ⚡ **支付后立即验证** - 调接口查支付状态
-- ⏰ **超时处理** - 设置支付超时时间
-
-> 💡 **核心理念**：用户体验第一，让用户感觉操作流畅、安全可靠。
-
-### 10、小程序分包怎么用？
+### 6、小程序分包怎么用？
 
 ::: tip 📦 分包加载
 分包就像把大房子分成几个小房间，按需进入，解决主包体积限制问题！
@@ -403,14 +196,11 @@ wx.requestPayment({
 
 **🤔 为什么要分包：**
 
-- ⚠️ **主包超过2M无法发布** <Badge type="danger" text="限制" />
-- 📦 **单个分包不能超过2M**，所有分包总大小不超过**20M**(普通小程序30M)
+- ⚠️ **主包/单个分包不能超过2M** <Badge type="danger" text="限制" />
+- 📦 **整个小程序所有分包总大小不超过20M**（服务商代开发的小程序）或**30M**（企业/个人自己开发的小程序）
 - 🚀 **提升首屏加载速度**
 
 **⚙️ 怎么配置分包：**
-
-<details>
-<summary>查看配置代码</summary>
 
 ```json
 // app.json
@@ -424,8 +214,6 @@ wx.requestPayment({
   ]
 }
 ```
-
-</details>
 
 **📁 目录结构：**
 
@@ -478,6 +266,199 @@ wx.loadSubPackage({
 - 如何优化分包体验？设置预加载规则
 :::
 
+### 7、小程序登录流程是怎样的？
+
+<!-- ![An image](/img/wx-login.jpg) -->
+
+::: tip 🔐 登录流程
+登录流程就像进门验证身份，必须严格按照步骤来：
+:::
+
+**🔑 登录五步走：**
+
+```mermaid
+graph LR
+    A[前端调用wx.login] --> B[获取临时code]
+    B --> C[发送code给后端]
+    C --> D[后端换取openid]
+    D --> E[生成自定义token]
+    E --> F[前端存储token]
+```
+
+**📋 详细步骤：**
+
+1. 🔐 **获取临时凭证code** - 前端调用`wx.login()`拿到code，<Badge type="danger" text="只能用一次" />
+2. 📡 **发送给服务器** - 通过`wx.request()`把code发给你的后端
+3. 🔄 **换取用户标识** - 后端用code向微信服务器换取`openid`和`session_key`
+4. 🎫 **生成自定义登录态** - 服务器生成`token`返回给小程序
+5. 💾 **存储登录状态** - 小程序存储token，后续请求带上这个token
+
+**⚠️ 关键点记住：**
+- code是**一次性**的，用完就废
+- openid是用户**唯一标识**，永久有效
+- session_key是**解密密钥**，要保存在服务器
+- 登录态管理用**token或session**
+
+::: warning ❓ 面试常问
+code过期了怎么办？重新调用`wx.login()`获取新code。
+:::
+
+### 8、怎么获取用户头像和昵称？（2025年最新）
+
+::: warning ⚠️ 政策变化
+微信政策一直在变，现在不能直接获取用户信息了，必须用户主动操作！
+:::
+
+**👤 头像获取（新版）：**
+
+用户点击选择头像后，通过`bind:chooseavatar`事件获取头像临时路径。
+
+```html
+<button open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+  <image src="{{avatarUrl}}"></image>
+</button>
+```
+
+**✍️ 昵称获取（新版）：**
+
+
+`input`设置type为`nickname`，用户输入时微信会提供昵称建议。
+
+```html
+<input type="nickname" placeholder="请输入昵称" />
+```
+
+
+**📜 政策演变历史：**
+
+```mermaid
+timeline
+    section 2019-2021
+        自动获取时代 : wx.getUserInfo
+        : 一键授权获取信息
+        : 无需用户主动选择
+    section 2021-2022
+        过渡时期 : getUserProfile
+        : 按钮触发获取
+        : 需用户主动点击
+    section 2022-至今
+        用户自主时代 : open-type="chooseAvatar"
+        : 头像用户主动选择
+        : 昵称用户自主输入
+```
+
+::: danger 🔑 记住这个变化
+- ❌ 旧版：`wx.getUserInfo` → `getUserProfile` → 现在都不能用了
+- ✅ 新版：必须**用户主动操作**，不能再自动获取
+- 👤 头像要用户选择，昵称要用户输入
+:::
+
+::: tip 💬 面试加分项
+说清楚这个演变过程，体现你对技术发展的关注。
+:::
+
+### 9、小程序支付怎么实现？
+
+::: danger 💰 支付安全
+支付功能涉及资金，要特别注意安全和流程，这是企业级开发的核心！
+:::
+
+**🔄 完整支付流程：**
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant F as 前端
+    participant S as 服务器
+    participant W as 微信支付
+    
+    U->>F: 1. 点击支付
+    F->>S: 2. 创建订单
+    S->>W: 3. 获取支付参数
+    W-->>S: 4. 返回prepay_id
+    S->>S: 5. 生成签名
+    S-->>F: 6. 返回支付参数
+    F->>W: 7. 调起支付
+    W-->>U: 8. 用户确认支付
+```
+
+**💻 核心代码实现：**
+
+```js
+wx.requestPayment({
+  timeStamp: '时间戳',
+  nonceStr: '随机字符串', 
+  package: 'prepay_id=xxxxx',
+  signType: 'MD5',
+  paySign: '签名',
+  success(res) {
+    // 支付成功，更新订单状态
+  },
+  fail(res) {
+    // 支付失败，处理错误
+  }
+})
+```
+
+**🔒 安全要点：**
+
+- 🔐 **签名必须在服务器生成** <Badge type="danger" text="重要" /> - 前端不能有密钥
+- ✅ **支付结果要验证** - 防止伪造
+- ⚠️ **异常情况要处理** - 用户取消、网络超时等
+
+::: tip 💬 面试重点
+支付流程、签名生成、异常处理是必考内容！
+:::
+
+### 10、用户取消支付怎么办？
+
+::: warning ⚠️ 异常处理
+用户取消支付很常见，处理不好影响用户体验，这是面试必问的异常处理场景！
+:::
+
+**🔍 检测取消操作：**
+
+<details>
+<summary>查看处理代码</summary>
+
+```js
+wx.requestPayment({
+  // 支付参数...
+  fail(res) {
+    if (res.errMsg === "requestPayment:fail cancel") {
+      // 用户主动取消
+      wx.showToast({
+        title: '支付已取消',
+        icon: 'none'
+      })
+      // 提供重新支付选项
+    }
+  }
+})
+```
+
+</details>
+
+**🛠️ 需要处理的场景：**
+
+| 场景 | 处理方式 | 重要性 |
+|------|----------|--------|
+| 📋 订单状态回滚 | 标记为未支付 | ⭐⭐⭐⭐ |
+| 📦 库存恢复 | 恢复库存数量 | ⭐⭐⭐⭐ |
+| 🎫 优惠券恢复 | 退回优惠券 | ⭐⭐⭐ |
+| 🔄 重新支付 | 提供再次支付入口 | ⭐⭐⭐⭐ |
+| 💬 友好提示 | 不让用户觉得出错 | ⭐⭐⭐ |
+
+**✨ 最佳实践：**
+
+- 🔍 **支付前先确认** - 显示订单信息，让用户核对
+- ⚡ **支付后立即验证** - 调接口查支付状态
+- ⏰ **超时处理** - 设置支付超时时间
+
+> 💡 **核心理念**：用户体验第一，让用户感觉操作流畅、安全可靠。
+
+
+
 ### 11、怎么跳转到其他小程序？
 
 ::: tip 🔗 跨小程序跳转
@@ -485,8 +466,6 @@ wx.loadSubPackage({
 :::
 
 **🚀 方法一：navigateToMiniProgram**
-
-
 
 ```js
 wx.navigateToMiniProgram({
@@ -500,7 +479,6 @@ wx.navigateToMiniProgram({
   }
 })
 ```
-
 
 **🎯 应用场景：**
 
@@ -522,8 +500,6 @@ wx.navigateToMiniProgram({
 
 **🔙 返回处理：**
 
-<details>
-<summary>查看返回代码</summary>
 
 ```js
 // 目标小程序中处理返回
@@ -533,8 +509,6 @@ wx.navigateBackMiniProgram({
   }
 })
 ```
-
-</details>
 
 
 ## 📊 二、可视化大屏
