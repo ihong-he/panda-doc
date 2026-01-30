@@ -75,7 +75,7 @@ function App(){
 ![image.png](assets/03.png)
 
 ::: info 补充
-`Babel` 是一个JavaScript 编译器。它的主要作用是将使用最新、最前沿的 JavaScript 语法（如 ES2015/ES6 及更高版本）或非标准语法（如 JSX）编写的代码，转换（编译）成向后兼容的、能在当前和旧版本浏览器或环境中运行的 JavaScript 代码。
+`Babel` 是一个JavaScript 编译器。它的一个作用是将非标准语法（如 JSX）编写的代码，转换成能在当前浏览器环境中运行的 JavaScript 代码。
 :::
 
 ### JSX高频场景-JS表达式
@@ -123,7 +123,7 @@ const list = [
 function App(){
   return (
     <ul>
-      {list.map(item=><li key={item.id}>{item}</li>)}
+      {list.map(item=><li key={item.id}>{item.name}</li>)}
     </ul>
   )
 }

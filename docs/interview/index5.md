@@ -102,8 +102,8 @@ outline: deep
 
 **🌟 方式一：全局变量（简单粗暴）**
 
-<details>
-<summary>查看代码实现</summary>
+
+<Badge type="warning" text="适合：公共数据" />
 
 ```js
 // app.js
@@ -118,16 +118,10 @@ const app = getApp()
 app.globalData.userInfo = '用户信息'
 ```
 
-</details>
-
-<Badge type="warning" text="适合：公共数据" />
-
----
 
 **🚀 方式二：URL传参（最常用）**
 
-<details>
-<summary>查看代码实现</summary>
+<Badge type="tip" text="最适合：规范传参" />
 
 ```js
 // 发送页
@@ -141,19 +135,13 @@ onLoad: function(options) {
 }
 ```
 
-</details>
-
-<Badge type="tip" text="最适合：规范传参" />
-
----
 
 **💾 方式三：本地缓存（数据持久化）**
 
-用`wx.setStorageSync`存，`wx.getStorageSync`取，关了小程序数据还在。
-
 <Badge type="info" text="最适合：长期保存" />
 
----
+用`wx.setStorageSync`存，`wx.getStorageSync`取，关了小程序数据还在。
+
 
 ::: tip 💬 面试技巧
 问哪种方式好？URL传参最规范，全局变量适合存公共数据，缓存适合需要长期保存的数据。
@@ -418,9 +406,6 @@ wx.requestPayment({
 
 **🔍 检测取消操作：**
 
-<details>
-<summary>查看处理代码</summary>
-
 ```js
 wx.requestPayment({
   // 支付参数...
@@ -436,8 +421,6 @@ wx.requestPayment({
   }
 })
 ```
-
-</details>
 
 **🛠️ 需要处理的场景：**
 
@@ -458,14 +441,13 @@ wx.requestPayment({
 > 💡 **核心理念**：用户体验第一，让用户感觉操作流畅、安全可靠。
 
 
-
 ### 11、怎么跳转到其他小程序？
 
 ::: tip 🔗 跨小程序跳转
 小程序之间跳转用开放能力，实现生态联动！
 :::
 
-**🚀 方法一：navigateToMiniProgram**
+**🚀 小程序内部跳转：navigateToMiniProgram**
 
 ```js
 wx.navigateToMiniProgram({
@@ -487,7 +469,7 @@ wx.navigateToMiniProgram({
 - 🌟 **多小程序生态联动**
 
 
-**🌐 方法二：URL Scheme (/skiːm/)（外部跳转）**
+**🌐 外部链接跳转：URL Scheme (/skiːm/)**
 
 生成格式：`weixin://dl/business/?t=miniProgram&appId=xxx&path=xxx`
 

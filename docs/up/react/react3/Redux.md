@@ -199,8 +199,9 @@ const channelStore = createSlice({
   },
 });
 
-// 创建异步
 const { setChannelList } = channelStore.actions;
+
+// 创建异步
 const url = "http://geek.itheima.net/v1_0/channels";
 // 封装一个函数 在函数中return一个新函数 在新函数中封装异步
 // 得到数据之后通过dispatch函数 触发修改
@@ -225,7 +226,7 @@ function App() {
   const { channelList } = useSelector((state) => state.channel);
   useEffect(() => {
     dispatch(fetchChannelList());
-  }, [dispatch]);
+  }, []);
 
   return (
     <div className="App">

@@ -211,8 +211,17 @@ export default App
 ```
 
 ## 八、useEffect
-### 概念理解 
-`useEffect`是一个React Hook函数，用于在React组件中创建不是由事件引起而是由渲染本身引起的操作（副作用）, 比如发送AJAX请求，更改DOM等等 
+### 概念理解
+`useEffect`是一个React Hook函数，用于在React组件中创建不是由事件引起而是由渲染本身引起的操作（副作用）, 比如发送AJAX请求，更改DOM等等
+
+:::tip 与Vue的对比
+useEffect与Vue中的`watch`功能类似：
+- **相同点**：都能监听数据变化并执行副作用操作
+- **不同点**：
+  - useEffect在组件渲染后执行，而watch在响应式数据变化时执行
+  - useEffect的依赖项控制执行时机，watch通过watch选项或配置控制
+  - useEffect提供清理函数机制，watch通过handler的参数控制
+:::
 ![image.png](assets/10.png)
 :::info 说明
 上面的组件中没有发生任何的用户事件，组件渲染完毕之后就需要和服务器要数据，整个过程属于“只由渲染引起的操作”
@@ -300,7 +309,7 @@ function useToggle () {
 
   const toggle = () => setValue(!value)
 
-  // 哪些状态和回调函数需要在其他组件中使用 return
+  // 哪些状态和回调函数在其他组件中需要使用 return
   return {
     value,
     toggle
@@ -311,7 +320,7 @@ function useToggle () {
 
 // 1. 声明一个以use打头的函数
 // 2. 在函数体内封装可复用的逻辑（只要是可复用的逻辑）
-// 3. 把组件中用到的状态或者回调return出去（以对象或者数组）
+// 3. 把组件中用到的状态或者函数return出去（以对象或者数组）
 // 4. 在哪个组件中要用到这个逻辑，就执行这个函数，解构出来状态和回调进行使用
 
 
@@ -327,14 +336,13 @@ function App () {
 
 export default App
 ```
-## 十、React Hooks使用规则
-
-1. 只能在组件中或者其他自定义Hook函数中调用
-2. 只能在组件的顶层调用，不能嵌套在if、for、其它的函数中
+> [!IMPORTANT] React Hooks使用规则
+> 1. 只能在组件中或者其他自定义Hook函数中调用
+> 2. 只能在组件的顶层调用，不能嵌套在if、for、其它的函数中
 
 ![image.png](assets/14.png)
 
-## 十一、案例-优化B站评论案例
+## 十、案例-优化B站评论案例
 ![image.png](assets/15.png)
 1. 使用请求接口的方式获取评论列表并渲染 
 2. 使用自定义Hook函数封装数据请求的逻辑 

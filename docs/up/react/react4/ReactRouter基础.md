@@ -191,8 +191,6 @@ const name = searchParams.get('name')  // "Tom"
 * 刷新不丢失
 * 适合筛选、搜索等场景
 
----
-
 
 ## 五、嵌套路由配置
 ### 1. 什么是嵌套路由
