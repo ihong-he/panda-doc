@@ -361,91 +361,47 @@ function Button() {
 Redux是JavaScript应用程序的状态管理容器，提供可预测的状态管理，适合大型复杂应用。
 :::
 
-**🏗️ 核心概念：**
-- **Store（仓库）**：存储应用状态的唯一对象
-- **Action（动作）**：描述状态变化的普通对象
-- **Reducer（归约器）**：纯函数，根据action返回新状态
-- **Dispatch（分发）**：发送action到store的方法
+**💡 核心概念：**
 
-**🔄 工作流程：**
-1. 用户操作触发Action
-2. Store接收Action，通过Dispatch分发
-3. Reducer处理Action，返回新状态
-4. Store更新状态，组件重新渲染
+Redux 是一个单向数据流的状态管理库，三大核心原则：
+- **单一数据源**：整个应用只有一个 Store
+- **状态只读**：不能直接修改 state，必须通过 action
+- **纯函数修改**：使用纯函数 reducer 返回新 state
 
-**📝 传统Redux示例：**
-```javascript
-// 定义Action类型
-const ADD_TODO = 'ADD_TODO';
+**🔄 工作原理（数据流）：**
 
-// 创建Action
-const addTodo = (text) => ({
-  type: ADD_TODO,
-  payload: text
-});
-
-// 创建Reducer
-const todoReducer = (state = [], action) => {
-  switch (action.type) {
-    case ADD_TODO:
-      return [...state, { id: Date.now(), text: action.payload }];
-    default:
-      return state;
-  }
-};
-
-// 创建Store
-import { createStore } from 'redux';
-const store = createStore(todoReducer);
-
-// 分发Action
-store.dispatch(addTodo('学习Redux'));
+```
+UI组件 → dispatch(action) → Reducer → 更新State → 通知订阅者 → UI重新渲染
 ```
 
-::: tip 🚀 Redux Toolkit（推荐）
-现在推荐使用Redux Toolkit，代码更简洁，功能更强大！
-:::
+**核心概念：**
 
-**⚡ Redux Toolkit（现代用法）：**
-```javascript
-import { createSlice, configureStore } from '@reduxjs/toolkit';
+| 概念 | 作用 |
+|------|------|
+| **State** | 存储应用的状态数据（只读） |
+| **Action** | 描述发生什么事情的对象（如 `{ type: 'ADD_TODO', payload: 'xxx' }`） |
+| **Reducer** | 纯函数，根据 action 返回新 state |
+| **Store** | 保存 state、提供方法（dispatch、subscribe、getState） |
 
-const todoSlice = createSlice({
-  name: 'todos',
-  initialState: [],
-  reducers: {
-    addTodo: (state, action) => {
-      state.push({ id: Date.now(), text: action.payload });
-    }
-  }
-});
+**⚡ 快速理解：**
 
-const store = configureStore({
-  reducer: {
-    todos: todoSlice.reducer
-  }
-});
+> Redux = 1个Store + 纯函数Reducer + 单向数据流
+>
+> **口诀**：改状态必须发action，reducer接收算出新state，store统一管理，组件订阅更新
 
-// React组件中使用
-import { useSelector, useDispatch } from 'react-redux';
+**🎯 优点：**
+- 状态可预测、易调试（Redux DevTools）
+- 适合多组件共享状态
+- 便于测试
 
-function TodoList() {
-  const todos = useSelector(state => state.todos);
-  const dispatch = useDispatch();
+**⚠️ 缺点：**
+- 代码冗余（样板代码多）
+- 简单应用可能过度设计
 
-  return (
-    <button onClick={() => dispatch(todoSlice.actions.addTodo('新任务'))}>
-      添加任务
-    </button>
-  );
-}
-```
+**💡 替代方案：** Zustand、Jotai、Recoil、Context API
 
-**✨ 优势：**
-- 状态集中管理，便于调试
-- 状态变化可预测、可追踪
-- 支持时间旅行调试
-- 适用于大型复杂应用
+
+
 
 ### 10、Next.js技术是什么
 
