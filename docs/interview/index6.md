@@ -398,9 +398,15 @@ UI组件 → dispatch(action) → Reducer → 更新State → 通知订阅者 �
 - 代码冗余（样板代码多）
 - 简单应用可能过度设计
 
-**💡 替代方案：** Zustand、Jotai、Recoil、Context API
+**💡 替代方案：** Zustand（/ˈtsuːʃtant/）、Jotai、Context API
 
-
+> [!NOTE] Redux和Zustand对比
+>
+> - **代码量**：Redux样板代码多（action、reducer、dispatch），Zustand极简，几行代码搞定
+> - **学习曲线**：Redux陡峭，需理解多个概念；Zustand平缓，几乎零学习成本
+> - **适用场景**：Redux适合大型复杂应用、团队协作；Zustand适合中小型项目、快速开发
+>
+> **一句话总结：** Redux功能强大但复杂，适合大项目；Zustand简单高效，适合快速开发。
 
 
 ### 10、Next.js技术是什么
@@ -506,205 +512,121 @@ export async function getStaticProps() {
 SWR 和 React Query 是专门用于管理服务器状态的数据请求库，提供了缓存、自动重试、数据同步等功能。
 :::
 
-**🎯 为什么需要数据请求管理？**
+**💡 核心作用：**
+解决React中服务器状态管理问题，避免使用`useEffect` + `useState`手动管理请求逻辑。
 
-传统使用 `useEffect` + `fetch` 的方式存在以下问题：
-- 需要手动处理加载状态、错误状态
-- 没有缓存机制，重复请求浪费资源
-- 难以处理数据同步和更新
-- 代码冗余，容易出错
+**📦 常用方案对比：**
 
-**🔄 SWR（Stale-While-Revalidate）**
-
-由 Vercel 团队开发，核心思想是"先返回缓存数据，后台再更新"。
-
-```javascript
-import useSWR from 'swr';
-
-const fetcher = url => fetch(url).then(res => res.json());
-
-function Profile() {
-  const { data, error, isLoading } = useSWR('/api/user', fetcher);
-
-  if (error) return <div>加载失败</div>;
-  if (isLoading) return <div>加载中...</div>;
-  
-  return <div>你好，{data.name}</div>;
-}
-```
-
-**⚡ React Query（TanStack Query）**
-
-功能更强大的数据管理库，提供更完善的功能和更好的开发体验。
-
-```javascript
-import { useQuery, useMutation, queryClient } from '@tanstack/react-query';
-
-// 查询数据
-function useUser() {
-  return useQuery({
-    queryKey: ['user'],
-    queryFn: () => fetch('/api/user').then(res => res.json()),
-    staleTime: 5000, // 5秒内不重新请求
-  });
-}
-
-// 修改数据
-function useUpdateUser() {
-  return useMutation({
-    mutationFn: (data) => fetch('/api/user', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    }).then(res => res.json()),
-    onSuccess: () => {
-      // 成功后自动重新获取数据
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-    }
-  });
-}
-```
-
-**📋 核心功能对比：**
-
-| 功能 | SWR | React Query |
-|------|-----|-------------|
-| 数据缓存 | ✅ | ✅ |
-| 自动重新请求 | ✅ | ✅ |
-| 离线支持 | ✅ | ✅ |
-| 分页支持 | ✅ 基础 | ✅ 完整 |
-| 突变操作 | ✅ | ✅ 更强大 |
-| DevTools | ❌ | ✅ |
-| 学习曲线 | 低 | 中等 |
+| 方案 | 特点 | 适用场景 |
+|-----|------|---------|
+| **SWR** | 轻量级、自动重获取、基于策略的数据同步 | 中小型项目、Next.js生态 |
+| **React Query (TanStack Query)** | 功能强大、完善的缓存管理、乐观更新 | 大型项目、复杂状态管理 |
 
 **✨ 核心优势：**
+1. **自动缓存**：相同请求只发送一次，减少服务器压力
+2. **自动重试**：请求失败自动重试，提升用户体验
+3. **数据同步**：窗口焦点、网络恢复时自动刷新数据
+4. **防抖节流**：避免重复请求
+5. **状态管理**：loading、error、data状态统一管理
 
-- **智能缓存**：自动缓存请求结果，避免重复请求
-- **自动重试**：请求失败自动重试，提升用户体验
-- **后台更新**：用户看到缓存数据的同时，后台更新最新数据
-- **乐观更新**：修改数据时先更新 UI，失败时回滚
-- **数据同步**：多窗口/标签页数据自动同步
+**📝 基本用法：**
+```javascript
+// React Query 示例
+import { useQuery } from '@tanstack/react-query'
 
-> 💡 **面试总结**：SWR/React Query 解决了数据请求的通用问题，让开发者专注于业务逻辑，而不是处理 loading、error、缓存等细节。推荐使用 React Query，功能更强大，生态更完善。
+function UserList() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetch('/api/users').then(res => res.json())
+  })
 
+  if (isLoading) return <div>加载中...</div>
+  if (error) return <div>出错了: {error.message}</div>
+  return <div>{data.map(user => <p key={user.id}>{user.name}</p>)}</div>
+}
+```
 
+::: tip 💬 面试要点
+"使用SWR/React Query可以减少约80%的数据请求代码，让开发者专注于业务逻辑而不是手动管理loading、缓存、重试等细节。"
+:::
 
 
 ## ⚡ 二、Electron
 
-### 1、什么是Electron？它的核心架构是什么？
+### 1、Electron 是什么？它有哪些特点和优势？
 
-::: info 💡 核心概念
-Electron是一个使用JavaScript、HTML和CSS构建跨平台桌面应用程序的开源框架，它允许前端开发者使用Web技术开发桌面应用。
-:::
+**💻 什么是Electron？**
 
-**🏗️ 核心架构（多进程模型）：**
+Electron 是 GitHub 开源的**跨平台桌面应用开发框架**，使用 JavaScript、HTML 和 CSS 构建原生桌面应用。它将 Chromium（渲染引擎）和 Node.js（运行时）整合在一起。
 
-Electron采用了多进程架构，主要由两个核心进程组成：
+**🌟 核心架构：**
 
-| 进程类型 | 作用 | 特点 |
-|---------|------|------|
-| **主进程** | 管理应用生命周期、创建渲染进程、处理系统级API | 每个应用只有一个主进程，可以使用Node.js所有API |
-| **渲染进程** | 负责渲染Web页面，运行前端代码 | 每个窗口对应一个渲染进程，运行在沙箱环境中 |
+<div class="arch-diagram" style="display: flex; gap: 20px; margin: 20px 0;">
+  <div style="flex: 1; padding: 15px; border: 2px solid #3b82f6; border-radius: 8px; text-align: center;">
+    <h4 style="margin: 0 0 10px 0; color: #3b82f6;">渲染进程（多实例）</h4>
+    <ul style="text-align: left; margin: 0; padding-left: 20px;">
+      <li>Chromium 引擎</li>
+      <li>Web 渲染</li>
+      <li>JavaScript 执行</li>
+    </ul>
+  </div>
+  <div style="flex: 1; padding: 15px; border: 2px solid #10b981; border-radius: 8px; text-align: center;">
+    <h4 style="margin: 0 0 10px 0; color: #10b981;">主进程（单实例）</h4>
+    <ul style="text-align: left; margin: 0; padding-left: 20px;">
+      <li>Node.js 运行时</li>
+      <li>系统 API 访问</li>
+      <li>窗口管理</li>
+    </ul>
+  </div>
+</div>
 
-**🔄 进程间通信（IPC）：**
-- **主进程 → 渲染进程**：通过`webContents.send()`发送消息
-- **渲染进程 → 主进程**：通过`ipcRenderer.send()`发送消息
-- **双向通信**：使用`ipcMain`和`ipcRenderer`
+**✨ 主要特点和优势：**
 
-::: tip 💬 理解要点
-可以把Electron想象成"浏览器壳"包装了你的Web应用，主进程是操作系统和Web应用之间的桥梁！
-:::
+| 特性 | 说明 |
+|------|------|
+| **跨平台** | 一套代码，同时支持 Windows、macOS、Linux |
+| **Web技术栈** | 前端开发者可直接上手，学习成本低 |
+| **原生能力** | 通过 Node.js 访问文件系统、数据库、硬件等 |
+| **生态丰富** | npm 全生态可用，大量现成组件 |
+| **热更新** | 支持应用自动更新机制 |
+| **开源免费** | 完全开源，无商业授权限制 |
 
----
+**🎯 代表应用：**
+- VS Code、Discord、Slack、Teams、Notion、Atom
 
-### 2、主进程和渲染进程如何通信？（IPC）
+### 2、Electron的进程模型是怎样的？
 
-::: warning 📡 核心考点
-进程间通信是Electron最重要的话题，必须掌握双向通信的各种场景！
-:::
+**🏗️ Electron进程模型：**
 
-**📖 通信原理说明：**
+Electron 采用**多进程架构**，主要包含两种进程类型：
 
-由于渲染进程运行在沙箱环境中，无法直接访问Node.js API和Electron API，因此需要通过预加载脚本（preload.js）作为中间桥梁进行安全的进程间通信。整个通信流程分为三个关键步骤：
+**主进程（Main Process）**
+- 数量：1个（应用启动时创建）
+- 职责：创建和管理窗口、处理应用生命周期、访问 Node.js API、管理系统资源、处理原生菜单/托盘
+- 能力：完整的 Node.js API
 
-1. **预加载脚本层**：使用 `contextBridge` 将 Electron 的 `ipcRenderer` API 安全地暴露给渲染进程，确保渲染进程只能访问特定的 API
-2. **主进程层**：使用 `ipcMain` 监听来自渲染进程的消息（`ipcMain.handle()` 用于异步请求，`ipcMain.on()` 用于单向消息）
-3. **渲染进程层**：通过 `window.electronAPI` 调用预加载脚本暴露的方法，实现与主进程的通信
+**渲染进程（Renderer Process）**
+- 数量：多个（每个 BrowserWindow 窗口一个）
+- 职责：渲染 Web 页面内容、运行 JavaScript 业务逻辑、处理用户交互
+- 能力：Chromium 沙箱环境，受限的 API 访问
+- 特性：一个窗口崩溃不影响其他窗口
 
-这种设计既保证了安全性（防止渲染进程直接访问系统资源），又提供了灵活的通信方式。
+**📊 主进程 vs 渲染进程对比：**
 
----
+| 维度 | 主进程 | 渲染进程 |
+|------|--------|----------|
+| **数量** | 单例（启动时创建） | 多个（每个窗口一个） |
+| **能力** | 完整 Node.js API | 受限（需要 preload 桥接） |
+| **职责** | 窗口管理、原生功能、IPC 通信 | UI 渲染、业务逻辑、交互 |
+| **通信** | `ipcMain` 监听消息 | `ipcRenderer` 发送消息 |
+| **环境** | Node.js 运行时 | Chromium 沙箱环境 |
 
-**🎯 渲染进程 → 主进程（单向通信）：**
+**🔑 核心区别总结：**
 
-```javascript
-// electron/preload.js（预加载脚本）
-const { contextBridge, ipcRenderer } = require('electron')
-
-contextBridge.exposeInMainWorld('electronAPI', {
-  readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
-  sendNotification: (title, body) => ipcRenderer.send('show-notification', title, body)
-})
-
-// electron/main.js（主进程）
-const { ipcMain } = require('electron')
-
-ipcMain.handle('read-file', async (event, filePath) => {
-  const fs = require('fs').promises
-  return await fs.readFile(filePath, 'utf-8')
-})
-
-ipcMain.on('show-notification', (event, title, body) => {
-  const { Notification } = require('electron')
-  new Notification({ title, body }).show()
-})
-
-// Vue组件中使用
-const handleReadFile = async () => {
-  const content = await window.electronAPI.readFile('./data.txt')
-  console.log(content)
-}
-```
-
-**🔄 主进程 → 渲染进程（单向通信）：**
-
-```javascript
-// electron/main.js（主进程）
-// 发送消息到特定窗口
-win.webContents.send('update-data', { count: 100 })
-
-// electron/preload.js
-contextBridge.exposeInMainWorld('electronAPI', {
-  onUpdateData: (callback) => ipcRenderer.on('update-data', callback)
-})
-
-// Vue组件中监听
-import { onMounted } from 'vue'
-
-onMounted(() => {
-  window.electronAPI.onUpdateData((event, data) => {
-    console.log('收到更新:', data.count)
-  })
-})
-```
-
-**💡 双向通信（invoke/handle模式）：**
-
-```javascript
-// 主进程
-ipcMain.handle('get-system-info', async () => {
-  return {
-    platform: process.platform,
-    version: process.version,
-    arch: process.arch
-  }
-})
-
-// 渲染进程
-const systemInfo = await window.electronAPI.getSystemInfo()
-```
-
----
+1. **主进程是大脑**：负责全局控制、系统资源访问、窗口创建
+2. **渲染进程是视图**：只负责展示界面和用户交互，隔离在沙箱中
+3. **安全隔离**：渲染进程不能直接访问 Node.js，需通过 IPC 安全通信
+4. **多实例优势**：一个窗口崩溃不影响其他窗口，稳定性更好
 
 ### 3、Electron常见问题及解决方案？
 
@@ -764,51 +686,81 @@ export default defineConfig({
 
 ## 三、鸿蒙APP开发
 
-### 1、什么是ArkTS？它与TypeScript有什么区别？
+### 1、什么是HarmonyOS？鸿蒙APP开发流程？
 
-::: info 💡 核心概念
-ArkTS是华为为HarmonyOS（鸿蒙系统）推出的声明式编程语言，基于TypeScript扩展而来，专为构建高性能、跨设备的鸿蒙应用而设计。
-:::
+**📱 什么是HarmonyOS？**
 
-**🏗️ ArkTS的核心特性：**
+HarmonyOS（鸿蒙）是华为自主研发的**分布式操作系统**，基于微内核架构，支持"一次开发，多端部署"，可在手机、平板、车机、智能穿戴等多种设备上运行。核心特性：
 
-| 特性 | 说明 |
-|------|------|
-| **声明式UI** | 使用ArkUI框架，通过@Component装饰器构建组件化界面 |
-| **状态管理** | 提供@State、@Prop、@Link等装饰器实现响应式数据绑定 |
-| **类型安全** | 继承TypeScript的静态类型检查，编译期发现错误 |
-| **性能优化** | 编译为方舟字节码，运行性能优于JavaScript |
-| **跨设备** | 支持手机、平板、车机、智能穿戴等多终端适配 |
+- **分布式架构**：多设备协同，资源共享（如手机屏幕共享给车机）
+- **微内核设计**：安全性高、性能优越、低延迟
+- **统一生态**：鸿蒙原生应用与Android应用兼容（过渡期）
+- **方舟编译器**：ArkTS代码编译为方舟字节码，运行性能优异
 
-**🔄 ArkTS vs TypeScript：**
+---
 
-```typescript
-// TypeScript 传统写法
-class User {
-  name: string;
-  age: number;
-  
-  constructor(name: string, age: number) {
-    this.name = name;
-    this.age = age;
-  }
-}
+**🚀 鸿蒙APP开发流程：**
 
-// ArkTS 声明式组件写法
-@Component
-struct UserCard {
-  @State user: User = new User('张三', 20)
-  
-  build() {
-    Column() {
-      Text(this.user.name)
-        .fontSize(20)
-      Text(`${this.user.age}岁`)
-        .fontColor('#666')
-    }
-  }
-}
 ```
+1️⃣ 环境准备
+   ↓
+   安装 DevEco Studio（鸿蒙官方IDE）
+   配置华为开发者账号
+
+2️⃣ 创建项目
+   ↓
+   选择模板（Empty Ability、JS/ArkTS）
+   配置项目信息（包名、应用名称）
+
+3️⃣ 编写代码
+   ↓
+   使用 ArkTS + ArkUI 声明式开发
+   - @Component 定义页面组件
+   - @State 管理状态
+   - @Builder/@Styles 复用UI
+
+4️⃣ 调试测试
+   ↓
+   使用模拟器或真机调试
+   查看日志和性能分析
+
+5️⃣ 打包签名
+   ↓
+   生成 .hap 应用包
+   配置应用签名证书
+
+6️⃣ 上架发布
+   ↓
+   提交华为应用市场（AppGallery Connect）
+   审核通过后发布
+```
+
+**📌 关键技术栈：**
+- **语言**：ArkTS（推荐）、ArkUI（JS）
+- **框架**：ArkUI 声明式UI框架
+- **工具**：DevEco Studio
+- **运行环境**：HarmonyOS 4.0+
+
+### 2、什么是ArkTS？它与TypeScript有什么区别？
+
+**什么是ArkTS**
+
+ArkTS 是鸿蒙开发的官方语言，基于 TypeScript 扩展而来，专门为声明式 UI 开发设计。
+
+**与TypeScript的主要区别**
+
+| 特性 | TypeScript | ArkTS |
+|------|-----------|-------|
+| 装饰器 | 可选 | 必须使用 |
+| 状态管理 | 需要自己实现 | 内置 @State/@Prop/@Link |
+| UI 语法 | 需要框架支持 | 声明式 UI 语法原生支持 |
+| 性能优化 | 依赖编译器 | 方舟运行时深度优化 |
+
+**ArkTS 核心特性**
+- 声明式 UI：`build() { ... }` 函数描述界面
+- 装饰器系统：`@State`、`@Prop`、`@Link` 管理状态
+- 响应式更新：状态自动触发 UI 刷新
+- 方舟运行时：针对鸿蒙系统深度优化
 
 ::: tip 💬 面试要点
 ArkTS = TypeScript + ArkUI声明式语法 + 鸿蒙状态管理装饰器 + 方舟运行时优化
@@ -816,73 +768,45 @@ ArkTS = TypeScript + ArkUI声明式语法 + 鸿蒙状态管理装饰器 + 方舟
 
 ---
 
-### 2、鸿蒙应用中的状态管理装饰器有哪些？分别是什么作用？
 
-::: warning 🎣 高频考点
-状态管理是鸿蒙开发的核心概念，必须掌握各装饰器的作用和使用场景！
+
+### 2、ArkUI 中的常用的组件有哪些？
+
+**基础组件**
+- `Text` - 文本显示组件
+- `Image` - 图片显示组件
+- `TextInput` - 文本输入框
+- `Button` - 按钮组件
+
+**布局容器**
+- `Column` - 垂直布局容器
+- `Row` - 水平布局容器
+- `Stack` - 层叠布局容器
+- `List` - 列表容器
+- `Grid` - 网格布局容器
+
+**导航组件**
+- `Navigation` - 页面导航容器
+- `Tabs` - 标签页组件
+- `Navigator` - 页面跳转组件
+
+**显示组件**
+- `Scroll` - 滚动容器
+- `Refresh` - 下拉刷新
+- `Progress` - 进度条
+
+**选择组件**
+- `Checkbox` - 复选框
+- `Radio` - 单选框
+- `Toggle` - 开关
+- `Slider` - 滑块
+
+**弹窗组件**
+- `AlertDialog` - 对话框
+- `ActionSheet` - 操作面板
+- `Picker` - 选择器
+
+::: tip 💬 面试要点
+记忆要点：基础(文本/图片/输入/按钮)、布局(行列/堆叠/列表/网格)、导航(页面/标签/跳转)、显示(滚动/刷新/进度)、选择(勾选/单选/开关/滑块)、弹窗(对话框/面板/选择器)
 :::
 
-**📚 核心装饰器对比：**
-
-| 装饰器 | 作用 | 数据流向 | 使用场景 |
-|--------|------|----------|----------|
-| **@State** | 组件内部状态 | 内部管理 | 组件私有数据 |
-| **@Prop** | 父子单向同步 | 父 → 子 | 父组件传递数据给子组件 |
-| **@Link** | 父子双向同步 | 父 ↔ 子 | 父子组件共享状态 |
-| **@Provide/@Consume** | 跨层级共享 | 祖先 ↔ 后代 | 深层嵌套组件通信 |
-| **@Observed/@ObjectLink** | 嵌套对象观察 | 内部/传递 | 复杂对象类型状态管理 |
-| **@Watch** | 状态监听 | - | 监听状态变化执行回调 |
-
-**📝 代码示例：**
-
-```typescript
-// 父组件
-@Component
-struct Parent {
-  @State message: string = 'Hello HarmonyOS'
-  @State count: number = 0
-
-  build() {
-    Column() {
-      // @Prop 单向传递
-      ChildProp({ title: this.message })
-      
-      // @Link 双向绑定
-      ChildLink({ count: $count })
-      
-      Text(`父组件count: ${this.count}`)
-    }
-  }
-}
-
-// @Prop 子组件（单向）
-@Component
-struct ChildProp {
-  @Prop title: string  // 只能读取，修改不影响父组件
-  
-  build() {
-    Text(this.title)
-  }
-}
-
-// @Link 子组件（双向）
-@Component
-struct ChildLink {
-  @Link count: number  // 双向绑定，修改同步到父组件
-  
-  build() {
-    Button('增加')
-      .onClick(() => {
-        this.count++  // 会同步修改父组件的值
-      })
-  }
-}
-```
-
-::: danger ⚠️ 注意事项
-- @State装饰的变量必须是对象类型或简单类型，不支持复杂类型的嵌套观察
-- @Prop是单向同步，子组件修改不会反馈到父组件
-- @Link需要用$符号传递引用（如 `$count`）
-:::
-
----
