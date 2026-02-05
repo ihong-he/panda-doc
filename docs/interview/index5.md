@@ -491,7 +491,75 @@ wx.navigateBackMiniProgram({
   }
 })
 ```
+### 12、谈谈你对uni-app的理解？
 
+::: tip 🚀 uni-app 简介
+uni-app 是 DCloud 推出的**跨端开发框架**，用一套 Vue 代码可以同时开发微信小程序、H5、App（iOS/Android）、支付宝/百度/字节跳动小程序等，实现"一次编写，多端运行"。
+:::
+
+**🎯 核心优势：**
+
+| 优势 | 说明 | 价值 |
+|------|------|------|
+| 📝 **一套代码** | Vue 语法 + 条件编译 | 大幅降低开发成本 |
+| 📱 **多端覆盖** | 支持 10+ 平台 | 一套业务逻辑全端复用 |
+| 🧩 **丰富生态** | uni-ui 组件库 + 插件市场 | 开箱即用，开发效率高 |
+| ⚡ **性能优秀** | 原生渲染 + 优化编译 | 接近原生体验 |
+
+**🏗️ 技术架构：**
+
+- **开发层**：开发者编写 Vue 代码，使用 uni-app API
+- **编译层**：uni-app 编译器 + 条件编译 + 运行时框架
+- **运行层**：微信小程序 / H5 / App / 支付宝小程序...
+
+**💻 代码示例：**
+
+```vue
+<template>
+  <view class="container">
+    <text>{{ title }}</text>
+    <!-- 条件编译：仅微信小程序显示 -->
+    #ifdef MP-WEIXIN
+    <button open-type="share">分享</button>
+    #endif
+  </view>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      title: 'Hello uni-app'
+    }
+  },
+  onLoad() {
+    // 统一 API 调用，自动适配各端
+    uni.request({
+      url: 'https://api.example.com/data',
+      success: (res) => {
+        console.log(res.data)
+      }
+    })
+  }
+}
+</script>
+```
+
+**🔥 适用场景：**
+
+| 场景 | 推荐理由 |
+|------|----------|
+| 🏢 **企业多端应用** | 需同时覆盖小程序+App+H5 |
+| ⏰ **快速原型开发** | 时间紧、需求变动频繁 |
+| 👥 **小团队项目** | 人员有限，减少重复开发 |
+
+**⚠️ 注意事项：**
+
+- 🚫 **不是所有功能都能跨端** - 平台特有功能需条件编译
+- 🚫 **性能不如纯原生** - 超大型 App 建议原生或 Flutter
+- 🚫 **坑比较多** - 各平台兼容性需要测试覆盖
+
+> 💡 **面试加分项**：可以提到 uni-app 3.x 版本使用了 Vue3 + Vite，支持 Composition API，性能和开发体验都有大幅提升。
 
 ## 📊 二、可视化大屏
 
