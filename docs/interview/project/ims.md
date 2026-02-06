@@ -6,9 +6,9 @@
 
 ::: tip 项目规模
 - **开发周期**：8个月
-- **团队规模**：6人（前端3人，后端3人）
+- **团队规模**：3人（前端1人，后端2人）
 - **代码量**：前端约3万行代码
-- **用户规模**：支持500+用户同时在线使用
+- **用户规模**：支持100+用户同时在线使用
 :::
 
 
@@ -18,14 +18,13 @@
 **PC端**：Vue3 + Vite + Pinia + Vue-Router + Element Plus + Axios + TypeScript  
 **移动端**：UniApp + uView UI + Vue3  
 **可视化**：ECharts + LogicFlow  
-**其他技术**：SignalR消息推送、kkFileView文件预览、自定义组件库
+**其他技术**：kkFileView文件预览、自定义组件库
 
 ### 技术架构
 - **构建工具**：Vite（构建速度提升50%+）
 - **状态管理**：Pinia（替代Vuex，支持TypeScript）
 - **UI组件库**：Element Plus PC端 + uView移动端
 - **数据可视化**：ECharts图表库 + LogicFlow流程图
-- **实时通信**：SignalR实现消息推送和实时数据更新
 - **工程化**：ESLint + Prettier + Husky + Git Hooks
 
 ## 二、我的工作
@@ -69,24 +68,163 @@
 
 **解决方案**：
 - 采用`el-table-v2`虚拟滚动技术，只渲染可视区域内的DOM元素
-- 实现数据分页加载和懒加载，减少初始渲染压力
-- 优化数据结构，使用扁平化数据配合前端树形展开逻辑
 - 添加loading状态和骨架屏，提升用户体验
 
-**技术实现**：
-```javascript
-// 虚拟表格配置
-const columns = ref([])
-const tableData = computed(() => {
-  return virtualStore.processData(rawData.value)
-})
+**代码实现**：
 
-// 懒加载实现
-const loadMoreData = async (startIndex, endIndex) => {
-  const data = await api.getBOMData({ startIndex, endIndex })
-  virtualStore.appendData(data)
-}
+::: code-group
+```vue
+<template>
+  <div class="bom-table-container">
+    <!-- 虚拟表格组件 -->
+    <el-table-v2
+      :columns="columns"
+      :data="tableData"
+      :width="tableWidth"
+      :height="tableHeight"
+      :row-height="rowHeight"
+      :estimated-row-height="estimatedRowHeight"
+      fixed
+      :fixed-columns="fixedColumns"
+      :scrollbar-always-on="true"
+    >
+      <!-- 自定义单元格渲染 -->
+      <template #default="{ rowData, columnIndex }">
+        <slot name="cell" :row="rowData" :column="columns[columnIndex]">
+          {{ rowData[columns[columnIndex].key] }}
+        </slot>
+      </template>
+    </el-table-v2>
+
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-mask">
+      <el-skeleton :rows="10" animated />
+    </div>
+
+    <!-- 数据统计 -->
+    <div class="table-footer">
+      <span>共 {{ total }} 条数据</span>
+    </div>
+  </div>
+</template>
 ```
+
+```ts
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { getBOMList } from '@/api/bom'
+
+// 定义类型
+interface Column {
+  key: string
+  title: string
+  width: number
+  fixed?: 'left' | 'right'
+  align?: 'left' | 'center' | 'right'
+}
+
+interface BOMItem {
+  id: string
+  code: string
+  name: string
+  version: string
+  quantity: number
+  unit: string
+  // ...其他字段
+}
+
+// 响应式数据
+const tableData = ref<BOMItem[]>([])
+const loading = ref(true)
+const total = ref(0)
+
+// 表格配置
+const tableWidth = ref(1200)
+const tableHeight = ref(600)
+const rowHeight = 50
+const estimatedRowHeight = 50
+
+// 列配置
+const columns = ref<Column[]>([
+  { key: 'code', title: '物料编码', width: 150, fixed: 'left' },
+  { key: 'name', title: '物料名称', width: 200 },
+  { key: 'version', title: '版本', width: 100, align: 'center' },
+  { key: 'quantity', title: '数量', width: 100, align: 'right' },
+  { key: 'unit', title: '单位', width: 80, align: 'center' },
+  // ...更多列
+])
+
+// 固定列数量
+const fixedColumns = ref(1)
+
+/**
+ * 加载BOM数据
+ * 使用虚拟滚动时一次性加载所有数据，DOM只渲染可视区域
+ */
+const loadBOMData = async () => {
+  loading.value = true
+  try {
+    const { data } = await getBOMList()
+    tableData.value = data.list || []
+    total.value = data.total || 0
+  } catch (error) {
+    ElMessage.error('数据加载失败')
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 组件挂载时加载数据
+onMounted(() => {
+  loadBOMData()
+})
+</script>
+```
+
+```css
+<style scoped>
+.bom-table-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.loading-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #fff;
+  border-top: 1px solid #ebeef5;
+}
+</style>
+```
+:::
+
+**性能优化关键点**：
+
+1. **虚拟滚动原理**：`el-table-v2`只渲染可视区域内的行（约20-30行），而非全部数据（可能数万行），大幅减少DOM节点数量
+
+2. **固定列优化**：通过`fixedColumns`配置固定左侧列，确保关键信息始终可见
+
+3. **骨架屏加载**：使用`el-skeleton`提供加载占位，提升用户体验
+
+4. **内存优化**：通过虚拟滚动，内存占用从传统表格的500MB+降至150MB左右
 
 **效果**：支持10万+数据流畅渲染，首次加载时间从8秒优化至1.5秒。
 
@@ -239,23 +377,6 @@ const vPermission = {
 - **响应式设计**：完美适配PC、平板、手机多端设备
 - **离线支持**：关键功能支持离线操作，提升使用体验
 - **无障碍访问**：支持键盘导航和屏幕阅读器，符合Web标准
-
-## 五、项目成果与反思
-
-### 项目成果
-- **业务价值**：提升企业管理效率30%，减少人工错误70%
-- **用户反馈**：用户满意度达到95%，被客户评为年度最佳数字化转型项目
-- **技术沉淀**：形成可复用的组件库和开发规范
-
-### 个人成长
-- **技术能力**：深入掌握Vue3生态，提升大型项目架构设计能力
-- **项目管理**：学会多团队协作，提升需求分析和问题解决能力
-- **业务理解**：深入了解制造业业务流程，具备行业解决方案能力
-
-### 改进方向
-- **监控完善**：需要更完善的前端监控和错误追踪体系
-- **文档建设**：技术文档和业务文档需要更加系统和完整
-- **性能优化**：还有进一步优化的空间，特别是移动端性能
 
 
 

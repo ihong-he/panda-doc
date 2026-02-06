@@ -70,64 +70,123 @@ outline: deep
 
 **解决方案**：
 - **RTK Query**：使用Redux Toolkit的RTK Query管理服务器状态，自动处理缓存、重复请求
-- **表单库集成**：集成React-Hook-Form处理复杂表单逻辑，减少不必要渲染
 - **状态结构优化**：按功能模块划分state，避免过度嵌套
 - **自定义Hooks**：封装常用表单逻辑，提升代码复用性
 
-**技术实现**：
+
+#### RTK Query 使用详解
+
+**什么是 RTK Query？**
+
+RTK Query 是 Redux Toolkit 提供的数据获取和状态管理工具，简单来说就是一个帮你处理 API 请求的"管家"。
+
+**核心功能**：
+- **自动请求数据**：帮你发 HTTP 请求
+- **自动缓存**：把数据存起来，避免重复请求
+- **自动管理状态**：加载中、成功、失败状态自动切换
+
+**如何使用**：
+
+1. **创建 API 服务**
+
 ```javascript
-// RTK Query API定义
-export const taskApi = createApi({
-  reducerPath: 'taskApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: '/api/tasks',
-    prepareHeaders: (headers, { getState }) => {
-      headers.set('authorization', `Bearer ${getState().auth.token}`)
-      return headers
-    }
-  }),
-  tagTypes: ['Task'],
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+// 创建 API 服务
+export const api = createApi({
+  reducerPath: 'api', // 在 Redux store 中的状态名
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://api.example.com' }), // 配置基础 URL
   endpoints: (builder) => ({
-    getTasks: builder.query({
-      query: (params) => ({ url: '', params }),
-      providesTags: ['Task']
+    // 定义获取用户列表的接口
+    getUsers: builder.query({
+      query: () => '/users', // 相对路径，会拼接到 baseUrl
     }),
-    updateTask: builder.mutation({
-      query: ({ id, ...patch }) => ({
-        url: `/${id}`,
-        method: 'PATCH',
-        body: patch
+    // 定义创建用户的接口
+    createUser: builder.mutation({
+      query: (user) => ({
+        url: '/users',
+        method: 'POST',
+        body: user,
       }),
-      invalidatesTags: ['Task']
-    })
-  })
+    }),
+  }),
 })
 
-// 复杂表单Hook
-const useTaskForm = (taskId) => {
-  const { data: task, isLoading } = useGetTaskQuery(taskId, {
-    skip: !taskId
-  })
+// 自动生成的 hooks
+export const { useGetUsersQuery, useCreateUserMutation } = api
+```
+
+2. **配置到 Store**
+
+```javascript
+import { configureStore } from '@reduxjs/toolkit'
+import { api } from './services/api'
+
+const store = configureStore({
+  reducer: {
+    [api.reducerPath]: api.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(api.middleware),
+})
+```
+
+3. **在组件中使用**
+
+```javascript
+import { useGetUsersQuery, useCreateUserMutation } from './services/api'
+
+function UserList() {
+  // 使用 query 获取数据
+  const { data, isLoading, error } = useGetUsersQuery()
   
-  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation()
-  
-  const form = useForm({
-    defaultValues: task,
-    resolver: yupResolver(taskSchema)
-  })
-  
-  const onSubmit = useCallback(async (data) => {
-    try {
-      await updateTask({ id: taskId, ...data }).unwrap()
-      message.success('任务更新成功')
-    } catch (error) {
-      message.error('更新失败：' + error.message)
-    }
-  }, [taskId, updateTask])
-  
-  return { form, onSubmit, isLoading: isLoading || isUpdating }
+  // 使用 mutation 修改数据
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation()
+
+  const handleAddUser = () => {
+    createUser({ name: '张三', age: 25 })
+  }
+
+  if (isLoading) return <div>加载中...</div>
+  if (error) return <div>出错了：{error.message}</div>
+
+  return (
+    <div>
+      <h2>用户列表</h2>
+      {data?.map(user => (
+        <div key={user.id}>{user.name} - {user.age}</div>
+      ))}
+      <button onClick={handleAddUser} disabled={isCreating}>
+        添加用户
+      </button>
+    </div>
+  )
 }
 ```
+
+**关键概念**：
+
+- **Query（查询）**：用于**获取**数据，结果会被缓存
+  - 使用 `builder.query()` 定义
+  - 生成的 hook：`useGetXXXQuery()`
+
+- **Mutation（变更）**：用于**修改**数据（增删改），不会缓存
+  - 使用 `builder.mutation()` 定义
+  - 生成的 hook：`useCreateXXXMutation()`
+
+**自动缓存的好处**：
+
+```javascript
+// 组件 A 调用
+const { data } = useGetUsersQuery() // 发送请求
+
+// 组件 B 也调用
+const { data } = useGetUsersQuery() // 不会发送请求，直接用缓存
+```
+
+只有数据过期或手动刷新时才会重新请求。
+
+**总结**：RTK Query = **自动发请求** + **自动缓存** + **自动管理加载状态**
 
 **效果**：表单响应速度提升60%，状态同步准确率达到99%。
 
@@ -186,170 +245,6 @@ const VirtualTaskList = ({ tasks }) => {
 
 **效果**：支持10000+任务列表流畅滚动，内存占用减少70%。
 
-### （三）复杂查询与筛选功能
-
-**问题描述**：项目管理中需要支持多维度的数据查询和筛选，包括项目状态、任务优先级、时间范围、负责人等多个筛选条件，需要处理复杂的筛选逻辑。
-
-**解决方案**：
-- **动态筛选器**：开发可配置的筛选组件，支持动态添加删除筛选条件
-- **高级搜索**：实现全文搜索和组合条件搜索，支持保存搜索方案
-- **本地缓存**：实现查询结果本地缓存，提升重复查询性能
-- **筛选器联动**：实现筛选条件之间的联动关系，避免无效查询
-
-**技术实现**：
-```javascript
-// 动态筛选器组件
-const DynamicFilter = ({ onFilterChange }) => {
-  const [filters, setFilters] = useState([])
-  const [availableFields] = useState([
-    { key: 'status', label: '项目状态', type: 'select', options: [...] },
-    { key: 'priority', label: '优先级', type: 'select', options: [...] },
-    { key: 'startDate', label: '开始时间', type: 'dateRange' },
-    { key: 'assignee', label: '负责人', type: 'multiSelect', options: [...] }
-  ])
-  
-  const addFilter = useCallback((field) => {
-    const newFilter = {
-      id: Date.now(),
-      field: field.key,
-      label: field.label,
-      type: field.type,
-      value: null,
-      options: field.options
-    }
-    setFilters(prev => [...prev, newFilter])
-  }, [])
-  
-  const removeFilter = useCallback((filterId) => {
-    setFilters(prev => prev.filter(f => f.id !== filterId))
-  }, [])
-  
-  const updateFilter = useCallback((filterId, value) => {
-    setFilters(prev => prev.map(f => 
-      f.id === filterId ? { ...f, value } : f
-    ))
-  }, [])
-  
-  useEffect(() => {
-    const activeFilters = filters.filter(f => f.value !== null && f.value !== '')
-    onFilterChange(activeFilters)
-  }, [filters, onFilterChange])
-  
-  return (
-    <div className="dynamic-filter">
-      <div className="filter-list">
-        {filters.map(filter => (
-          <FilterItem
-            key={filter.id}
-            filter={filter}
-            onUpdate={(value) => updateFilter(filter.id, value)}
-            onRemove={() => removeFilter(filter.id)}
-          />
-        ))}
-      </div>
-      <Dropdown menu={{
-        items: availableFields.map(field => ({
-          key: field.key,
-          label: field.label,
-          onClick: () => addFilter(field)
-        }))
-      }}>
-        <Button icon={<PlusOutlined />}>添加筛选条件</Button>
-      </Dropdown>
-    </div>
-  )
-}
-
-// 查询缓存Hook
-const useQueryCache = (queryKey, queryFn) => {
-  const cache = useRef(new Map())
-  
-  return useCallback(async (...args) => {
-    const cacheKey = `${queryKey}_${JSON.stringify(args)}`
-    
-    if (cache.current.has(cacheKey)) {
-      return cache.current.get(cacheKey)
-    }
-    
-    const result = await queryFn(...args)
-    cache.current.set(cacheKey, result)
-    
-    // 缓存过期清理
-    setTimeout(() => {
-      cache.current.delete(cacheKey)
-    }, 5 * 60 * 1000) // 5分钟过期
-    
-    return result
-  }, [queryKey, queryFn])
-}
-```
-
-**效果**：支持10+筛选维度组合，查询响应时间<500ms，用户体验流畅。
-
-### （四）复杂权限系统前端实现
-
-**问题描述**：项目管理系统需要细粒度权限控制，包括页面权限、操作权限、数据权限等多个维度。
-
-**解决方案**：
-- **权限路由**：基于用户角色动态生成路由表
-- **组件权限**：自定义指令和HOC控制组件显示
-- **数据过滤**：在前端实现数据级别的权限过滤
-- **权限缓存**：缓存用户权限信息，减少重复请求
-
-**技术实现**：
-```javascript
-// 权限路由配置
-const ProtectedRoute = ({ children, requiredPermission }) => {
-  const { user } = useSelector(state => state.auth)
-  const hasPermission = usePermission(requiredPermission)
-  
-  if (!hasPermission) {
-    return <Navigate to="/403" replace />
-  }
-  
-  return children
-}
-
-// 权限Hook
-const usePermission = (permission) => {
-  const { permissions } = useSelector(state => state.auth)
-  
-  return useMemo(() => {
-    if (!permission) return true
-    
-    return permissions.some(p => {
-      if (typeof permission === 'string') {
-        return p === permission
-      }
-      return checkWildcardPermission(p, permission)
-    })
-  }, [permissions, permission])
-}
-
-// 权限组件
-const PermissionWrapper = ({ permission, children, fallback = null }) => {
-  const hasPermission = usePermission(permission)
-  
-  return hasPermission ? children : fallback
-}
-
-// 使用示例
-const TaskActions = ({ task }) => {
-  return (
-    <div>
-      <PermissionWrapper permission="task.edit">
-        <Button onClick={() => editTask(task)}>编辑</Button>
-      </PermissionWrapper>
-      <PermissionWrapper permission="task.delete">
-        <Button danger onClick={() => deleteTask(task)}>删除</Button>
-      </PermissionWrapper>
-    </div>
-  )
-}
-```
-
-**效果**：支持20+权限维度，权限验证响应时间<5ms。
-
 
 ## 四、项目亮点
 
@@ -359,41 +254,9 @@ const TaskActions = ({ task }) => {
 - **包体积优化**：通过Tree-shaking和按需加载，打包体积从1.8MB优化至800KB
 - **缓存策略**：多级缓存机制使页面切换响应时间减少80%
 
-### 2. 用户体验提升
-- **响应式设计**：完美适配桌面、平板、手机多端设备，保持一致的交互体验
-- **智能提示**：表单验证、操作引导、错误提示等功能提升用户操作效率
-- **无障碍支持**：支持键盘导航和屏幕阅读器，符合WCAG 2.1标准
-- **消息通知**：全局消息通知系统，及时反馈操作结果
-
-### 3. 技术创新实践
+### 2. 技术创新实践
 - **状态管理模式**：Redux Toolkit + RTK Query的组合方案，简化复杂状态管理
 - **组件化架构**：高度可复用的业务组件库，提升开发效率50%
 - **工程化体系**：完整的ESLint、Prettier、Husky配置，保障代码质量
 - **监控系统**：集成Sentry错误监控，实现线上问题的快速定位和修复
-
-### 4. 业务价值实现
-- **效率提升**：任务管理效率提升40%，项目交付周期缩短25%
-- **数据洞察**：多维度统计报表为管理决策提供数据支持
-- **协作优化**：团队协作效率提升，减少沟通成本30%
-- **用户满意度**：用户满意度达到92%，获得客户高度认可
-
-## 五、项目成果与反思
-
-### 项目成果
-- **技术成果**：形成完整的React项目开发规范和组件库
-- **业务价值**：帮助客户提升项目管理效率，实现数字化转型
-- **团队成长**：团队成员React技能水平显著提升，形成技术沉淀
-- **客户反馈**：系统稳定性达到99.5%，获得客户续约
-
-### 个人成长
-- **技术能力**：深入掌握React生态系统，提升复杂业务场景的技术方案设计能力
-- **架构思维**：学会从业务角度出发设计技术架构，平衡技术实现和业务需求
-- **项目管理**：提升需求分析、风险评估、进度控制等项目管理能力
-- **团队协作**：锻炼跨团队沟通协作，学会技术方案的有效表达和推广
-
-### 改进方向
-- **测试覆盖**：单元测试覆盖率需要进一步提升，目标达到90%+
-- **监控完善**：需要更细致的性能监控和用户行为分析
-- **文档建设**：技术文档和API文档需要更加系统和规范
-- **持续优化**：根据用户反馈持续迭代优化，提升用户体验
 

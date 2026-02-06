@@ -1,5 +1,5 @@
 ---
-outline: deep
+outline: [1,3]
 ---
 
 ## 一、Redux 介绍
@@ -242,13 +242,219 @@ function App() {
 export default App;
 ```
 
-## 七、Redux 调试 - devtools
+## 七、RTK Query一体化方案
+
+> RTK Query 是 Redux Toolkit 内置的高级数据获取和缓存库,专门为处理服务端数据而设计
+
+### 1. RTK Query 核心特性
+
+- **自动缓存管理**: 自动缓存请求结果,避免重复请求相同数据
+- **内置状态管理**: 自动跟踪请求状态(isLoading, isFetching)
+- **错误处理**: 内置错误处理机制
+- **代码简化**: 自动生成 hooks,减少样板代码
+
+### 2. RTK Query 基本使用
+
+#### 步骤1: 创建 API slice
+
+```javascript
+// store/modules/channelApi.js
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+export const channelApi = createApi({
+  // reducer路径
+  reducerPath: 'channelApi',
+  // 基础配置
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://geek.itheima.net/v1_0/'
+  }),
+  // 定义接口端点
+  endpoints: (builder) => ({
+    getChannels: builder.query({
+      query: () => 'channels',
+    }),
+  }),
+})
+
+// 自动生成的 hook
+export const { useGetChannelsQuery } = channelApi
+```
+
+#### 步骤2: 在 store 中注册 API slice
+
+```javascript
+// store/index.js
+import { configureStore } from "@reduxjs/toolkit";
+import { channelApi } from "./modules/channelApi";
+
+export default configureStore({
+  reducer: {
+    // 注册 API reducer
+    [channelApi.reducerPath]: channelApi.reducer,
+  },
+  // 添加 API middleware
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(channelApi.middleware),
+});
+```
+
+#### 步骤3: 在组件中使用
+
+```jsx
+import { useGetChannelsQuery } from './store/modules/channelApi'
+
+function App() {
+  // 自动处理 loading/error/data
+  const { data, isLoading, error } = useGetChannelsQuery()
+
+  if (isLoading) return <div>加载中...</div>
+  if (error) return <div>出错了</div>
+
+  return (
+    <ul>
+      {data?.data.channels?.map(item => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
+
+### 3. RTK Query vs Axios 方案对比
+
+| 对比项 | Axios 方案 | RTK Query 方案 |
+|--------|------------------|----------------|
+| **状态管理** | 需手动编写 reducer 管理数据 | 自动管理,无需编写 reducer |
+| **异步处理** | 需手动编写 async action 函数 | 自动生成,自动处理异步 |
+| **缓存机制** | 无缓存机制 | 内置智能缓存系统 |
+| **Loading状态** | 需手动在 reducer 中管理 | 自动提供 isLoading, isFetching |
+| **错误处理** | 需手动 try-catch | 自动提供 error 状态 |
+| **重复请求** | 可能触发重复请求 | 自动去重,避免重复请求 |
+| **代码量** | 较多(需写 store、async action、reducer) | 较少(只需定义 API endpoint) |
+| **组件使用** | dispatch(action) + useEffect | 直接使用生成的 hook |
+| **数据刷新** | 需手动 dispatch | 提供 refetch 方法 |
+
+### 4. Axios 方案代码示例
+
+```javascript
+// 需要: slice定义 + reducer + async action + 组件中手动调用
+import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+const channelStore = createSlice({
+  name: "channel",
+  initialState: { channelList: [] },
+  reducers: {
+    setChannelList(state, action) {
+      state.channelList = action.payload;
+    },
+  },
+});
+
+const fetchChannelList = () => {
+  return async (dispatch) => {
+    const res = await axios.get(url);
+    dispatch(setChannelList(res.data.data.channels));
+  };
+};
+
+// 组件中
+useEffect(() => {
+  dispatch(fetchChannelList());
+}, []);
+```
+
+### 5. RTK Query 方案代码示例
+
+```javascript
+// 只需: 定义 API slice + 组件中使用 hook
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+
+export const channelApi = createApi({
+  reducerPath: 'channelApi',
+  baseQuery: fetchBaseQuery({ baseUrl }),
+  endpoints: (builder) => ({
+    getChannels: builder.query({
+      query: () => 'channels',
+    }),
+  }),
+});
+
+// 组件中
+const { data } = useGetChannelsQuery()
+```
+
+### 6. RTK Query 高级用法
+
+#### 6.1 动态参数
+
+```javascript
+endpoints: (builder) => ({
+  // 带参数的查询
+  getArticle: builder.query({
+    query: (id) => `articles/${id}`,
+  }),
+})
+
+// 组件中使用
+const { data } = useGetArticleQuery(articleId)
+```
+
+#### 6.2 手动触发请求
+
+```javascript
+endpoints: (builder) => ({
+  // 变更操作(POST/PUT/DELETE)
+  createArticle: builder.mutation({
+    query: (data) => ({
+      url: 'articles',
+      method: 'POST',
+      body: data,
+    }),
+  }),
+})
+
+// 组件中使用
+const [createArticle, { isLoading }] = useCreateArticleMutation()
+
+const handleSubmit = async () => {
+  await createArticle(articleData)
+}
+```
+
+#### 6.3 重新获取数据
+
+```javascript
+// 自动 hook
+const { data, refetch } = useGetChannelsQuery()
+
+// 手动刷新
+const handleRefresh = () => {
+  refetch()
+}
+```
+
+### 7. 选择建议
+
+**选择 RTK Query 的场景:**
+- 需要处理大量服务端数据
+- 需要缓存机制提升性能
+- 中大型项目,需要优化代码结构
+- 团队协作,需要统一的数据管理方案
+
+**选择 Axios 方案的场景:**
+- 需要完全控制请求流程
+- 简单的异步操作
+- 不需要缓存功能
+- 小型项目或学习理解 Redux 原理
+
+## 八、Redux 调试 - devtools
 
 > Redux 官方提供了针对于 Redux 的浏览器调试工具`Redux DevTools`，支持实时 state 信息展示、action 提交信息查看等
 
 ![image.png](assets/12.png)
 
-## 八、美团小案例
+## 九、美团小案例
 
 > [!NOTE] 开发思路
 > 使用 RTK（Redux Toolkit）来管理应用状态, 组件负责 数据渲染 和 dispatch action。
