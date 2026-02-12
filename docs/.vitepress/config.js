@@ -139,7 +139,7 @@ export default withMermaid({
           collapsed: true,
           items: [
             { text: '博欣信息管理系统', link: '/interview/project/ims' },
-            { text: '无人化试剂管理系统', link: '/interview/project/reagent' },
+            { text: '智能试剂管理系统', link: '/interview/project/reagent' },
             { text: '博欣项目管理系统', link: '/interview/project/task' },
             { text: '行政诉讼E监督', link: '/interview/project/e-supervise' },
             { text: 'APEC', link: '/interview/project/apec' },

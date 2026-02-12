@@ -9,8 +9,8 @@ outline: deep
 :::
 
 ::: tip 项目规模
-- **开发周期**：6个月
-- **团队规模**：5人（前端2人，后端2人，UI设计1人）
+- **开发周期**：3个月
+- **团队规模**：4人（前端1人，后端2人，UI设计1人）
 - **代码量**：前端约2.5万行代码
 - **用户规模**：支持300+用户同时在线使用
 :::
@@ -20,16 +20,9 @@ outline: deep
 ### 核心技术栈
 **前端技术**：React + Vite + Redux Toolkit + React Router + Ant Design + Axios + SCSS  
 **状态管理**：Redux Toolkit + RTK Query  
-**可视化**：ECharts + React-Chartjs-2  
+**可视化**：ECharts 
 **其他技术**：React-Hook-Form表单管理、自定义Hooks
 
-### 技术架构
-- **构建工具**：Vite（开发服务器启动速度提升80%）
-- **状态管理**：Redux Toolkit（替代传统Redux，简化状态管理）
-- **UI组件库**：Ant Design + 自定义主题配置
-- **数据可视化**：ECharts图表库实现多维度数据展示
-- **消息通知**：集成Ant Design消息组件，实现页面内消息通知
-- **工程化**：ESLint + Prettier + Husky + Pre-commit hooks
 
 ## 二、我的工作
 
@@ -42,7 +35,7 @@ outline: deep
 ### 2. 核心业务模块开发
 - **项目管理模块**：实现项目创建、编辑、状态跟踪，支持甘特图展示项目进度
 - **任务管理模块**：实现任务分配、状态流转、优先级管理，支持看板和列表视图切换
-- **日报管理模块**：实现日报编写、提交、审批，集成ECharts统计报表展示工作数据
+- **日报管理模块**：实现日报编写、提交，集成ECharts统计报表展示工作数据
 - **用户权限管理**：实现用户信息维护、角色分配、权限矩阵管理等
 
 ### 3. 数据可视化与报表系统
@@ -51,12 +44,8 @@ outline: deep
 - **报表导出**：支持PDF、Excel格式的报表导出功能
 - **数据筛选**：实现多维度数据筛选和自定义报表生成
 
-### 4. 消息通知系统
-- **通知组件**：集成Ant Design的Notification组件，实现全局消息通知
-- **消息中心**：开发消息中心模块，支持消息分类、标记已读等功能
-- **提醒功能**：实现任务截止时间提醒、项目里程碑提醒等定时提醒
 
-### 5. 性能优化与工程化
+### 4. 性能优化与工程化
 - **代码分割**：使用React.lazy和Suspense实现路由级代码分割
 - **组件优化**：使用React.memo、useCallback、useMemo优化组件渲染性能
 - **打包优化**：通过Vite的优化配置减少打包体积，提升加载速度
@@ -64,187 +53,186 @@ outline: deep
 
 ## 三、项目难点
 
-### （一）复杂表单状态管理
+### （一）使用 RTK Query 管理服务器状态
 
-**问题描述**：任务管理模块包含大量复杂表单，涉及多级联动、动态字段、条件显示等，传统状态管理容易出现数据不一致和性能问题。
+**问题描述**：项目需要从后端获取项目列表、项目详情、任务列表、任务详情等数据，并展示在页面上。使用传统的Redux管理状态时，数据获取和展示逻辑会重复Many times，导致代码冗长、维护困难。
 
 **解决方案**：
-- **RTK Query**：使用Redux Toolkit的RTK Query管理服务器状态，自动处理缓存、重复请求
-- **状态结构优化**：按功能模块划分state，避免过度嵌套
-- **自定义Hooks**：封装常用表单逻辑，提升代码复用性
+- **RTK Query**：基于RTK Query的API请求管理，自动缓存数据，支持数据更新和错误处理
+- **数据缓存**：使用RTK Query的缓存功能，自动缓存数据，提高数据获取效率
+- **数据更新**：使用RTK Query的`refetchOnMountOrArgChange`功能，自动刷新数据，提升用户体验
+- **错误处理**：使用RTK Query的`queryFn`参数，处理错误并返回错误信息
 
-
-#### RTK Query 使用详解
-
-**什么是 RTK Query？**
-
-RTK Query 是 Redux Toolkit 提供的数据获取和状态管理工具，简单来说就是一个帮你处理 API 请求的"管家"。
-
-**核心功能**：
-- **自动请求数据**：帮你发 HTTP 请求
-- **自动缓存**：把数据存起来，避免重复请求
-- **自动管理状态**：加载中、成功、失败状态自动切换
-
-**如何使用**：
-
-1. **创建 API 服务**
+**关键实现**：
 
 ```javascript
+// 1. 创建 API Slice - 就像定义一个"数据服务窗口"
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// 创建 API 服务
-export const api = createApi({
-  reducerPath: 'api', // 在 Redux store 中的状态名
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://api.example.com' }), // 配置基础 URL
+export const projectApi = createApi({
+  reducerPath: 'projectApi',  // 在 Redux store 中的名字
+  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),  // 基础请求配置
+  tagTypes: ['Project', 'Task'],  // 定义数据标签，用于缓存更新
   endpoints: (builder) => ({
-    // 定义获取用户列表的接口
-    getUsers: builder.query({
-      query: () => '/users', // 相对路径，会拼接到 baseUrl
+    // 获取项目列表（查询接口）
+    getProjects: builder.query({
+      query: (params) => `/projects?page=${params.page}`,
+      providesTags: ['Project']  // 标记返回的数据是 Project 类型
     }),
-    // 定义创建用户的接口
-    createUser: builder.mutation({
-      query: (user) => ({
-        url: '/users',
+    // 获取项目详情
+    getProjectById: builder.query({
+      query: (id) => `/projects/${id}`,
+      providesTags: (result, error, id) => [{ type: 'Project', id }]
+    }),
+    // 创建项目（修改接口）
+    createProject: builder.mutation({
+      query: (data) => ({
+        url: '/projects',
         method: 'POST',
-        body: user,
+        body: data
       }),
-    }),
-  }),
+      invalidatesTags: ['Project']  // 成功后自动刷新 Project 类型缓存
+    })
+  })
 })
 
-// 自动生成的 hooks
-export const { useGetUsersQuery, useCreateUserMutation } = api
+// 自动生成 Hook：useGetProjectsQuery, useCreateProjectMutation 等
+export const { useGetProjectsQuery, useGetProjectByIdQuery, useCreateProjectMutation } = projectApi
 ```
 
-2. **配置到 Store**
-
 ```javascript
+// 2. 配置 Store - 注册 API 服务
 import { configureStore } from '@reduxjs/toolkit'
-import { api } from './services/api'
+import { projectApi } from './projectApi'
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    [api.reducerPath]: api.reducer,
+    [projectApi.reducerPath]: projectApi.reducer  // 添加 API reducer
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(api.middleware),
+  middleware: (getDefault) => getDefault().concat(projectApi.middleware)  // 添加 API 中间件（处理缓存、自动刷新等）
 })
 ```
 
-3. **在组件中使用**
-
 ```javascript
-import { useGetUsersQuery, useCreateUserMutation } from './services/api'
-
-function UserList() {
-  // 使用 query 获取数据
-  const { data, isLoading, error } = useGetUsersQuery()
-  
-  // 使用 mutation 修改数据
-  const [createUser, { isLoading: isCreating }] = useCreateUserMutation()
-
-  const handleAddUser = () => {
-    createUser({ name: '张三', age: 25 })
-  }
+// 3. 在组件中使用 - 一行代码搞定数据获取
+function ProjectList() {
+  // data: 返回的数据, isLoading: 加载状态, error: 错误信息, refetch: 手动刷新
+  const { data: projects, isLoading, error, refetch } = useGetProjectsQuery({ page: 1 })
 
   if (isLoading) return <div>加载中...</div>
-  if (error) return <div>出错了：{error.message}</div>
+  if (error) return <div>加载失败，<button onClick={refetch}>点击重试</button></div>
 
   return (
     <div>
-      <h2>用户列表</h2>
-      {data?.map(user => (
-        <div key={user.id}>{user.name} - {user.age}</div>
+      {projects?.map(project => (
+        <ProjectCard key={project.id} data={project} />
       ))}
-      <button onClick={handleAddUser} disabled={isCreating}>
-        添加用户
-      </button>
     </div>
   )
 }
 ```
 
-**关键概念**：
+**核心优势**：
+- **无需写 useEffect**：RTK Query 自动处理数据获取
+- **自动缓存**：相同参数的请求不会重复发送
+- **自动刷新**：组件卸载后重新挂载，自动判断是否需要更新数据
+- **自动生成 Hook**：通过 API 定义自动生成对应的 React Hook
 
-- **Query（查询）**：用于**获取**数据，结果会被缓存
-  - 使用 `builder.query()` 定义
-  - 生成的 hook：`useGetXXXQuery()`
+---
 
-- **Mutation（变更）**：用于**修改**数据（增删改），不会缓存
-  - 使用 `builder.mutation()` 定义
-  - 生成的 hook：`useCreateXXXMutation()`
+### （二）表单的字段权限控制
 
-**自动缓存的好处**：
-
-```javascript
-// 组件 A 调用
-const { data } = useGetUsersQuery() // 发送请求
-
-// 组件 B 也调用
-const { data } = useGetUsersQuery() // 不会发送请求，直接用缓存
-```
-
-只有数据过期或手动刷新时才会重新请求。
-
-**总结**：RTK Query = **自动发请求** + **自动缓存** + **自动管理加载状态**
-
-**效果**：表单响应速度提升60%，状态同步准确率达到99%。
-
-### （二）大数据量列表性能优化
-
-**问题描述**：项目任务列表可能包含数千条记录，传统渲染方式会导致页面卡顿，滚动不流畅，影响用户体验。
+**问题描述**：项目需要根据用户对应的角色权限，对表单的字段进行权限控制，比如某个用户只能查看某些字段，某个用户只能修改某些字段。
 
 **解决方案**：
-- **虚拟滚动**：实现虚拟滚动列表，只渲染可视区域内的元素
-- **分页加载**：实现无限滚动分页，按需加载数据
-- **搜索优化**：防抖搜索和本地筛选，减少服务器请求
-- **缓存策略**：实现多级缓存，提升数据访问速度
+- **设置字段权限**：在字段权限页面中设置权限，可以根据角色设置某一个表的字段权限
+- **字段权限控制**：根据配置的字段权限，动态生成表单字段，并控制字段的显示和隐藏
 
-**技术实现**：
-```javascript
-// 虚拟滚动组件
-const VirtualTaskList = ({ tasks }) => {
-  const [containerHeight, setContainerHeight] = useState(600)
-  const [itemHeight, setItemHeight] = useState(60)
-  const [scrollTop, setScrollTop] = useState(0)
+**关键实现**：
+
+::: code-group
+
+```javascript [字段权限配置]
+// 1. 字段权限配置数据结构 - 后端返回的权限配置
+// 示例：管理员可以看到所有字段，普通用户只能看到部分字段
+const fieldPermissions = {
+  // 表名：任务表
+  'task': {
+    'admin': {            // 管理员角色
+      'title': 'edit',     // 标题字段：可编辑
+      'status': 'edit',   // 状态字段：可编辑
+      'assignee': 'edit', // 负责人：可编辑
+      'deadline': 'view',  // 截止日期：只能查看
+      'salary': 'hidden'   // 薪资：隐藏
+    },
+    'user': {             // 普通用户角色
+      'title': 'view',    // 标题字段：只能查看
+      'status': 'hidden', // 状态字段：隐藏
+      'assignee': 'view', // 负责人：只能查看
+      'deadline': 'hidden',
+      'salary': 'hidden'
+    }
+  }
+}
+```
+
+```javascript [封装权限判断 Hook]
+// 2. 封装权限判断 Hook - 判断用户对某字段的权限
+import { useSelector } from 'react-redux'
+
+function useFieldPermission(tableName, fieldName) {
+  const userRole = useSelector(state => state.user.role)  // 获取当前用户角色
   
-  const visibleItems = useMemo(() => {
-    const startIndex = Math.floor(scrollTop / itemHeight)
-    const endIndex = Math.min(
-      startIndex + Math.ceil(containerHeight / itemHeight) + 1,
-      tasks.length
-    )
-    return tasks.slice(startIndex, endIndex).map((task, index) => ({
-      ...task,
-      index: startIndex + index
-    }))
-  }, [tasks, scrollTop, itemHeight, containerHeight])
+  // 获取该字段在当前角色下的权限：edit/view/hidden
+  const permission = fieldPermissions[tableName]?.[userRole]?.[fieldName] || 'hidden'
+  
+  return {
+    canEdit: permission === 'edit',    // 是否可编辑
+    canView: permission !== 'hidden',  // 是否可查看
+    isHidden: permission === 'hidden'   // 是否隐藏
+  }
+}
+```
+
+```javascript [动态生成表单字段]
+// 3. 动态生成表单字段 - 更通用的实现方式
+function DynamicPermissionForm({ tableName, initialValues }) {
+  // 定义所有字段配置
+  const allFields = [
+    { name: 'title', label: '任务标题', component: 'input' },
+    { name: 'status', label: '任务状态', component: 'select' },
+    { name: 'assignee', label: '负责人', component: 'userPicker' },
+    { name: 'deadline', label: '截止日期', component: 'datePicker' },
+    { name: 'salary', label: '薪资', component: 'inputNumber' }
+  ]
+  
+  // 过滤出有权限的字段
+  const visibleFields = allFields.filter(field => {
+    const { canView } = useFieldPermission(tableName, field.name)
+    return canView
+  })
   
   return (
-    <div 
-      style={{ height: containerHeight, overflow: 'auto' }}
-      onScroll={(e) => setScrollTop(e.target.scrollTop)}
-    >
-      <div style={{ height: tasks.length * itemHeight, position: 'relative' }}>
-        {visibleItems.map(item => (
-          <TaskItem
-            key={item.id}
-            task={item}
-            style={{
-              position: 'absolute',
-              top: item.index * itemHeight,
-              height: itemHeight
-            }}
-          />
-        ))}
-      </div>
-    </div>
+    <Form initialValues={initialValues}>
+      {visibleFields.map(field => {
+        const { canEdit, canView } = useFieldPermission(tableName, field.name)
+        const disabled = canView && !canEdit  // 可查看但不可编辑则禁用
+        
+        return (
+          <Form.Item key={field.name} name={field.name} label={field.label}>
+            {field.component === 'input' && <Input disabled={disabled} />}
+            {field.component === 'select' && <Select disabled={disabled}>...</Select>}
+            {field.component === 'datePicker' && <DatePicker disabled={disabled} />}
+            {/* 其他组件... */}
+          </Form.Item>
+        )
+      })}
+    </Form>
   )
 }
 ```
 
-**效果**：支持10000+任务列表流畅滚动，内存占用减少70%。
-
+:::
 
 ## 四、项目亮点
 

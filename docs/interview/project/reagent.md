@@ -1,15 +1,15 @@
 ---
 outline: deep
 ---
-# 无人化试剂管理系统
+# 智能试剂管理系统
 
 ::: info 项目概述
-无人化试剂管理系统旨在优化医院内部试剂物资的管理流程，从物料采购到库存管理再到院内使用，覆盖全生命周期的操作。通过规范化管理试剂物资、供应商及相关审批流程，提升工作效率，降低管理成本。系统基于桌面端开发，支持人脸识别登录，具备实时数据监控和智能分析功能，为医院提供安全、高效、智能的试剂管理解决方案。
+智能试剂管理系统旨在优化医院内部试剂物资的管理流程，从物料采购到库存管理再到院内使用，覆盖全生命周期的操作。系统基于桌面端开发，支持人脸识别登录，具备实时数据监控和智能分析功能，为医院提供安全、高效、智能的试剂管理解决方案。
 :::
 
 ::: tip 项目规模
-- **开发周期**：6个月
-- **团队规模**：4人（前端2人，后端2人）
+- **开发周期**：12个月
+- **团队规模**：4人（前端1人，后端2人，UI设计1人）
 - **代码量**：前端约2万行代码
 - **应用场景**：覆盖医院检验科、病理科等10+科室
 :::
@@ -23,14 +23,6 @@ outline: deep
 **数据可视化**：ECharts  
 **实时通信**：SignalR  
 **其他技术**：Axios、Vue Router、WebRTC
-
-### 技术架构
-- **桌面框架**：Electron提供跨平台桌面应用能力
-- **前端框架**：Vue3 + Vite实现现代化前端开发
-- **状态管理**：Pinia替代Vuex，支持TypeScript和Composition API
-- **UI组件**：Element Plus提供丰富的企业级组件
-- **可视化**：ECharts实现数据大屏和图表展示
-- **实时通信**：SignalR实现数据实时推送和更新
 
 ### Electron架构特点
 - **进程分离**：主进程和渲染进程分离，保证应用安全性
@@ -49,7 +41,7 @@ outline: deep
 ### 2. 核心业务模块开发
 - **试剂管理模块**：实现试剂信息维护、库存监控、有效期管理、试剂分类等功能
 - **请领管理模块**：开发试剂申请、审批流程、领用记录、状态跟踪等完整流程
-- **采购管理模块**：实现采购计划制定、供应商选择、价格对比、采购订单跟踪等功能
+- **采购管理模块**：实现采购计划制定、供应商选择、采购订单跟踪等功能
 - **仓储管理模块**：开发入库出库操作、库存盘点、仓储位置管理、预警提醒等功能
 - **供应商管理模块**：实现供应商信息维护、资质管理、评价体系、合同管理等功能
 
@@ -57,7 +49,6 @@ outline: deep
 - **摄像头集成**：基于WebRTC调用摄像头，实现实时视频流显示
 - **人脸检测**：集成人脸识别API，实现人脸位置检测和特征提取
 - **身份验证**：调用后端识别接口，实现人脸比对和用户身份验证
-- **安全控制**：添加活体检测和防攻击机制，保障系统安全
 
 ### 4. 数据可视化大屏
 - **大屏设计**：基于ECharts设计医院试剂管理可视化大屏
@@ -65,17 +56,14 @@ outline: deep
 - **多维度分析**：实现按科室、按时间、按试剂类型的多维度数据分析
 - **预警监控**：开发库存预警、过期预警、异常使用监控等功能
 
-### 5. 系统优化与部署
-- **性能优化**：通过代码分割、懒加载等技术提升应用启动速度
-- **内存管理**：优化Electron内存使用，防止内存泄漏
-- **打包优化**：配置Electron Builder，实现多平台打包和自动更新
-- **用户体验**：优化界面交互，添加快捷键支持，提升操作效率
 
 ## 三、项目难点
 
-### （一）Electron桌面端开发架构设计
+### （一）主进程和渲染进程通信
 
-**问题描述**：Electron应用需要处理主进程和渲染进程的通信，同时要确保安全性和性能，传统Web开发经验难以直接适用。
+**问题描述**：[Electron应用](/note/electron.html) 需要处理主进程和渲染进程的通信，同时要确保安全性和性能，传统Web开发经验难以直接适用。
+
+**应用场景**：系统需要调用摄像头进行人脸识别登录、访问本地文件系统进行试剂数据导出、控制窗口行为等原生功能，这些操作都需要主进程与渲染进程之间的安全通信。
 
 **解决方案**：
 - **进程分离**：主进程负责窗口管理和API调用，渲染进程专注UI展示
@@ -116,8 +104,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 ### （二）人脸识别登录系统
 
-> 通过摄像头定时拍照调用接口进行人脸识别，且人脸识别前需要先检测是否有人脸
+**问题描述**：
 
+**解决方案**：
 
 1. **启动摄像头**
    - 点击"启动摄像头"按钮调用 `startCamera()` 函数
@@ -270,78 +259,59 @@ class SignalRService {
 
 **效果**：数据延迟控制在100ms内，支持多客户端实时同步，连接稳定性达到99.5%。
 
-### （四）大文件性能优化
+### （四）Electron应用优化
 
-**问题描述**：试剂管理系统需要处理大量试剂图片、资质文件等，文件加载和渲染性能影响用户体验。
+**问题描述**：桌面端应用启动速度慢、内存占用高，用户体验不友好。
 
 **解决方案**：
-- **图片优化**：压缩图片大小，实现懒加载和渐进式加载
-- **虚拟滚动**：对于大数据列表，使用虚拟滚动技术
-- **缓存策略**：实现多层缓存机制，提升重复访问速度
-- **分包加载**：按需加载业务模块，减少首屏加载时间
+- **代码分割**：使用Vite的代码分割功能，按路由和组件动态加载，减少首屏加载时间
+- **资源优化**：压缩图片、字体等静态资源，使用CDN加速资源加载
+- **懒加载**：对非核心模块和大数据列表实现懒加载和虚拟滚动
+- **进程管理**：优化Electron主进程和渲染进程的资源使用，及时清理无用资源
+- **缓存策略**：使用localStorage和IndexedDB缓存常用数据，减少网络请求
+- **打包优化**：使用electron-builder进行打包优化，减小安装包体积
 
 **技术实现**：
 ```javascript
-// 虚拟滚动组件
-const VirtualList = {
-  props: ['items', 'itemHeight', 'containerHeight'],
-  data() {
-    return {
-      scrollTop: 0,
-      startIndex: 0,
-      endIndex: 0
-    }
+// 路由懒加载
+const routes = [
+  {
+    path: '/reagent',
+    component: () => import('@/views/Reagent.vue')
   },
-  computed: {
-    visibleItems() {
-      return this.items.slice(this.startIndex, this.endIndex + 1)
-    },
-    totalHeight() {
-      return this.items.length * this.itemHeight
-    }
-  },
-  methods: {
-    handleScroll(e) {
-      this.scrollTop = e.target.scrollTop
-      this.startIndex = Math.floor(this.scrollTop / this.itemHeight)
-      this.endIndex = this.startIndex + Math.ceil(this.containerHeight / this.itemHeight)
-    }
+  {
+    path: '/procurement',
+    component: () => import('@/views/Procurement.vue')
   }
-}
+]
 
-// 图片懒加载
-const LazyImage = {
-  props: ['src', 'alt'],
-  setup(props) {
-    const imgRef = ref(null)
-    const isLoaded = ref(false)
-    
-    const loadImage = () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = new Image()
-            img.onload = () => {
-              isLoaded.value = true
-            }
-            img.src = props.src
-            imgRef.value.src = props.src
-            observer.unobserve(entry.target)
-          }
-        })
-      })
-      
-      observer.observe(imgRef.value)
-    }
-    
-    onMounted(loadImage)
-    
-    return { imgRef, isLoaded }
+// 虚拟滚动组件
+import { VirtualList } from '@vueuse/components'
+
+// 主进程优化
+app.whenReady().then(() => {
+  // 预加载常用资源
+  const mainWindow = createWindow()
+  mainWindow.webContents.session.clearCache()
+})
+
+// 打包配置优化
+export default {
+  compression: 'maximum',
+  files: [
+    'dist/**/*',
+    'package.json'
+  ],
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true
   }
 }
 ```
 
-**效果**：首屏加载时间从5秒优化至2秒，内存占用降低40%，支持1万+数据流畅滚动。
+**效果**：应用启动时间从8秒优化至3秒，内存占用降低40%，安装包体积减小35%。
+
+
 
 ## 四、项目亮点
 
