@@ -13,41 +13,80 @@ outline: deep
 
 ## 一、ES6（必考重点）
 
-### 1、ES6核心特性
+### 1、ES6新特性
 
 ::: danger 🔥 重要提醒
-现在企业面试基本都会问ES6，这5个是重中之重：
+ES6（ECMAScript 2015）是JavaScript的一次重大更新，引入了大量新特性。面试时重点掌握以下核心内容！
 :::
 
-**必考1：let/const** 📝
-- 解决var的痛点：变量提升、重复声明、函数作用域
-- let有块级作用域，不存在变量提升
-- const声明常量，但对象数组内容可改（地址不能改）
+**ES6 主要新特性** ✨
 
-**必考2：箭头函数** ➡️
-- 语法更简洁：`(a, b) => a + b`
-- 没有自己的this，继承外层this（这是最重要的考点！）
-- 不能当构造函数，没有arguments对象
+1. **变量声明** 📝
+   - `let` 和 `const`（块级作用域）
+   - 替代 `var`，解决作用域和变量提升问题
 
-**必考3：解构赋值** 🎯
-- 数组解构：`const [a, b] = [1, 2]`
-- 对象解构：`const {name, age} = obj`
-- 实际开发中特别常用，尤其是React项目
+2. **箭头函数** ➡️
+   - 简化函数写法
+   - `const add = (a, b) => a + b`
+   - 没有自己的 `this`
 
-**必考4：模板字符串** 💬
-- 用反引号：`` `Hello ${name}` ``
-- 支持多行字符串，再也不用拼接了
+3. **模板字符串** 💬
+   - 使用反引号 `` ` ``
+   - 支持变量插值 `${name}`
+   - 支持多行字符串
 
-**必考5：Promise** 🔄
-- 解决回调地狱，异步编程的利器
-- 三种状态：pending、fulfilled、rejected
-- then/catch/finally用法
+4. **解构赋值** 🎁
+   ```javascript
+   // 数组解构
+   const [a, b] = [1, 2];
+   // 对象解构
+   const {name, age} = {name: '张三', age: 18};
+   ```
 
-::: info 📚 其他特性（了解即可）
-- 模块化：import/export
-- 展开运算符：`...args`
-- 新的数据类型：Map、Set、Symbol
-:::
+5. **扩展运算符** 📢
+   - `...` 用于展开数组/对象
+   ```javascript
+   const arr = [1, 2, 3];
+   const newArr = [...arr, 4]; // [1, 2, 3, 4]
+   ```
+
+6. **类和继承** 🏛️
+   - `class` 关键字定义类
+   - `extends` 实现继承
+   ```javascript
+   class Person {
+     constructor(name) {
+       this.name = name;
+     }
+     say() {
+       console.log(this.name);
+     }
+   }
+   ```
+
+7. **Promise** 🤝
+   - 解决回调地狱
+   - 链式调用处理异步
+
+8. **async/await** ⏳
+   - 同步方式写异步代码
+   - 更优雅的异步处理
+
+9. **模块化** 📦
+   - `import` 导入
+   - `export` 导出
+
+10. **Map 和 Set** 🗺️
+    - `Map`：键值对集合，键可以是任意类型
+    - `Set`：不重复的集合
+
+11. **其他特性** 🛠️
+    - `Symbol`（新的原始类型）
+    - `for...of`（遍历可迭代对象）
+    - 默认参数 `function(a = 1) {}`
+    - 剩余参数 `function(...args) {}`
+
+
 
 ### 2、let、const、var区别（经典面试题）
 
