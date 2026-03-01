@@ -8,9 +8,9 @@ outline: deep
 :::
 
 ::: tip 项目规模
-- **开发周期**：12个月
+- **开发周期**：6个月
 - **团队规模**：4人（前端1人，后端2人，UI设计1人）
-- **代码量**：前端约2万行代码
+- **代码量**：前端约10万行代码
 - **应用场景**：覆盖医院检验科、病理科等10+科室
 :::
 
@@ -63,13 +63,18 @@ outline: deep
 
 **问题描述**：[Electron应用](/note/electron.html) 需要处理主进程和渲染进程的通信，同时要确保安全性和性能，传统Web开发经验难以直接适用。
 
-**应用场景**：系统需要调用摄像头进行人脸识别登录、访问本地文件系统进行试剂数据导出、控制窗口行为等原生功能，这些操作都需要主进程与渲染进程之间的安全通信。
+**应用场景**：
+- **人脸识别登录**：渲染进程需要调用系统摄像头采集人脸图像，通过主进程调用原生API控制设备
+- **文件系统操作**：试剂信息导入导出、库存报表生成等需要主进程访问文件系统
+- **系统通知推送**：库存预警、过期提醒等需要主进程调用系统原生通知
+- **窗口管理**：多窗口数据同步、窗口最小化托盘等功能需要进程间协调
 
 **解决方案**：
-- **进程分离**：主进程负责窗口管理和API调用，渲染进程专注UI展示
-- **IPC通信**：使用IPC（进程间通信）实现安全的数据传递
-- **安全策略**：禁用Node.js集成，使用contextBridge安全暴露API
-- **性能优化**：合理管理进程生命周期，避免内存泄漏
+- **安全隔离**：禁用Node.js集成，启用上下文隔离，防止渲染进程直接访问Node.js API
+- **预加载脚本**：通过`preload.js`作为桥梁，使用`contextBridge`安全暴露有限的API接口
+- **IPC通信**：使用`ipcRenderer.invoke`和`ipcMain.handle`实现异步双向通信，避免同步阻塞
+- **API封装**：按业务模块封装API（如camera、file、notification），提供类型安全的接口定义
+
 
 **技术实现**：
 ```javascript
@@ -82,8 +87,8 @@ const createWindow = () => {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: false, // 禁用Node.js集成，防止渲染进程直接访问Node API
+      contextIsolation: true, // 启用上下文隔离，隔离预加载脚本与渲染进程的全局作用域
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -104,101 +109,221 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 ### （二）人脸识别登录系统
 
-**问题描述**：
+**问题描述**：医院检验科、病理科等科室需要快速、安全地登录系统，传统密码登录方式存在以下问题：密码容易遗忘或泄露、输入密码耗时、不符合医院无接触操作要求。需要实现基于人脸识别的快速登录系统，既保证安全性又提升用户体验。
 
 **解决方案**：
-
-1. **启动摄像头**
-   - 点击"启动摄像头"按钮调用 `startCamera()` 函数
-   - 请求用户媒体设备权限，设置视频约束参数
-   - 将视频流绑定到 `<video>` 元素并显示摄像头画面
-
-2. **捕获并识别**
-   - 用户将面部对准摄像头框内
-   - 点击"人脸识别"按钮调用 `captureAndRecognize()` 函数
-   - 将当前视频帧绘制到 Canvas 上
-   - 将 Canvas 内容转换为 base64 格式的 JPEG 图像
-
-3. **人脸检测**
-   - 调用 `/api/User/RecognizeFace` API 检测图像中的人脸
-   - 如果未检测到人脸，显示"未识别到人脸，请重试"
-
-4. **人脸验证**
-   - 检测成功后调用 `/api/User/GetUserBySwipFace` API 进行身份验证
-   - 将人脸特征与数据库中的用户信息进行比对
-   - 验证失败显示"人脸验证失败，请重试"
-
-5. **登录成功**
-   - 验证成功后显示"人脸识别成功"提示
-   - 将用户信息存储到 Pinia store
-   - 自动跳转到数据视图页面 (`/dataview`)
-
-6. **资源清理**
-   - 组件卸载时自动关闭摄像头
-   - 清理媒体流资源，释放设备权限
+- **摄像头调用**：通过`navigator.mediaDevices.getUserMedia` 浏览器API调用设备摄像头，获取实时视频流
+- **人脸检测**：集成face-api.js库，加载TinyFaceDetector模型实现前端实时人脸定位
+- **特征提取**：使用FaceLandmark68Net模型提取人脸关键点特征，确保人脸清晰度达标
+- **身份验证**：截取视频帧转换为Base64图像，调用后端API进行人脸特征比对
+- **登录流程**：验证通过后自动获取用户Token完成登录，失败则提示重新尝试
 
 **技术实现**：
 
-<details>
-<summary>查看完整代码</summary>
+```vue
+<!-- 人脸识别登录组件 -->
+<template>
+  <div class="face-login">
+    <video ref="video" autoplay playsinline muted></video>
+    <canvas ref="canvas" style="display: none"></canvas>
+    <div class="status">{{ status }}</div>
+    <el-button @click="startLogin" :disabled="isLoading">
+      {{ isLoading ? '识别中...' : '开始人脸识别' }}
+    </el-button>
+  </div>
+</template>
 
-```javascript
+<script setup>
+import { ref, onMounted } from 'vue'
+import * as faceapi from 'face-api.js'
+import { ElMessage } from 'element-plus'
+
+const video = ref(null)
+const canvas = ref(null)
+const status = ref('准备就绪')
+const isLoading = ref(false)
+let stream = null
+
+// 初始化人脸识别模型
+const initFaceApi = async () => {
+  try {
+    // 加载人脸检测和识别模型
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models')
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+    status.value = '模型加载完成'
+  } catch (error) {
+    status.value = '模型加载失败'
+    console.error('模型加载失败:', error)
+  }
+}
+
 // 启动摄像头
 const startCamera = async () => {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    stream = await navigator.mediaDevices.getUserMedia({
       video: {
         width: { ideal: 640 },
         height: { ideal: 480 },
         facingMode: 'user'
       }
     })
-    
-    videoElement.srcObject = stream
-    return stream
+    video.value.srcObject = stream
+    status.value = '摄像头已启动，请对准摄像头'
   } catch (error) {
-    console.error('摄像头启动失败:', error)
-    throw new Error('无法访问摄像头，请检查权限设置')
+    status.value = '摄像头启动失败'
+    ElMessage.error('无法访问摄像头，请检查权限设置')
   }
 }
 
-// 人脸识别完整流程
-const captureAndRecognize = async () => {
-  // 1. 捕获当前帧到Canvas
-  const canvas = document.createElement('canvas')
-  canvas.width = videoElement.videoWidth
-  canvas.height = videoElement.videoHeight
-  const ctx = canvas.getContext('2d')
-  ctx.drawImage(videoElement, 0, 0)
-  
-  const imageData = canvas.toDataURL('image/jpeg', 0.8)
-  
-  // 2. 人脸检测
-  const faceDetection = await api.post('/api/User/RecognizeFace', {
-    image: imageData
-  })
-  
-  if (!faceDetection.data.hasFace) {
-    throw new Error('未识别到人脸，请重试')
+// 开始人脸识别
+const startLogin = async () => {
+  if (isLoading.value) return
+
+  isLoading.value = true
+  status.value = '正在识别...'
+
+  try {
+    // 检测人脸
+    const detections = await faceapi
+      .detectAllFaces(video.value, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceDescriptors()
+
+    if (detections.length === 0) {
+      status.value = '未检测到人脸，请调整位置'
+      ElMessage.warning('未检测到人脸，请正对摄像头')
+      isLoading.value = false
+      return
+    }
+
+    if (detections.length > 1) {
+      status.value = '检测到多个人脸，请保持单人'
+      ElMessage.warning('请确保只有一人在镜头前')
+      isLoading.value = false
+      return
+    }
+
+    // 截取人脸图像
+    const faceImage = captureFace(detections[0])
+
+    // 发送到后端验证
+    const result = await verifyFace(faceImage)
+
+    if (result.success) {
+      status.value = '识别成功，正在登录...'
+      ElMessage.success('登录成功')
+      // 执行登录逻辑
+      setTimeout(() => {
+        window.location.href = '/home'
+      }, 500)
+    } else {
+      status.value = '识别失败，请重试'
+      ElMessage.error('人脸识别失败，请重试')
+    }
+  } catch (error) {
+    status.value = '识别出错，请重试'
+    console.error('人脸识别错误:', error)
+    ElMessage.error('识别出错，请重试')
+  } finally {
+    isLoading.value = false
   }
-  
-  // 3. 人脸验证
-  const recognizeResult = await api.post('/api/User/GetUserBySwipFace', {
-    image: imageData
-  })
-  
-  if (!recognizeResult.data.success) {
-    throw new Error('人脸验证失败，请重试')
-  }
-  
-  // 4. 登录成功处理
-  store.commit('setUserInfo', recognizeResult.data.userInfo)
-  router.push('/dataview')
-  
-  return recognizeResult.data.userInfo
 }
+
+// 截取人脸图像
+const captureFace = (detection) => {
+  const canvasEl = canvas.value
+  const ctx = canvasEl.getContext('2d')
+  const box = detection.detection.box
+
+  // 设置canvas尺寸
+  canvasEl.width = box.width
+  canvasEl.height = box.height
+
+  // 绘制人脸区域
+  ctx.drawImage(
+    video.value,
+    box.x, box.y, box.width, box.height,
+    0, 0, box.width, box.height
+  )
+
+  // 转换为Base64
+  return canvasEl.toDataURL('image/jpeg', 0.8)
+}
+
+// 后端验证
+const verifyFace = async (faceImage) => {
+  try {
+    const response = await fetch('/api/face/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ faceImage })
+    })
+    return await response.json()
+  } catch (error) {
+    console.error('验证请求失败:', error)
+    return { success: false }
+  }
+}
+
+// 清理资源
+const stopCamera = () => {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop())
+    stream = null
+  }
+}
+
+onMounted(() => {
+  initFaceApi()
+  startCamera()
+})
+
+// 组件卸载时清理资源
+onBeforeUnmount(() => {
+  stopCamera()
+})
+</script>
+
+<style scoped>
+.face-login {
+  text-align: center;
+  padding: 20px;
+}
+
+video {
+  width: 400px;
+  height: 300px;
+  border: 2px solid #409eff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.status {
+  margin: 15px 0;
+  font-size: 16px;
+  color: #606266;
+}
+</style>
 ```
-</details>
+
+**技术要点**：
+
+1. **WebRTC摄像头调用**：使用`navigator.mediaDevices.getUserMedia`获取视频流，这是浏览器原生API，无需额外依赖
+
+2. **face-api.js人脸识别**：轻量级前端人脸识别库，基于TensorFlow.js，支持人脸检测、特征提取、表情识别等
+
+3. **前端人脸处理**：在前端完成人脸检测和图像裁剪，减少网络传输数据量
+
+4. **后端身份验证**：前端只负责图像采集，实际的身份比对在后端完成，保证安全性
+
+5. **用户体验优化**：
+   - 实时视频流反馈
+   - 自动人脸检测提示
+   - 错误处理和重试机制
+   - Loading状态管理
 
 **效果**：人脸识别成功率达到95%，完整登录流程控制在3秒内，用户体验流畅。
 
@@ -207,10 +332,11 @@ const captureAndRecognize = async () => {
 **问题描述**：试剂管理大屏需要实时显示库存变化、试剂使用情况等数据，传统轮询方式效率低且延迟高。
 
 **解决方案**：
-- **SignalR集成**：使用SignalR建立WebSocket连接，实现服务端主动推送
-- **数据缓存**：客户端缓存历史数据，减少重复请求
-- **连接管理**：实现自动重连机制，保证连接稳定性
-- **数据同步**：多客户端数据实时同步，确保数据一致性
+- **SignalR WebSocket长连接**：采用SignalR建立WebSocket长连接，替代传统轮询方式，实现服务端主动推送
+- **连接生命周期管理**：封装SignalRService服务类，统一管理连接创建、断线重连、心跳检测等
+- **事件订阅机制**：监听库存更新、设备报警通知等事件，实时响应数据变化
+- **自动重连策略**：配置`withAutomaticReconnect`实现断线自动重连，最多重试5次，保证连接稳定性
+- **数据响应式更新**：接收到推送数据后，通过Pinia更新状态并触发图表组件刷新，实现数据可视化联动
 
 **技术实现**：
 ```javascript

@@ -11,7 +11,7 @@ outline: deep
 ::: tip 项目规模
 - **开发周期**：3个月
 - **团队规模**：4人（前端1人，后端2人，UI设计1人）
-- **代码量**：前端约2.5万行代码
+- **代码量**：前端约5万行代码
 - **用户规模**：支持300+用户同时在线使用
 :::
 
@@ -20,7 +20,7 @@ outline: deep
 ### 核心技术栈
 **前端技术**：React + Vite + Redux Toolkit + React Router + Ant Design + Axios + SCSS  
 **状态管理**：Redux Toolkit + RTK Query  
-**可视化**：ECharts 
+**可视化**：ECharts  
 **其他技术**：React-Hook-Form表单管理、自定义Hooks
 
 
@@ -53,90 +53,181 @@ outline: deep
 
 ## 三、项目难点
 
-### （一）使用 RTK Query 管理服务器状态
+### （一）解决多人同时编辑的数据冲突问题
 
-**问题描述**：项目需要从后端获取项目列表、项目详情、任务列表、任务详情等数据，并展示在页面上。使用传统的Redux管理状态时，数据获取和展示逻辑会重复Many times，导致代码冗长、维护困难。
+**问题描述**：项目管理系统支持多人同时对同一个项目进行编辑（例如任务拆解、进度更新等），这就要求系统必须具备实时协作能力。
 
 **解决方案**：
-- **RTK Query**：基于RTK Query的API请求管理，自动缓存数据，支持数据更新和错误处理
-- **数据缓存**：使用RTK Query的缓存功能，自动缓存数据，提高数据获取效率
-- **数据更新**：使用RTK Query的`refetchOnMountOrArgChange`功能，自动刷新数据，提升用户体验
-- **错误处理**：使用RTK Query的`queryFn`参数，处理错误并返回错误信息
+
+采用**乐观更新 + 版本号冲突检测**的方案，让用户体验流畅的同时保证数据一致性。
+
+**核心思想**：
+- **乐观更新**：用户操作后先立即更新本地界面，不用等服务器响应，用户体验流畅
+- **版本号检测**：每次数据修改都带上版本号，后端检测版本是否一致，不一致则说明有冲突
+- **冲突处理**：冲突时提示用户刷新，获取最新数据后重新操作
+
+**实现思路**：
+
+1. **前端层面**：用户编辑数据时，先本地更新（乐观更新），界面立即响应；同时发请求到后端
+2. **后端层面**：收到请求后，对比版本号。版本一致则更新成功；版本不一致则返回409冲突错误
+3. **错误处理**：前端收到409错误，说明数据已被他人修改，提示用户并回滚本地更新
 
 **关键实现**：
 
-```javascript
-// 1. 创建 API Slice - 就像定义一个"数据服务窗口"
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+::: code-group
 
-export const projectApi = createApi({
-  reducerPath: 'projectApi',  // 在 Redux store 中的名字
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),  // 基础请求配置
-  tagTypes: ['Project', 'Task'],  // 定义数据标签，用于缓存更新
-  endpoints: (builder) => ({
-    // 获取项目列表（查询接口）
-    getProjects: builder.query({
-      query: (params) => `/projects?page=${params.page}`,
-      providesTags: ['Project']  // 标记返回的数据是 Project 类型
-    }),
-    // 获取项目详情
-    getProjectById: builder.query({
-      query: (id) => `/projects/${id}`,
-      providesTags: (result, error, id) => [{ type: 'Project', id }]
-    }),
-    // 创建项目（修改接口）
-    createProject: builder.mutation({
-      query: (data) => ({
-        url: '/projects',
-        method: 'POST',
-        body: data
-      }),
-      invalidatesTags: ['Project']  // 成功后自动刷新 Project 类型缓存
+```javascript [前端：乐观更新Hook]
+// 1. 封装乐观更新的 Hook
+function useOptimisticUpdate() {
+  const [pendingUpdates, setPendingUpdates] = useState({}) // 记录待提交的更新
+
+  // 乐观更新：先更新本地数据，再提交到服务器
+  const updateWithOptimism = async (dataId, newData) => {
+    const currentData = store.getState().data.items[dataId]
+    const oldVersion = currentData.version
+
+    // 1. 先乐观更新本地数据（更新界面）
+    store.dispatch({
+      type: 'data/optimisticUpdate',
+      payload: { id: dataId, data: newData }
     })
-  })
-})
 
-// 自动生成 Hook：useGetProjectsQuery, useCreateProjectMutation 等
-export const { useGetProjectsQuery, useGetProjectByIdQuery, useCreateProjectMutation } = projectApi
+    // 2. 提交到服务器（带上版本号）
+    try {
+      await axios.put(`/api/data/${dataId}`, {
+        ...newData,
+        version: oldVersion  // 发送当前版本号
+      })
+      // 成功：清除待提交记录
+      setPendingUpdates(prev => {
+        const next = { ...prev }
+        delete next[dataId]
+        return next
+      })
+    } catch (error) {
+      // 3. 失败：回滚本地数据
+      if (error.response?.status === 409) {
+        // 版本冲突：需要重新获取最新数据
+        message.warning('数据已被他人修改，请刷新后重试')
+        store.dispatch({ type: 'data/refetch', payload: { id: dataId } })
+      } else {
+        // 其他错误：回滚到原数据
+        store.dispatch({
+          type: 'data/rollback',
+          payload: { id: dataId, data: currentData }
+        })
+      }
+    }
+  }
+
+  return { updateWithOptimism }
+}
 ```
 
-```javascript
-// 2. 配置 Store - 注册 API 服务
-import { configureStore } from '@reduxjs/toolkit'
-import { projectApi } from './projectApi'
+```javascript [Redux Slice：状态管理]
+// 2. Redux Toolkit 数据处理
+import { createSlice } from '@reduxjs/toolkit'
 
-export const store = configureStore({
-  reducer: {
-    [projectApi.reducerPath]: projectApi.reducer  // 添加 API reducer
+const dataSlice = createSlice({
+  name: 'data',
+  initialState: {
+    items: {},      // 正式数据
+    optimistic: {}  // 乐观更新的临时数据
   },
-  middleware: (getDefault) => getDefault().concat(projectApi.middleware)  // 添加 API 中间件（处理缓存、自动刷新等）
+  reducers: {
+    // 乐观更新：先存到临时区
+    optimisticUpdate: (state, action) => {
+      const { id, data } = action.payload
+      state.optimistic[id] = { ...state.items[id], ...data }
+    },
+    // 提交成功：临时数据转正
+    updateSuccess: (state, action) => {
+      const { id, data } = action.payload
+      state.items[id] = data
+      delete state.optimistic[id]
+    },
+    // 回滚：清除临时数据
+    rollback: (state, action) => {
+      const { id } = action.payload
+      delete state.optimistic[id]
+    },
+    // 获取最新数据
+    refetchSuccess: (state, action) => {
+      const { id, data } = action.payload
+      state.items[id] = data
+      delete state.optimistic[id]
+    }
+  }
 })
+
+// 选择器：优先返回乐观更新数据（让用户看到自己刚做的修改）
+export const selectDataWithOptimism = (state, id) => {
+  return state.data.optimistic[id] || state.data.items[id]
+}
 ```
 
-```javascript
-// 3. 在组件中使用 - 一行代码搞定数据获取
-function ProjectList() {
-  // data: 返回的数据, isLoading: 加载状态, error: 错误信息, refetch: 手动刷新
-  const { data: projects, isLoading, error, refetch } = useGetProjectsQuery({ page: 1 })
+```javascript [后端：版本号冲突检测]
+// 3. 后端版本号冲突检测逻辑（Node.js示例）
+async function updateData(req, res) {
+  const { id, ...data } = req.body
+  const { version } = req.body
 
-  if (isLoading) return <div>加载中...</div>
-  if (error) return <div>加载失败，<button onClick={refetch}>点击重试</button></div>
+  // 查询数据库中的最新数据
+  const currentData = await db.findById(id)
+
+  // 核心逻辑：对比版本号
+  if (currentData.version !== version) {
+    // 版本冲突：返回409状态码
+    return res.status(409).json({
+      error: '数据冲突',
+      message: '数据已被他人修改，请刷新后重试',
+      latestData: currentData // 返回最新数据供前端使用
+    })
+  }
+
+  // 版本一致：更新数据并递增版本号
+  const updatedData = await db.update(id, {
+    ...data,
+    version: currentData.version + 1  // 版本号+1
+  })
+
+  return res.json(updatedData)
+}
+```
+
+```javascript [组件使用示例]
+// 4. 在任务编辑组件中使用
+function TaskEditForm({ taskId }) {
+  // 获取数据（优先取乐观更新数据）
+  const task = useSelector(state => selectDataWithOptimism(state, taskId))
+  const { updateWithOptimism } = useOptimisticUpdate()
+
+  const handleSave = async (values) => {
+    await updateWithOptimism(taskId, values)
+    // 用户点击保存后，界面立即更新（乐观更新）
+    // 如果有冲突，会自动提示并处理
+  }
 
   return (
-    <div>
-      {projects?.map(project => (
-        <ProjectCard key={project.id} data={project} />
-      ))}
-    </div>
+    <Form initialValues={task} onFinish={handleSave}>
+      <Form.Item name="title" label="任务标题">
+        <Input />
+      </Form.Item>
+      <Form.Item name="status" label="任务状态">
+        <Select>...</Select>
+      </Form.Item>
+      <Button type="primary" htmlType="submit">保存</Button>
+    </Form>
   )
 }
 ```
 
-**核心优势**：
-- **无需写 useEffect**：RTK Query 自动处理数据获取
-- **自动缓存**：相同参数的请求不会重复发送
-- **自动刷新**：组件卸载后重新挂载，自动判断是否需要更新数据
-- **自动生成 Hook**：通过 API 定义自动生成对应的 React Hook
+:::
+
+**方案优势**：
+- **体验好**：用户操作后界面立即响应，无需等待网络请求
+- **实现简单**：比WebSocket实时同步方案简单，适合中小项目
+- **数据安全**：版本号机制确保不会静默覆盖他人修改
 
 ---
 

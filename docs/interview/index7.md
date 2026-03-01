@@ -12,61 +12,130 @@ outline: [1,3]
 [[toc]]
 ## 🚀 一、面试实战
 
-### 1、前端性能优化
+### 1、前端性能优化的方法
 
-#### **🎯 核心思路**
-减少请求、加快加载、优化渲染
+**1. 加载优化**：使用HTTP缓存减少重复请求，CDN加速就近访问，Gzip压缩减少资源大小。
 
-#### **📦 资源加载优化**
+**2. 资源优化**：Tree Shaking移除未使用代码，路由懒加载减少首屏资源，图片使用WebP格式并懒加载。
 
-| 优化点 | 具体措施 |
-|--------|----------|
-| **减少HTTP请求** | 合并CSS/JS文件、使用雪碧图/Icon字体 |
-| **压缩资源** | Gzip压缩、代码压缩（Terser）、图片压缩（WebP） |
-| **CDN加速** | 静态资源使用CDN分发 |
-| **懒加载** | 图片懒加载（loading="lazy"）、路由懒加载 |
+**3. 渲染优化**：批量操作DOM减少重排重绘，使用虚拟DOM和CSS硬件加速提升渲染性能。
 
-#### **⚡ 渲染性能优化**
+**4. 运行优化**：搜索框用防抖，滚动用节流，列表用事件委托，计算结果用缓存。
 
-- **减少DOM操作**：使用文档片段、虚拟列表
-- **防抖节流**：滚动、resize事件使用防抖/节流
-- **避免重排重绘**：批量修改样式、使用CSS transform
+在项目中，通过图片优化和代码分割，把首屏加载时间从3秒降到了1.5秒。"
 
-#### **🚀 Vue/React首屏优化**
+### 2、AI 工具在工作中的使用
 
-```javascript
-// Vue 路由懒加载
-const Home = () => import('@/views/Home.vue')
-const routes = [
-  { path: '/', component: Home }
-]
+::: info 🤖 AI 辅助开发
+AI 工具已成为前端开发的必备助手，合理使用可以显著提升开发效率，但不能完全替代人工思考和代码质量把控。
+:::
 
-// React 路由懒加载
-const Home = React.lazy(() => import('./Home'))
-<Route path="/" element={<Home />} />
-```
+#### **🎯 核心应用场景**
 
-**首屏专项优化：**
+| 场景 | AI 工具 | 优势 | 注意事项 |
+|------|---------|------|----------|
+| **代码生成** | Cursor/CodeBuddy | 快速生成样板代码 | 需人工审核和测试 |
+| **代码解释** | ChatGPT/Claude | 快速理解复杂逻辑 | 验证解释准确性 |
+| **Bug 修复** | AI 调试工具 | 定位和修复常见问题 | 深度问题需人工分析 |
+| **代码重构** | Cursor Refactor | 优化代码结构和质量 | 保持业务逻辑不变 |
+| **文档生成** | AI 文档工具 | 快速生成 API 文档 | 需人工补充细节 |
 
-| 优化方向 | 具体措施 | 效果 |
-|----------|----------|------|
-| **SSR服务端渲染** | Next.js/Nuxt.js[/nʌkst/]，减少白屏时间 | ⭐⭐⭐⭐⭐ |
-| **预加载关键资源** | `<link rel="preload">` 提前加载关键CSS/JS | ⭐⭐⭐⭐ |
-| **骨架屏** | 数据加载前显示占位结构，提升体验 | ⭐⭐⭐⭐ |
-| **代码分割** | 按路由/组件拆分，按需加载 | ⭐⭐⭐⭐⭐ |
-| **服务端生成** | SSG静态生成，SSR动态渲染 | ⭐⭐⭐⭐ |
+#### **⚡ AI 工具使用最佳实践**
 
-#### **🚀 SSR服务端渲染**
-```javascript
-// Next.js 示例
-export async function getServerSideProps(context) {
-  // 服务端获取数据
-  const data = await fetchData();
-  return {
-    props: { data }  // 页面直接渲染完整内容
-  };
-}
-```
+##### **✅ 推荐做法**
+
+1. **代码生成后必须审查**
+   ```javascript
+   // AI 生成的代码
+   const data = await fetch('/api/users').then(res => res.json());
+
+   // 人工审查后改进：添加错误处理
+   const data = await fetch('/api/users')
+     .then(res => {
+       if (!res.ok) throw new Error('请求失败');
+       return res.json();
+     })
+     .catch(err => {
+       console.error('获取用户列表失败:', err);
+       return [];
+     });
+   ```
+
+2. **提供清晰的上下文**
+   ```
+   ❌ 差的提示词：帮我写个函数
+   ✅ 好的提示词：帮我写一个函数，输入用户 ID 列表，异步获取每个用户的详细信息，
+     返回 Promise<User[]>，需要处理并发请求，最多同时 5 个请求
+   ```
+
+3. **保持代码风格一致**
+   ```javascript
+   // 统一使用项目现有的代码风格
+   const getUserById = async (id: number): Promise<User> => {
+     const response = await fetch(`/api/users/${id}`);
+     if (!response.ok) throw new Error('用户不存在');
+     return response.json();
+   };
+   ```
+
+---
+
+##### **❌ 避免陷阱**
+
+1. **盲目信任 AI 生成的代码**
+   ```javascript
+   // AI 可能生成不安全的代码
+   // ❌ 危险：直接拼接 SQL
+   const query = `SELECT * FROM users WHERE name = '${userName}'`;
+
+   // ✅ 安全：使用参数化查询
+   const query = 'SELECT * FROM users WHERE name = ?';
+   db.query(query, [userName]);
+   ```
+
+2. **忽略性能优化**
+   ```javascript
+   // ❌ 低效：循环中的异步请求
+   for (const id of userIds) {
+     const user = await getUserById(id);
+     users.push(user);
+   }
+
+   // ✅ 高效：并发请求
+   const users = await Promise.all(userIds.map(id => getUserById(id)));
+   ```
+
+3. **不进行测试**
+   ```javascript
+   // AI 生成代码后，必须编写测试用例
+   describe('getUserById', () => {
+     it('应该返回用户信息', async () => {
+       const user = await getUserById(1);
+       expect(user).toBeDefined();
+       expect(user.id).toBe(1);
+     });
+
+     it('应该处理用户不存在的情况', async () => {
+       await expect(getUserById(999)).rejects.toThrow('用户不存在');
+     });
+   });
+   ```
+
+---
+
+#### **📊 AI 工具效率提升数据**
+
+| 任务类型 | 传统时间 | AI 辅助时间 | 效率提升 |
+|----------|----------|-------------|----------|
+| 创建基础组件 | 30 分钟 | 5 分钟 | **6x** |
+| 编写工具函数 | 20 分钟 | 3 分钟 | **6.7x** |
+| 代码重构 | 1 小时 | 15 分钟 | **4x** |
+| Bug 定位 | 30 分钟 | 5 分钟 | **6x** |
+| 编写文档 | 45 分钟 | 10 分钟 | **4.5x** |
+
+::: tip 💡 记忆口诀
+**AI 工具是助手，生成代码要审查，效率提升很显著，质量把控不放松**
+:::
 
 ## ✍️ 二、手写代码
 
