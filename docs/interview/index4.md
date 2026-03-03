@@ -255,15 +255,112 @@ emit('update', value)
 - 小项目：创建一个响应式对象导出
 - 大项目：用Pinia（官方推荐）
 
-**📌 Vue2 组件通信方式补充**（了解即可）：
-- 父传子：`props`
-- 子传父：自定义事件（`this.$emit`）
-- 跨层级：`EventBus`（`new Vue()`）
-- 状态管理：Vuex（Vue2官方推荐）
+**💾 4. 本地存储通信**：
 
-::: warning ⚠️ 注意
-Vue2的写法已过时，面试简单了解即可，重点掌握Vue3新写法！
+> 💬 **要点**：利用浏览器的本地存储功能，实现跨页面、跨会话的数据共享
+
+**localStorage**：
+- **永久存储**，除非手动清除
+- 所有同源页面共享数据
+- 容量约5-10MB
+
+```javascript
+// 存储数据
+localStorage.setItem('userInfo', JSON.stringify({ name: '张三', age: 25 }))
+
+// 读取数据
+const user = JSON.parse(localStorage.getItem('userInfo'))
+
+// 删除数据
+localStorage.removeItem('userInfo')
+```
+
+
+**🛣️ 5. 路由传参**：
+
+> 💬 **要点**：通过URL参数在页面跳转时传递数据
+
+**query参数**（问号后）：
+```javascript
+// 传参
+router.push({ path: '/search', query: { q: 'vue', page: 1 } })
+
+// 获取
+import { useRoute } from 'vue-router'
+const route = useRoute()
+console.log(route.query.q) // 'vue'
+```
+
+**params参数**（路径中）：
+```javascript
+// 传参
+router.push({ name: 'User', params: { id: 123 } })
+
+// 获取
+console.log(route.params.id) // 123
+```
+
+**动态路由**：
+```javascript
+// 路由配置
+{ path: '/user/:id', component: User }
+
+// 跳转
+router.push('/user/123')
+
+// 获取
+console.log(route.params.id) // 123
+```
+
+::: tip 💬 **注意事项**
+- **params**刷新会丢失，需要配合路由配置使用
+- **query**刷新不丢失，适合公开参数
+- 敏感数据不要用路由传参（会暴露在URL中）
 :::
+
+**🔗 6. 其他通信方式**：
+
+**$refs/ref**：
+```javascript
+// 父组件
+<Child ref="childRef" />
+
+const childRef = ref(null)
+childRef.value.childMethod() // 直接调用子组件方法
+```
+
+**$parent/$root**：
+```javascript
+// 子组件访问父组件
+const parent = getCurrentInstance()?.parent
+parent?.exposed?.parentMethod()
+```
+
+**v-model**（双向绑定）：
+```javascript
+// 父组件
+<Child v-model:value="data" />
+
+// 子组件
+const props = defineProps(['value'])
+const emit = defineEmits(['update:value'])
+emit('update:value', newValue)
+```
+
+**$attrs**（透传属性）：
+```javascript
+// 自动透传未被props接收的属性到子组件
+<Child :title="标题" :description="描述" />
+// 如果Child只定义了title，description会透传下去
+```
+
+> 💡 **选择建议**：
+> - **简单父子** → props/emit
+> - **深层嵌套** → provide/inject
+> - **跨页面** → localStorage/sessionStorage
+> - **路由跳转** → query/params
+> - **全局状态** → Pinia
+
 
 ---
 
