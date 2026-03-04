@@ -1097,15 +1097,15 @@ class FileUploader {
 
   // 并发控制
   async concurrentUpload(chunks, limit) {
-    const queue = [...chunks]
-    const executing = new Set()
-    while (queue.length || executing.size) {
-      if (queue.length && executing.size < limit) {
-        const task = this.uploadChunk(queue.shift())
-        executing.add(task)
-        task.finally(() => executing.delete(task))
+    const queue = [...chunks] // 复制分片数组作为任务队列
+    const executing = new Set() // 存储正在执行的 Promise 任务
+    while (queue.length || executing.size) { // 队列或执行池不为空时继续循环
+      if (queue.length && executing.size < limit) { // 还有待处理任务且未达到并发限制
+        const task = this.uploadChunk(queue.shift()) // 从队列取出一个分片并开始上传
+        executing.add(task) // 添加到执行池
+        task.finally(() => executing.delete(task)) // 任务完成后从执行池移除
       }
-      await Promise.race(executing)
+      await Promise.race(executing) // 等待任意一个任务完成
     }
   }
 }

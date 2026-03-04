@@ -428,50 +428,35 @@ document.documentElement.style.fontSize = window.innerWidth / 750 + 'px';
 | **性能消耗** | 消耗很大，要尽量避免 | 消耗相对较小 |
 
 
-### 10、响应式设计实战技巧
+### 10、grid 网格布局
 
-**媒体查询基础**：
+**核心概念**：二维布局系统，可同时控制行和列
+
+**基本语法**：
 ```css
-/* 移动端优先 */
-body { font-size: 14px; }
-
-/* 平板 */
-@media (min-width: 768px) {
-    body { font-size: 16px; }
-}
-
-/* 桌面端 */
-@media (min-width: 1024px) {
-    body { font-size: 18px; }
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;  /* 三列等宽 */
+    grid-template-rows: 100px auto;     /* 两行 */
+    gap: 20px;                          /* 间距 */
 }
 ```
 
-**响应式单位选择**：
-- **rem**：字体、间距、padding等
-- **vw/vh**：视口相关，如大图、全屏组件
-- **%**：相对父元素，如容器宽度
-- **px**：边框、阴影等固定元素
+**常用属性**：
+- `grid-template-columns/rows`：定义行列（支持 `fr`、`repeat()`、`minmax()`）
+- `gap`：单元格间距
+- `grid-area`：指定单元格位置
+- `justify-content/align-content`：整体对齐
 
-**移动端适配方案**：
-```css
-/* 1. 设置viewport */
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+**优势**：
+- 比Flex更强大，适合复杂布局
+- 代码简洁，无需嵌套
+- 响应式友好
 
-/* 2. 使用rem + 媒体查询 */
-html {
-    font-size: 16px;
-}
-@media (max-width: 375px) {
-    html { font-size: 14px; }
-}
+**典型应用**：网页整体布局、图片网格、仪表盘
 
-/* 3. flexible.js方案（淘宝方案） */
-(function flexible(window, document) {
-    // 根据屏幕宽度设置根字体大小
-})();
-```
 
-**面试回答技巧**：重点说rem方案和媒体查询。
+
 
 ## 三、实战面试题
 
