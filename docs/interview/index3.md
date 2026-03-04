@@ -475,3 +475,115 @@ WebSocket是现在很火的实时通信技术！
 ::: tip 🎯 面试重点
 对比HTTP长轮询，说明WebSocket的优势在于真正的实时性。
 :::
+
+## 三、Node.js
+
+### 1、Node.js是什么？
+
+Node.js是一个基于Chrome V8引擎的JavaScript运行时环境，允许开发者使用JavaScript编写服务器端代码。它采用事件驱动、非阻塞I/O模型，使得构建高性能、可扩展的网络应用变得简单高效。
+
+**主要特点**：
+- **异步非阻塞**：高效的事件驱动架构，能够处理大量并发连接。
+- **跨平台**：支持Windows、macOS、Linux等操作系统。
+- **丰富的生态系统**：拥有庞大的npm包库，便于快速开发。
+
+**使用场景**：
+- 实时应用（聊天室、在线游戏）
+- 微服务架构
+- 数据处理和分析
+- 实时监控系统
+
+### 2、express 如何使用？
+**如何使用Express？**
+
+express是一个基于Node.js的Web框架，提供了强大的API和中间件功能，可以快速构建高性能的Web应用。
+
+**基本使用步骤**：
+
+1. **安装Express**：
+   ```bash
+   npm install express
+   ```
+
+2. **创建应用**：
+   ```javascript
+   const express = require('express');
+   const app = express();
+   const port = 3000;
+   ```
+
+3. **定义路由**：
+   ```javascript
+   app.get('/', (req, res) => {
+     res.send('Hello World!');
+   });
+   ```
+
+4. **启动服务器**：
+   ```javascript
+   app.listen(port, () => {
+     console.log(`App listening at http://localhost:${port}`);
+   });
+   ```
+
+**主要特性**：
+- **简洁的API**：提供了一系列简洁易用的方法来处理HTTP请求。
+- **中间件支持**：可以使用各种中间件来扩展功能，如解析JSON、处理静态文件等。
+- **路由灵活**：支持RESTful API设计，可以轻松定义URL路由。
+
+**使用场景**：
+- 构建Web应用
+- API服务
+- 实时应用（结合WebSocket）
+
+
+2. **创建基本应用**：
+   ```javascript
+   const express = require('express');
+   const app = express();
+   const port = 3000;
+
+   app.get('/', (req, res) => {
+     res.send('Hello World!');
+   });
+
+   app.listen(port, () => {
+     console.log(`App listening at http://localhost:${port}`);
+   });
+   ```
+
+3. **使用中间件**：
+   Express提供了许多内置中间件，如`express.json()`用于解析JSON请求体，`express.urlencoded()`用于解析URL编码的请求体。
+
+4. **路由配置**：
+   可以通过`app.get()`, `app.post()`, `app.put()`, `app.delete()`等方法配置不同HTTP方法的路由。
+
+5. **静态文件服务**：
+   使用`express.static`中间件可以方便地提供静态文件服务。
+   ```javascript
+   app.use(express.static('public'));
+   ```
+
+通过这些步骤，你可以快速搭建一个使用Express的Node.js Web应用。
+
+::: info 与 egg.js 的区别
+
+Express和egg.js都是流行的Node.js框架，但它们有一些关键区别：
+
+1. **简化 vs 结构化**：
+   - **Express**：提供了一个更轻量级和灵活的解决方案，适合小型项目和快速开发。
+   - **egg.js**：基于Koa构建，提供了更结构化的项目组织方式，适合大型企业级应用。
+
+2. **生态系统**：
+   - **Express**：拥有庞大的第三方中间件生态系统，可以满足各种需求。
+   - **egg.js**：虽然也有插件系统，但生态系统相对较小，更多聚焦于企业级应用。
+
+3. **配置方式**：
+   - **Express**：配置相对简单直接，通过链式调用和中间件来扩展功能。
+   - **egg.js**：采用更复杂的配置方式，通过配置文件和插件来管理应用。
+
+4. **社区支持**：
+   - **Express**：拥有悠久的历史和广泛的社区支持，文档丰富。
+   - **egg.js**：社区相对较新，但发展迅速，文档也在不断完善。
+
+选择哪个框架取决于项目的具体需求和团队的技术栈偏好。

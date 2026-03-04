@@ -131,7 +131,7 @@ export default withMermaid({
             { text: '小程序及大屏', link: '/interview/index5' },
             { text: 'React&Electron', link: '/interview/index6' },
             { text: '笔试实战', link: '/interview/index7' },
-            { text: '项目实现', link: '/interview/index8' },
+            { text: '面试实战', link: '/interview/index8' },
           ]
         },
         {

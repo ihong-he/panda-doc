@@ -573,95 +573,127 @@ Electron 是 GitHub 开源的**跨平台桌面应用开发框架**，使用 Java
 **🎯 代表应用：**
 - VS Code、Discord、Slack、Teams、Notion、Atom
 
-### 2、Electron的进程模型是怎样的？
+### 2、主进程和渲染是什么？他们之间是如何通信的？
 
-**🏗️ Electron进程模型：**
+**主进程**：Electron 应用的入口，运行在 Node.js 环境，负责创建和管理窗口、处理系统级操作（文件系统访问、原生菜单、托盘等）。每个应用只有一个主进程。
 
-Electron 采用**多进程架构**，主要包含两种进程类型：
+**渲染进程**：运行 Web 页面的进程，负责渲染 UI、执行 JavaScript、处理用户交互。每个窗口对应一个渲染进程，使用 Chromium 渲染引擎。
 
-**主进程（Main Process）**
-- 数量：1个（应用启动时创建）
-- 职责：创建和管理窗口、处理应用生命周期、访问 Node.js API、管理系统资源、处理原生菜单/托盘
-- 能力：完整的 Node.js API
+**通信方式**：
+- **IPC（进程间通信）**：主进程和渲染进程通过 `ipcMain` 和 `ipcRenderer` 模块通信
+- **渲染进程发送消息**：`ipcRenderer.send('channel', data)`
+- **主进程接收并回复**：`ipcMain.on('channel', (event, data) => { event.reply('reply', result) })`
+- **渲染进程接收回复**：`ipcRenderer.on('reply', (event, result) => {})`
 
-**渲染进程（Renderer Process）**
-- 数量：多个（每个 BrowserWindow 窗口一个）
-- 职责：渲染 Web 页面内容、运行 JavaScript 业务逻辑、处理用户交互
-- 能力：Chromium 沙箱环境，受限的 API 访问
-- 特性：一个窗口崩溃不影响其他窗口
+### 3、如何创建多窗口以及实现窗口间通信？
 
-**📊 主进程 vs 渲染进程对比：**
-
-| 维度 | 主进程 | 渲染进程 |
-|------|--------|----------|
-| **数量** | 单例（启动时创建） | 多个（每个窗口一个） |
-| **能力** | 完整 Node.js API | 受限（需要 preload 桥接） |
-| **职责** | 窗口管理、原生功能、IPC 通信 | UI 渲染、业务逻辑、交互 |
-| **通信** | `ipcMain` 监听消息 | `ipcRenderer` 发送消息 |
-| **环境** | Node.js 运行时 | Chromium 沙箱环境 |
-
-**🔑 核心区别总结：**
-
-1. **主进程是大脑**：负责全局控制、系统资源访问、窗口创建
-2. **渲染进程是视图**：只负责展示界面和用户交互，隔离在沙箱中
-3. **安全隔离**：渲染进程不能直接访问 Node.js，需通过 IPC 安全通信
-4. **多实例优势**：一个窗口崩溃不影响其他窗口，稳定性更好
-
-### 3、Electron常见问题及解决方案？
-
-::: danger 🐛 面试高频
-了解Electron常见问题及解决方案，体现实际项目经验！
-:::
-
-**❓ 常见问题清单：**
-
-| 问题 | 原因 | 解决方案 |
-|-----|------|---------|
-| **应用白屏** | 资源加载失败 | 检查文件路径、确认devtools报错 |
-| **热更新失效** | Vite配置问题 | 检查`base: './'`配置 |
-| **Node.js API不可用** | nodeIntegration: false | 使用preload + contextBridge |
-| **内存泄漏** | 事件监听未清理 | 组件销毁时移除监听器 |
-| **窗口闪烁** | 窗口初始化问题 | 使用`show: false`，加载完成后再显示 |
-| **打包体积过大** | 未开启Tree Shaking | 配置生产构建、排除依赖 |
-
-**✅ 解决方案示例：**
-
+**创建多窗口**：
 ```javascript
-// 问题1：窗口闪烁解决方案
-const win = new BrowserWindow({
-  show: false, // 先不显示窗口
-  width: 1200,
-  height: 800
-})
-
-// 等页面加载完成再显示
-win.once('ready-to-show', () => {
-  win.show()
-})
-
-// 问题2：内存泄漏解决方案
-import { onUnmounted } from 'vue'
-
-const cleanup = () => {
-  window.electronAPI.removeListener('update-data', handleUpdate)
+// 主进程中
+const { BrowserWindow } = require('electron')
+function createWindow() {
+  return new BrowserWindow({
+    width: 800, height: 600,
+    webPreferences: { nodeIntegration: true }
+  })
 }
+// 创建多个窗口
+const win1 = createWindow()
+const win2 = createWindow()
+```
 
-onUnmounted(cleanup)
+**窗口间通信方式**：
+1. **通过主进程中转**：窗口 A 发送消息到主进程，主进程转发给窗口 B
+2. **使用 WebContents**：直接通过 `win.webContents.send()` 向目标窗口发送消息
+3. **LocalStorage/SessionStorage**：共享存储实现状态同步
+4. **BroadcastChannel API**：现代浏览器支持的跨窗口通信机制
 
-// 问题3：热更新失效解决方案
-// vite.config.js
-export default defineConfig({
-  base: './', // 重要：使用相对路径
-  server: {
-    port: 5173,
-    strictPort: true
-  }
+### 4、electron 应用的性能如何优化？
+
+**加载优化**：
+- 使用 `preload.js` 预加载脚本，减少 IPC 通信开销
+- 开启代码分割和懒加载，按需加载资源
+- 使用 `nodeIntegration: false` + `contextBridge` 隔离环境，提升安全性
+
+**渲染优化**：
+- 禁用不必要的 Chromium 功能（如 GPU 加速、动画）
+- 减少 DOM 节点数量，避免频繁重排重绘
+- 使用虚拟列表处理大数据量渲染
+- 启用 V8 快照和代码缓存
+
+**内存优化**：
+- 及时释放不用的窗口和资源
+- 避免在渲染进程中加载大型依赖库
+- 使用 `webContents` 的 `session` 缓存管理
+
+**构建优化**：
+- 使用 `electron-builder` 打包时启用压缩
+- 启用 ASAR 归档格式，减少文件数量
+
+### 5、如何解决electron在Windows 和 macOS的兼容性问题？
+
+> 以窗口管理、权限申请及 UI 适配为例
+
+**窗口管理**：
+- **窗口按钮**：macOS 窗口控制按钮在左侧，Windows 在右侧，需要使用 CSS 区分样式并动态调整位置
+- **原生菜单**：Windows 使用顶部菜单栏，macOS 使用系统菜单栏，通过 `Menu.setApplicationMenu()` 配置
+- **窗口状态**：macOS 支持全屏模式，Windows 需要手动处理；使用 `process.platform` 判断并设置不同参数
+```javascript
+const platform = process.platform
+new BrowserWindow({
+  frame: platform === 'darwin', // macOS 隐藏原生标题栏
+  titleBarStyle: platform === 'darwin' ? 'hiddenInset' : 'default'
 })
 ```
 
-::: tip 💬 面试技巧
-回答问题时，结合具体项目场景描述问题及其解决过程，更能体现实战经验！
-:::
+**权限申请**：
+- **macOS**：需要访问麦克风、摄像头等权限时，必须在 `Info.plist` 中声明权限描述，否则会崩溃
+- **Windows**：某些操作需要管理员权限，使用 `electron-sudo` 或通过安装程序提升权限
+- **文件访问**：macOS 沙盒环境下需要明确声明访问路径，Windows 相对宽松但仍需注意 UAC（用户账户控制）
+
+**UI 适配**：
+- **字体渲染**：Windows 使用 ClearType，macOS 使用次像素渲染，字体大小和行高需单独调整
+- **滚动条**：macOS 默认隐藏滚动条，Windows 始终显示，使用 CSS 自定义滚动条样式统一
+- **托盘图标**：Windows 需要 `.ico` 格式，macOS 需要 `.png` 模板格式（会自动适配系统深浅色主题）
+```javascript
+tray.setImage(path.join(__dirname, platform === 'win32' ? 'icon.ico' : 'icon.png'))
+```
+- **快捷键**：Windows 使用 `Ctrl`，macOS 使用 `Cmd`，通过 `CmdOrCtrl` 统一处理
+
+### 6、如何实现应用自动更新？
+
+**使用 electron-updater 实现自动更新**：
+
+1. **服务端准备**：搭建更新服务器（如 GitHub Releases、私有服务器），存储版本信息 `latest.yml` 和安装包。
+
+2. **配置打包工具**：在 `electron-builder` 中配置发布地址：
+```javascript
+"publish": {
+  "provider": "github",
+  "owner": "your-username",
+  "repo": "your-repo"
+}
+```
+
+3. **客户端实现**：
+```javascript
+import { autoUpdater } from 'electron-updater'
+
+// 检查更新
+autoUpdater.checkForUpdatesAndNotify()
+
+// 监听更新事件
+autoUpdater.on('update-available', () => {
+  // 提示用户有新版本
+})
+autoUpdater.on('update-downloaded', () => {
+  // 下载完成，询问用户是否重启安装
+  autoUpdater.quitAndInstall()
+})
+```
+
+4. **自定义更新流程**：提供"立即检查"、"后台下载"、"延迟更新"等选项，优化用户体验。
+
 
 ## 三、鸿蒙APP开发
 
@@ -746,8 +778,6 @@ ArkTS = TypeScript + ArkUI声明式语法 + 鸿蒙状态管理装饰器 + 方舟
 :::
 
 ---
-
-
 
 ### 2、ArkUI 中的常用的组件有哪些？
 
