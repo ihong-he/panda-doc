@@ -200,6 +200,82 @@ ESLint 和 Prettier 都负责代码格式化，规则不一致时会相互覆盖
 | 内存泄漏 | 及时解绑事件、清除定时器、断开引用 |
 | 同步阻塞 | 使用 Web Worker、requestIdleCallback |
 
+### 6、type 和 interface 的区别？
+
+**声明方式：**
+
+- `type` 可以定义任意类型：
+  - 别名：给类型起个名字，如 `type ID = string | number`
+  - 联合类型：多个类型任选其一，如 `type Status = 'loading' | 'success' | 'error'`
+  - 元组：固定长度和类型的数组，如 `type Point = [number, number]`
+  - 基本类型：如 `type Str = string`
+- `interface` 只能定义对象类型
+
+**合并能力：**
+
+- `interface` 会自动合并：同名接口会自动合并成一个
+- `type` 不会合并：同名类型会报错
+
+```typescript
+// interface 可以合并
+interface User {
+  name: string;
+}
+interface User {
+  age: number;
+}
+// 最终：{ name: string; age: number; }
+
+// type 不可以合并，会报错
+```
+
+**扩展方式：**
+
+- `interface` 使用 `extends` 继承
+- `type` 使用交叉类型 `&` 或 extends
+
+**适用场景：**
+
+- **interface**：定义对象、类、组件 props，需要合并的场景
+- **type**：联合类型、元组、函数类型、映射类型
+
+**实际开发建议：**
+
+- 定义对象优先用 `interface`
+- 定义联合类型、元组等用 `type`
+- React 组件 props 用 `interface`（方便扩展）
+
+### 7、webpack 或者 vite 有哪些优化手段？
+
+**构建速度优化：**
+
+- 开启缓存：webpack 使用 `cache`，vite 默认基于 esbuild，已经很快
+- 缩小构建范围：使用 `include/exclude` 排除不需要处理的文件
+- 多线程打包：`thread-loader` 或 `parallel-webpack`
+- 使用更快的工具：vite 的 esbuild 比 webpack 快 10-100 倍
+
+**打包体积优化：**
+
+- 代码分割：`SplitChunks` 提取公共代码，按路由懒加载
+- Tree Shaking：删除未使用的代码
+- 压缩代码：`TerserPlugin` 或 `esbuild` 压缩
+- Gzip 压缩：服务器开启 gzip
+
+**加载性能优化：**
+
+- CDN 加速：第三方库用 CDN
+- 图片优化：压缩、webp 格式、懒加载
+- 预加载：`<link rel="preload">` 提前加载关键资源
+- HTTP/2：利用多路复用
+
+**Vite 特有优势：**
+
+- 开发服务器使用 esbuild，启动秒开
+- HMR 基于原生 ESM，更新速度极快
+- 按需编译，不打包整个应用
+
+**实际效果：** 首屏加载时间减少 30%-50%，构建速度提升 2-5 倍。
+
 
 ## 其它面试题
 
