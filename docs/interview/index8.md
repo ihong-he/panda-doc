@@ -24,20 +24,32 @@ outline: [1,3]
 
 **核心代码：**
 ```js
-const rowHeights = ref({}); // 缓存每行高度
+// 缓存每行的实际高度，key 为行索引，value 为高度值
+// 例如：{ 0: 60, 1: 120, 2: 80 }
+const rowHeights = ref({});
+
+// 预估的默认行高，用于行未渲染时的位置估算
 const estimatedRowHeight = 50;
 
+// 计算指定行的垂直偏移量（距离容器顶部的距离）
+// 例如：计算第 5 行的偏移量 = 第 0-4 行的高度之和
 const getRowOffset = (index) => {
   let offset = 0;
   for (let i = 0; i < index; i++) {
+    // 如果该行已缓存真实高度则使用，否则使用预估高度
     offset += rowHeights.value[i] || estimatedRowHeight;
   }
   return offset;
 };
 
+// 行高度更新后的回调函数
+// @param index - 行索引
+// @param height - 该行的真实高度
 const handleRowResize = (index, height) => {
+  // 更新该行的高度缓存
   rowHeights.value[index] = height;
-  // 触发重新计算和更新视图
+  // 触发虚拟列表重新计算位置和更新视图
+  // 例如：调用 updateVisibleRows() 重新渲染可见区域
 };
 ```
 
