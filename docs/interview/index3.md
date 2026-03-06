@@ -162,7 +162,7 @@ const obj = {
 
 
 
-### 4、Promise 和 async/await（异步编程必考）
+### 🔥 4、Promise 和 async/await（异步编程必考）
 
 ::: danger 🔥 必考内容
 异步编程是现代前端开发的核心，Promise + async/await是必备技能！
@@ -245,7 +245,7 @@ const utils = require('./utils'); // ❓ 运行时确定
 
 ## 二、网络请求（前端必知必会）
 
-### 1、HTTP VS HTTPS（基本概念题）
+### 🔥 1、HTTP VS HTTPS（基本概念题）
 
 ::: tip 📚 基础概念
 这个现在算是送分题，但一定要答对！
@@ -366,7 +366,7 @@ https://www.example.com:8080/api/user?id=123#profile
 "协议域名端口，路径参数锚点"
 :::
 
-### 5、跨域解决方案（必考实战题）
+### 🔥 5、跨域解决方案（必考实战题）
 
 ::: info ❓ 什么是跨域？
 浏览器出于安全考虑，不允许不同源（协议、域名、端口不同）的页面之间互相访问。
@@ -440,7 +440,7 @@ https://www.example.com:8080/api/user?id=123#profile
 可以提一下HTTP缓存、CDN、浏览器的重排重绘优化等。
 :::
 
-### 7、WebSocket理解（实时通信）
+### 🔥 7、WebSocket理解（实时通信）
 
 ::: tip 🚀 现代技术
 WebSocket是现在很火的实时通信技术！

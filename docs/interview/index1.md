@@ -14,7 +14,7 @@ outline: deep
 
 ## 一、HTML基础
 
-### 1、DOCTYPE是什么？为什么必须要有？
+### 1、DOCTYPE是什么？
 
 > 💡 **简单来说**，DOCTYPE是告诉浏览器是哪个版本的HTML来写这个网页的声明。它必须放在HTML文档的最顶部，在`<html>`标签之前。
 
@@ -27,7 +27,7 @@ outline: deep
 没有DOCTYPE，浏览器可能用老版本的标准解析页面，导致样式错乱、布局问题，这是前端开发的基础常识。
 :::
 
-### 2、什么是HTML语义化？为什么重要？
+### 2、什么是HTML语义化？
 
 > 📝 **定义**：语义化就是根据内容的含义选择合适的HTML标签，而不是只考虑外观效果。
 
@@ -45,7 +45,7 @@ outline: deep
 强调语义化是现代Web开发的基础，体现了开发者的专业素养。
 :::
 
-### 3、浏览器渲染页面的过程是什么？
+### 🔥 3、浏览器渲染页面的过程是什么？
 
 ::: danger 🔥 高频考点
 这是一个高频面试题，考察对浏览器工作原理的理解。
@@ -118,7 +118,7 @@ HTML5带来了革命性变化，这些是面试官最喜欢问的：
 HTML5让Web应用变得更强大，减少了对第三方插件的依赖。
 :::
 
-### 6、存储方案对比：Cookie vs LocalStorage vs SessionStorage
+### 6、Cookie vs LocalStorage vs SessionStorage
 
 > 📊 **重要对比表格**，面试时直接说：
 
@@ -141,7 +141,9 @@ HTML5让Web应用变得更强大，减少了对第三方插件的依赖。
 
 ## 二、CSS核心知识
 
-### 1、CSS选择器优先级
+### 1、CSS3有哪些新特性？
+
+### 2、CSS选择器优先级
 
 ::: warning 📚 必背知识点
 CSS选择器优先级，这个必须背下来！
@@ -169,37 +171,12 @@ CSS选择器优先级，这个必须背下来！
 #nav { color: red; } /* 🔴 红色会胜出 */
 ```
 
-### 2、哪些CSS属性可以继承？
 
-**✅ 可继承的主要属性**（记住这些常用的）：
-
-**🔤 字体相关**：
-- `font-family`、`font-size`、`font-weight`、`font-style`
-- `color`、`line-height`、`letter-spacing`、`text-align`
-
-**🔧 其他**：
-- `visibility`、`cursor`、`list-style`
-
-**❌ 不可继承的常见属性**：
-- 📦 盒模型相关：`width`、`height`、`margin`、`padding`、`border`
-- 🎨 背景相关：`background`、`background-color`
-- 📍 定位相关：`position`、`top`、`left`、`right`、`bottom`
-- 👁️ 显示相关：`display`、`overflow`
-
-::: tip 💡 面试技巧
-可以强制继承用`inherit`值，但要注意性能影响。
-:::
-
-### 3、盒模型是什么？box-sizing怎么用？
+### 3、CSS3盒模型是什么？box-sizing怎么用？
 
 > 📦 **盒模型就是网页元素的"包装盒"**，每个元素都是一个矩形盒子，从外到内包含：
 
 **外边距（Margin）** → **边框（Border）** → **内边距（Padding）** → **内容区（Content）**
-
-1. **📝 内容区（Content）**：实际内容所在
-2. **📏 内边距（Padding）**：内容到边框的距离
-3. **🖼️ 边框（Border）**：元素的边框线
-4. **↔️ 外边距（Margin）**：元素与其他元素的距离
 
 **⚖️ 两种盒模型标准**：
 
@@ -221,45 +198,64 @@ CSS选择器优先级，这个必须背下来！
 
 > ✅ **为什么推荐border-box**：计算更直观，不会因为加了padding和border而意外撑大容器。
 
-### 4、CSS3有哪些新特性
+### 🔥 4、CSS中的定位及作用
 
-::: danger 🔥 高频考点
-CSS3带来了革命性变化，按类别记忆更清晰!
+::: danger 🎯 必考题目
+定位是 CSS 中控制元素位置的一种方式，通过 position 属性实现。
 :::
 
-**🎭 选择器增强**：
-- **属性选择器** `[type="text"]`、`a[href^="https"]` - 根据属性值选择
-- **结构伪类** `:first-child`、`:nth-child(2n)` - 按位置选择元素
-- **状态伪类** `:hover`、`:focus`、`:checked`、`:disabled` - 交互状态
+**static（默认定位）**
+- 按文档流正常排列
+- 无法使用 `top/left/right/bottom` 调整位置
 
-**📱 布局增强**：
-- **Flexbox弹性布局** - 一维布局，主轴/交叉轴对齐，`justify-content`/`align-items`
-- **Grid网格布局** - 二维布局，行列控制，`grid-template-columns`/`grid-template-areas`
+**relative（相对定位）**
+- 相对于自身原始位置偏移
+- 不影响其他元素布局
+- 常用场景：绝对定位的父容器
 
-**🎨 视觉特效类**：
-- **圆角边框** `border-radius` - 告别图片切角，支持圆形
-- **盒阴影** `box-shadow` - 卡片阴影效果，参数:水平/垂直偏移 模糊半径 颜色
-- **渐变** `linear-gradient`/`radial-gradient` - 背景渐变，不再依赖图片
+**absolute（绝对定位）**
+- 相对于最近的有定位（非static）的祖先元素定位
+- 脱离文档流，不占空间
+- 常用场景：弹窗、下拉菜单、悬浮按钮
 
-**🔄 变换与过渡类**：
-- **2D/3D变换** `transform` - 旋转/缩放/平移/倾斜，用transform做动画性能更好
-- **过渡** `transition` - 属性平滑过渡，语法:`property duration timing-function`
-- **关键帧动画** `@keyframes` - 复杂动画序列，支持多阶段状态
+**fixed（固定定位）**
+- 相对于浏览器窗口定位
+- 滚动时位置固定
+- 常用场景：导航栏、回到顶部按钮
 
-**🌈 其他实用特性**：
-- **媒体查询** `@media` - 响应式设计基础
-- **滤镜** `filter` - 模糊/灰度/亮度调整
-- **RGBA/HSLA颜色** - 支持透明度
-- **视口单位** `vw`/`vh` - 相对视口尺寸
+**sticky（粘性定位）**
+- 在指定范围内表现为 relative，超出范围变为 fixed
+- 常用场景：吸顶导航栏、表格表头
+
+### 🔥 5、Grid 网格布局
+
+**核心概念**：二维布局系统，可同时控制行和列
+
+**基本语法**：
+```css
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;  /* 三列等宽 */
+    grid-template-rows: 100px auto;     /* 两行 */
+    gap: 20px;                          /* 间距 */
+}
+```
+
+**常用属性**：
+- `grid-template-columns/rows`：定义行列（支持 `fr`、`repeat()`、`minmax()`）
+- `gap`：单元格间距
+- `grid-area`：指定单元格位置
+- `justify-content/align-content`：整体对齐
+
+**优势**：
+- 比Flex更强大，适合复杂布局
+- 代码简洁，无需嵌套
+- 响应式友好
+
+**典型应用**：网页整体布局、图片网格、仪表盘
 
 
-::: tip 💡 面试回答技巧
-按类别回答：选择器增强 + 布局(flex/grid) + 视觉特效(圆角/阴影/渐变) + 动画过渡(transform/transition/@keyframes)，这样层次清晰，容易记忆。
-:::
-
-
-
-### 5、px、em、rem有什么区别？怎么选？
+### 6、px、em、rem有什么区别？
 
 | 单位 | 📏 px（像素） | 📐 em | 🌍 rem（root em） |
 |------|-------------|-------|------------------|
@@ -295,7 +291,7 @@ html {
 
 **面试回答技巧**：推荐使用rem配合媒体查询做响应式，px用于固定尺寸，em慎用。
 
-### 6、元素水平垂直居中的N种方法
+### 7、元素水平垂直居中的N种方法
 
 ::: danger 🎯 面试必考题
 这是面试必考题，建议掌握前3种：
@@ -340,7 +336,7 @@ html {
 优先说Flexbox，次选Grid，最后提transform作为兼容方案。
 :::
 
-### 7、BFC到底是什么？什么时候用？
+### 8、BFC到底是什么？什么时候用？
 
 > 🌍  **BFC（Block Formatting Context，块级格式化上下文）** 是Web页面中一个独立的渲染区域，拥有独立的布局规则：
 
@@ -370,53 +366,7 @@ graph LR
 BFC主要用于解决布局问题，现在有了Flexbox和Grid，BFC用的相对少了，但理解它对调试布局bug很有帮助。
 :::
 
-### 8、移动端1px边框问题怎么解决？
 
-> ❓ **问题原因**：现在的手机屏幕像素密度很高（比如Retina屏），CSS的1px在手机上实际占用了好几个物理像素，所以看起来会变粗。
-
-**🛠️ 常见解决方案**：
-
-**1. 🎯 使用transform缩放（推荐）**：
-
-核心思路：通过伪元素创建边框，用`transform: scaleY(0.5)`将边框缩小一半。
-
-```css
-.border-1px {
-    position: relative;
-}
-.border-1px::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 1px;
-    background: #ddd;
-    transform: scaleY(0.5); /* 在2倍屏上将1px缩小为0.5px，实际渲染为1物理像素 */
-    transform-origin: 0 0;
-}
-```
-
-**2. 📱 使用viewport + rem**：
-
-- 设置`viewport`的`initial-scale`为0.5，将页面整体缩小一半
-- 所有尺寸按2倍设计稿开发，用rem单位适配不同屏幕
-::: code-group
-```html [HTML]
-<!-- HTML中设置viewport -->
-<meta name="viewport" content="width=device-width, initial-scale=0.5, 
-    maximum-scale=0.5, user-scalable=no">
-```
-```javascript [JS]
-// JS中动态设置rem基准值（以375px设计稿为例）
-document.documentElement.style.fontSize = window.innerWidth / 750 + 'px';
-// 使用时：1px = 0.01rem
-```
-:::
-
-::: tip 💬 面试回答重点
-说明问题产生的原因，提出1-2种具体解决方案。
-:::
 
 ### 9、重绘和重排的区别？
 
@@ -428,42 +378,10 @@ document.documentElement.style.fontSize = window.innerWidth / 750 + 'px';
 | **性能消耗** | 消耗很大，要尽量避免 | 消耗相对较小 |
 
 
-### 10、grid 网格布局
-
-**核心概念**：二维布局系统，可同时控制行和列
-
-**基本语法**：
-```css
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;  /* 三列等宽 */
-    grid-template-rows: 100px auto;     /* 两行 */
-    gap: 20px;                          /* 间距 */
-}
-```
-
-**常用属性**：
-- `grid-template-columns/rows`：定义行列（支持 `fr`、`repeat()`、`minmax()`）
-- `gap`：单元格间距
-- `grid-area`：指定单元格位置
-- `justify-content/align-content`：整体对齐
-
-**优势**：
-- 比Flex更强大，适合复杂布局
-- 代码简洁，无需嵌套
-- 响应式友好
-
-**典型应用**：网页整体布局、图片网格、仪表盘
-
-
-
-
-## 三、实战面试题
-
-### 1、如何实现一个三栏布局？
+### 11、如何实现一个三栏布局？
 
 ::: danger 🎯 必考题目
-面试时至少要会2种方法
+三栏布局是网页经典布局，左右固定、中间自适应，现代开发优先用 Flexbox 或 Grid
 :::
 
 **1. 🌟 Flexbox方案（最推荐）**：
@@ -497,31 +415,22 @@ document.documentElement.style.fontSize = window.innerWidth / 750 + 'px';
 - 利用负margin和relative定位
 
 
-### 2、暗黑模式实现方案
+### 12、CSS预处理器是什么？
 
-**🌙 CSS变量 + 媒体查询**：
-```css
-:root {
-    --bg-color: #fff;
-    --text-color: #333;
-}
+> 💡 **简单来说**，CSS预处理器就是用编程的方式写样式，最后编译成浏览器能识别的CSS代码。
 
-/* 检测系统是否处于深色模式（dark mode），如果是则应用以下样式 */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #1a1a1a;
-        --text-color: #fff;
-    }
-}
+**🎯 常见工具**：
+- Sass/SCSS（最流行）
+- Less
+- Stylus
 
-body {
-    background: var(--bg-color);
-    color: var(--text-color);
-    transition: background 0.3s, color 0.3s;
-}
-```
+**✨ 主要作用**：
+1. **变量**：定义颜色、字体等，一处修改全局生效
+2. **嵌套**：子样式写父样式内部，结构更清晰
+3. **混合（Mixin）**：封装常用样式，按需复用
+4. **函数和运算**：支持数学计算
+5. **模块化**：拆分文件，便于维护
+
+**💼 面试回答**：CSS本身很死板，预处理器让CSS有了编程能力，开发效率更高，代码更易维护。
 
 
-::: tip 🎉 总结
-HTML&CSS面试的核心是基础扎实 + 实战经验 + 性能意识。重点掌握布局、性能优化、现代CSS特性，就能从容应对大部分面试！
-:::

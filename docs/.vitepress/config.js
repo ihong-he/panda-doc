@@ -130,8 +130,8 @@ export default withMermaid({
             { text: 'Vue', link: '/interview/index4' },
             { text: '小程序及大屏', link: '/interview/index5' },
             { text: 'React&Electron', link: '/interview/index6' },
-            { text: '笔试实战', link: '/interview/index7' },
             { text: '面试实战', link: '/interview/index8' },
+            { text: '手写代码', link: '/interview/index7' },
           ]
         },
         {

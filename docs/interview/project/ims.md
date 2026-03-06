@@ -11,10 +11,10 @@ outline: [1, 3]
 ::: tip 项目规模
 
 - **开发周期**：12个月
-- **团队规模**：5人（前端2人，后端3人）
+- **团队规模**：5人（前端2人，后端2人）
 - **代码量**：前端约20万行代码
 - **用户规模**：支持100+用户同时在线使用
-  :::
+:::
 
 ## 一、项目技术
 
@@ -67,13 +67,14 @@ outline: [1, 3]
 
 ## 三、项目难点
 
-### （一）细粒度权限管理系统
+### 1. 细粒度权限管理系统
 
 **问题描述**：企业级应用需要复杂的权限控制，包括菜单权限、按钮操作权限、字段权限多维度权限管理。
 
 该项目采用 **RBAC（Role-Based Access Control）** 模型，实现机制如下：
 
-**权限数据结构设计**
+<details>
+<summary>权限数据结构设计</summary>
 
 ```json
 menus: [
@@ -91,6 +92,7 @@ menus: [
   ...
 ]
 ```
+</details>
 
 **菜单权限控制**
 
@@ -106,210 +108,65 @@ menus: [
 **核心原理**：
 
 1. **权限获取**：用户登录后，后端返回的菜单数据中包含每个页面拥有的按钮权限列表（如 `["Search", "Edit", "Delete"]`）
-2. **权限对比**：在页面中，通过自定义指令`v-permission`或函数检查当前按钮的权限标识是否在权限列表中
-3. **UI控制**：无权限时自动隐藏按钮，避免用户误操作
+2. **权限对比**：在页面中，通过自定义指令`v-permission`检查当前按钮的权限标识是否在权限列表中
+3. **UI控制**：有权限时加载按钮，无权限时自动隐藏按钮
 4. **双重验证**：前端隐藏按钮 + 后端再次校验，确保安全性
 
 **代码实现**：
 
 ::: code-group
 
-```js [1. 创建权限检查函数 - src/utils/permission.js]
+```js [1. 自定义指令 - src/directives/permission.js]
 import { useUserStore } from '@/stores/user'
 
-/**
- * 检查用户是否拥有指定权限
- * @param {string} permission - 权限标识，如 'Edit'、'Delete'
- * @returns {boolean} - 是否有权限
- */
-export function hasPermission(permission) {
-  const userStore = useUserStore()
-  const currentRouteName = userStore.currentRoute?.name
-  if (!currentRouteName) return false
-
-  // 从菜单数据中找到当前页面的权限列表
-  const currentMenu = userStore.menus.find(
-    menu => menu.url === `/${currentRouteName}` || menu.name === currentRouteName
-  )
-
-  if (!currentMenu || !currentMenu.permission) return false
-
-  // 检查权限是否在列表中
-  return currentMenu.permission.includes(permission)
-}
-```
-
-```js [2. 创建自定义指令 - src/directives/permission.js]
-import { hasPermission } from '@/utils/permission'
-
-/**
- * v-permission 指令使用示例：
- * <el-button v-permission="'Edit'">编辑</el-button>
- * <el-button v-permission="['Edit', 'Delete']">删除</el-button>
- */
 export default {
   mounted(el, binding) {
-    const { value } = binding
-    let hasAuth = false
-
-    // 支持单个权限字符串或权限数组
-    if (Array.isArray(value)) {
-      // 数组：只要有其中一个权限即可
-      hasAuth = value.some(permission => hasPermission(permission))
-    } else {
-      // 字符串：必须有该权限
-      hasAuth = hasPermission(value)
-    }
-
-    // 无权限时移除元素
-    if (!hasAuth) {
-      el.parentNode?.removeChild(el)
-    }
-  },
-
-  // 权限变化时重新检查（如切换用户、刷新权限）
-  updated(el, binding) {
-    const { value } = binding
-    let hasAuth = false
-
-    if (Array.isArray(value)) {
-      hasAuth = value.some(permission => hasPermission(permission))
-    } else {
-      hasAuth = hasPermission(value)
-    }
-
-    if (!hasAuth && el.parentNode) {
-      el.parentNode.removeChild(el)
+    const userStore = useUserStore()
+    const requiredPermission = binding.value  // 如 'Delete'
+    
+    // 获取当前用户的所有按钮权限
+    const permissions = userStore.permissions || []
+    
+    // 没有权限或不在权限列表中，则隐藏元素
+    if (!permissions.includes(requiredPermission)) {
+      el.parentNode && el.parentNode.removeChild(el)
     }
   }
 }
 ```
 
-```js [3. 全局注册指令 - src/main.js]
-import { createApp } from 'vue'
+```js [2. 注册指令 - main.js]
 import permission from '@/directives/permission'
 
-const app = createApp(App)
-
-// 注册全局权限指令
 app.directive('permission', permission)
-
-app.mount('#app')
 ```
 
-```vue [4. 在页面中使用 - src/views/user/index.vue]
+```vue [3. 页面使用 - UserList.vue]
 <template>
-  <div class="user-list">
-    <!-- 页面操作按钮 -->
-    <el-button
-      type="primary"
-      v-permission="'Add'"
-      @click="handleAdd"
-    >
-      新增用户
-    </el-button>
-
-    <el-button
-      v-permission="'Export'"
-      @click="handleExport"
-    >
-      导出数据
-    </el-button>
-
-    <!-- 表格行内操作按钮 -->
-    <el-table :data="userList">
-      <el-table-column label="用户名" prop="username" />
-      <el-table-column label="操作" width="200">
-        <template #default="{ row }">
-          <el-button
-            link
-            type="primary"
-            v-permission="'Edit'"
-            @click="handleEdit(row)"
-          >
-            编辑
-          </el-button>
-
-          <el-button
-            link
-            type="danger"
-            v-permission="'Delete'"
-            @click="handleDelete(row)"
-          >
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+  <!-- 使用 v-permission 指令 -->
+  <el-button v-permission="'Search'">查询</el-button>
+  <el-button v-permission="'Add'">新增</el-button>
+  <el-button v-permission="'Edit'">编辑</el-button>
+  <el-button v-permission="'Delete'">删除</el-button>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-
-const userList = ref([])
-
-// 这些函数会在有权限时才能触发
-const handleAdd = () => {
-  ElMessage.success('打开新增弹窗')
-}
-
-const handleEdit = (row) => {
-  ElMessage.success(`编辑用户：${row.username}`)
-}
-
-const handleDelete = (row) => {
-  ElMessage.warning(`删除用户：${row.username}`)
-}
-
-const handleExport = () => {
-  ElMessage.success('导出数据中...')
-}
-</script>
 ```
 
-```vue [5. 函数式使用（不推荐用于隐藏，用于逻辑判断）]
-<template>
-  <div>
-    <!-- 使用函数判断权限 -->
-    <el-button
-      v-if="hasPermission('Edit')"
-      @click="handleEdit"
-    >
-      编辑
-    </el-button>
+```js [4. 权限存储 - stores/user.js]
+import { defineStore } from 'pinia'
 
-    <!-- 组合多个权限判断 -->
-    <el-button
-      v-if="hasPermission('Edit') || hasPermission('Audit')"
-      @click="handleAudit"
-    >
-      审核通过
-    </el-button>
-  </div>
-</template>
-
-<script setup>
-import { hasPermission } from '@/utils/permission'
-
-const handleEdit = () => {
-  // 编辑逻辑
-}
-
-const handleAudit = () => {
-  // 审核逻辑
-}
-</script>
+export const useUserStore = defineStore('user', {
+  state: () => ({
+    permissions: []  // 当前用户拥有的按钮权限
+  }),
+  actions: {
+    setPermissions(permissions) {
+      this.permissions = permissions
+    }
+  }
+})
 ```
+
 :::
-
-**实现要点**：
-
-- **指令优先**：推荐使用 `v-permission` 指令，代码简洁且自动处理移除逻辑
-- **后端兜底**：前端隐藏按钮只是视觉优化，后端必须再次校验权限，防止恶意请求
-- **权限设计**：权限标识要清晰易懂，如 `Add`、`Edit`、`Delete`、`Export`、`Audit` 等
-- **性能考虑**：权限检查基于内存中的数据，无需额外请求，性能影响极小
 
 **字段权限控制**
 
@@ -323,420 +180,66 @@ const handleAudit = () => {
 
 ::: code-group
 
-```js [1. 字段权限工具 - src/utils/fieldPermission.js]
-import { useUserStore } from '@/stores/user'
-
-// 字段权限类型
-export const FIELD_PERMISSION = {
-  VISIBLE: 'visible',    // 可见
-  HIDDEN: 'hidden',      // 隐藏
-  READONLY: 'readonly'   // 只读
-}
-
-/**
- * 获取当前用户对指定表的字段权限配置
- * @param {string} tableName - 表名
- * @returns {Object} 字段权限映射 { fieldName: 'visible' | 'hidden' | 'readonly' }
- */
-export const getFieldPermissions = (tableName) => {
-  const userStore = useUserStore()
-  const roleCode = userStore.userInfo?.roleCode
-  
-  // 从权限配置中获取该角色对该表的字段权限
-  const fieldPermissions = userStore.permissionConfig?.[roleCode]?.[tableName]?.fields || {}
-  
-  return fieldPermissions
-}
-
-/**
- * 检查字段是否可见
- * @param {string} tableName - 表名
- * @param {string} fieldName - 字段名
- * @returns {boolean}
- */
-export const isFieldVisible = (tableName, fieldName) => {
-  const permissions = getFieldPermissions(tableName)
-  const permission = permissions[fieldName]
-  
-  // 未配置默认可见
-  if (!permission) return true
-  
-  return permission !== FIELD_PERMISSION.HIDDEN
-}
-
-/**
- * 检查字段是否只读
- * @param {string} tableName - 表名
- * @param {string} fieldName - 字段名
- * @returns {boolean}
- */
-export const isFieldReadonly = (tableName, fieldName) => {
-  const permissions = getFieldPermissions(tableName)
-  return permissions[fieldName] === FIELD_PERMISSION.READONLY
-}
-
-/**
- * 根据权限过滤表格列配置
- * @param {string} tableName - 表名
- * @param {Array} columns - 原始列配置
- * @returns {Array} 过滤后的列配置
- */
-export const filterColumnsByPermission = (tableName, columns) => {
-  return columns.filter(column => {
-    // 没有配置字段名的列默认显示（如操作列）
-    if (!column.prop) return true
-    
-    return isFieldVisible(tableName, column.prop)
-  })
-}
-
-/**
- * 根据权限过滤表单字段配置
- * @param {string} tableName - 表名
- * @param {Array} fields - 原始字段配置
- * @returns {Array} 过滤并处理后的字段配置
- */
-export const filterFormFieldsByPermission = (tableName, fields) => {
-  return fields
-    .filter(field => isFieldVisible(tableName, field.prop))
-    .map(field => ({
-      ...field,
-      disabled: field.disabled || isFieldReadonly(tableName, field.prop)
-    }))
-}
-```
-
-```vue [2. 动态表格列 - src/components/PermissionTable.vue]
+```vue
 <template>
-  <el-table
-    :data="tableData"
-    v-loading="loading"
-    border
-    stripe
-  >
-    <!-- 动态渲染列 -->
-    <el-table-column
-      v-for="column in visibleColumns"
-      :key="column.prop"
-      :prop="column.prop"
-      :label="column.label"
-      :width="column.width"
-      :min-width="column.minWidth"
-      :align="column.align || 'left'"
-      :fixed="column.fixed"
-      :sortable="column.sortable"
-    >
-      <template #default="{ row }" v-if="column.slot">
-        <slot :name="column.slot" :row="row" :column="column">
-          {{ row[column.prop] }}
-        </slot>
-      </template>
-    </el-table-column>
-
-    <!-- 操作列始终显示 -->
-    <el-table-column label="操作" width="150" fixed="right">
-      <template #default="{ row }">
-        <slot name="operation" :row="row" />
-      </template>
-    </el-table-column>
+  <el-table :data="tableData">
+    <!-- 使用 v-if 根据权限控制列的显示 -->
+    <el-table-column v-if="hasFieldPermission('name')" prop="name" label="姓名" />
+    <el-table-column v-if="hasFieldPermission('phone')" prop="phone" label="电话" />
+    <el-table-column v-if="hasFieldPermission('email')" prop="email" label="邮箱" />
+    <el-table-column v-if="hasFieldPermission('salary')" prop="salary" label="薪资" />
   </el-table>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { filterColumnsByPermission } from '@/utils/fieldPermission'
+import { ref, onMounted } from 'vue'
+import { getUserFieldPermissions } from '@/api/permission'
 
-const props = defineProps({
-  tableName: {
-    type: String,
-    required: true
-  },
-  columns: {
-    type: Array,
-    required: true
-  },
-  tableData: {
-    type: Array,
-    default: () => []
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  }
-})
+// 字段权限配置
+const fieldPermissions = ref({})
 
-// 根据权限过滤列
-const visibleColumns = computed(() => {
-  return filterColumnsByPermission(props.tableName, props.columns)
+// 检查用户是否有某个字段的权限
+const hasFieldPermission = (fieldName) => {
+  const permission = fieldPermissions.value[fieldName]
+  // 如果没有配置权限，默认有权限；有配置则按配置来
+  return permission === undefined || permission?.visible !== false
+}
+
+// 获取当前用户的字段权限
+const fetchFieldPermissions = async () => {
+  const res = await getUserFieldPermissions()
+  // 转换为 { fieldName: { visible: true/false, readonly: true/false } }
+  fieldPermissions.value = res.data
+}
+
+onMounted(() => {
+  fetchFieldPermissions()
 })
 </script>
 ```
 
-```vue [3. 动态表单字段 - src/components/PermissionForm.vue]
-<template>
-  <el-form
-    ref="formRef"
-    :model="formData"
-    :rules="formRules"
-    :label-width="labelWidth"
-  >
-    <el-row :gutter="20">
-      <el-col
-        v-for="field in visibleFields"
-        :key="field.prop"
-        :span="field.span || 12"
-      >
-        <el-form-item
-          :label="field.label"
-          :prop="field.prop"
-        >
-          <!-- 输入框 -->
-          <el-input
-            v-if="field.type === 'input'"
-            v-model="formData[field.prop]"
-            :placeholder="field.placeholder"
-            :disabled="field.disabled"
-            clearable
-          />
-          
-          <!-- 选择器 -->
-          <el-select
-            v-else-if="field.type === 'select'"
-            v-model="formData[field.prop]"
-            :placeholder="field.placeholder"
-            :disabled="field.disabled"
-            clearable
-            style="width: 100%"
-          >
-            <el-option
-              v-for="option in field.options"
-              :key="option.value"
-              :label="option.label"
-              :value="option.value"
-            />
-          </el-select>
-          
-          <!-- 日期选择器 -->
-          <el-date-picker
-            v-else-if="field.type === 'date'"
-            v-model="formData[field.prop]"
-            :type="field.dateType || 'date'"
-            :placeholder="field.placeholder"
-            :disabled="field.disabled"
-            style="width: 100%"
-          />
-          
-          <!-- 数字输入框 -->
-          <el-input-number
-            v-else-if="field.type === 'number'"
-            v-model="formData[field.prop]"
-            :min="field.min"
-            :max="field.max"
-            :disabled="field.disabled"
-            style="width: 100%"
-          />
-        </el-form-item>
-      </el-col>
-    </el-row>
-  </el-form>
-</template>
-
-<script setup>
-import { ref, computed, watch } from 'vue'
-import { filterFormFieldsByPermission } from '@/utils/fieldPermission'
-
-const props = defineProps({
-  tableName: {
-    type: String,
-    required: true
-  },
-  fields: {
-    type: Array,
-    required: true
-  },
-  modelValue: {
-    type: Object,
-    default: () => ({})
-  },
-  labelWidth: {
-    type: String,
-    default: '100px'
-  }
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const formRef = ref(null)
-const formData = ref({ ...props.modelValue })
-
-// 根据权限过滤字段并处理只读状态
-const visibleFields = computed(() => {
-  return filterFormFieldsByPermission(props.tableName, props.fields)
-})
-
-// 根据可见字段生成校验规则
-const formRules = computed(() => {
-  const rules = {}
-  props.fields.forEach(field => {
-    if (field.rules && isFieldVisible(props.tableName, field.prop)) {
-      rules[field.prop] = field.rules
-    }
+```js
+// api/permission.js - 接口示例
+export const getUserFieldPermissions = () => {
+  return axios.get('/api/field-permissions', {
+    params: { tableName: 'user' }
   })
-  return rules
-})
+}
 
-// 同步表单数据
-watch(formData, (val) => {
-  emit('update:modelValue', val)
-}, { deep: true })
-
-watch(() => props.modelValue, (val) => {
-  formData.value = { ...val }
-}, { deep: true })
-
-// 暴露验证方法
-defineExpose({
-  validate: () => formRef.value?.validate(),
-  resetFields: () => formRef.value?.resetFields()
-})
-</script>
+// 返回数据示例
+// {
+//   "name": { "visible": true, "readonly": false },
+//   "phone": { "visible": true, "readonly": false },
+//   "email": { "visible": false, "readonly": false },  // 普通用户不可见
+//   "salary": { "visible": false, "readonly": false }  // 普通用户不可见
+// }
 ```
 
-```vue [4. 页面使用示例 - src/views/material/index.vue]
-<template>
-  <div class="material-page">
-    <!-- 搜索区域 -->
-    <el-card class="search-card">
-      <el-form :inline="true" :model="searchForm">
-        <el-form-item label="物料编码">
-          <el-input v-model="searchForm.code" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
-    <!-- 表格区域 -->
-    <el-card class="table-card">
-      <PermissionTable
-        table-name="material"
-        :columns="tableColumns"
-        :table-data="tableData"
-        :loading="loading"
-      >
-        <template #status="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-            {{ row.status === 1 ? '启用' : '禁用' }}
-          </el-tag>
-        </template>
-
-        <template #operation="{ row }">
-          <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
-          <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
-        </template>
-      </PermissionTable>
-    </el-card>
-
-    <!-- 编辑弹窗 -->
-    <el-dialog
-      v-model="dialogVisible"
-      title="编辑物料"
-      width="600px"
-    >
-      <PermissionForm
-        ref="formRef"
-        table-name="material"
-        :fields="formFields"
-        v-model="formData"
-      />
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">确定</el-button>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
-<script setup>
-import { ref, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
-import PermissionTable from '@/components/PermissionTable.vue'
-import PermissionForm from '@/components/PermissionForm.vue'
-
-// 表格列配置（完整配置，组件会根据权限自动过滤）
-const tableColumns = [
-  { prop: 'code', label: '物料编码', width: 150, fixed: 'left' },
-  { prop: 'name', label: '物料名称', minWidth: 200 },
-  { prop: 'spec', label: '规格型号', width: 150 },
-  { prop: 'unit', label: '单位', width: 80, align: 'center' },
-  { prop: 'price', label: '单价', width: 100, align: 'right' },
-  { prop: 'stock', label: '库存', width: 100, align: 'right' },
-  { prop: 'supplier', label: '供应商', minWidth: 150 },
-  { prop: 'status', label: '状态', width: 100, align: 'center', slot: 'status' },
-  { prop: 'createTime', label: '创建时间', width: 180 }
-]
-
-// 表单字段配置
-const formFields = [
-  { prop: 'code', label: '物料编码', type: 'input', span: 12 },
-  { prop: 'name', label: '物料名称', type: 'input', span: 12 },
-  { prop: 'spec', label: '规格型号', type: 'input', span: 12 },
-  { prop: 'unit', label: '单位', type: 'select', span: 12, options: [] },
-  { prop: 'price', label: '单价', type: 'number', span: 12, min: 0 },
-  { prop: 'stock', label: '库存', type: 'number', span: 12, min: 0 },
-  { prop: 'supplier', label: '供应商', type: 'select', span: 24, options: [] }
-]
-
-const loading = ref(false)
-const tableData = ref([])
-const dialogVisible = ref(false)
-const formRef = ref(null)
-
-const searchForm = reactive({
-  code: ''
-})
-
-const formData = ref({})
-
-// 不同角色看到不同的列：
-// - 普通用户：code, name, spec, unit, status
-// - 采购员：code, name, spec, unit, price, supplier, status
-// - 管理员：全部字段
-
-const handleSearch = () => {
-  // 查询逻辑
-}
-
-const handleReset = () => {
-  searchForm.code = ''
-}
-
-const handleEdit = (row) => {
-  formData.value = { ...row }
-  dialogVisible.value = true
-}
-
-const handleDelete = (row) => {
-  // 删除逻辑
-}
-
-const handleSubmit = async () => {
-  const valid = await formRef.value?.validate()
-  if (valid) {
-    // 提交逻辑
-    ElMessage.success('保存成功')
-    dialogVisible.value = false
-  }
-}
-</script>
-```
 :::
 
 **效果**：支持10+角色类型，100+权限点，权限验证响应时间<10ms。
 
-### （二）大数据量表格渲染卡顿
+### 2. 大数据量表格渲染卡顿
 
 **问题描述**：BOM树数据量可能达到数万条记录，传统表格渲染会导致页面严重卡顿，甚至浏览器崩溃。
 
@@ -745,130 +248,6 @@ const handleSubmit = async () => {
 - 采用`el-table-v2`虚拟化表格组件，只渲染可视区域内的DOM元素
 - 添加`loading`状态和骨架屏，提升用户体验
 
-**代码实现**：
-
-::: code-group
-
-```vue
-<template>
-  <div class="bom-table-container">
-    <!-- 虚拟表格组件 -->
-    <el-table-v2
-      :columns="columns"
-      :data="tableData"
-      :width="tableWidth"
-      :height="tableHeight"
-      :row-height="rowHeight"
-      :estimated-row-height="estimatedRowHeight"
-      fixed
-      :fixed-columns="fixedColumns"
-      :scrollbar-always-on="true"
-    >
-      <!-- 自定义单元格渲染 -->
-      <template #default="{ rowData, columnIndex }">
-        <slot name="cell" :row="rowData" :column="columns[columnIndex]">
-          {{ rowData[columns[columnIndex].key] }}
-        </slot>
-      </template>
-    </el-table-v2>
-
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading-mask">
-      <el-skeleton :rows="10" animated />
-    </div>
-
-    <!-- 数据统计 -->
-    <div class="table-footer">
-      <span>共 {{ total }} 条数据</span>
-    </div>
-  </div>
-</template>
-```
-
-```js
-<script setup>
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { getBOMList } from '@/api/bom'
-
-// 响应式数据
-const tableData = ref([])        // 表格数据源（可能上万条）
-const loading = ref(true)        // 加载状态
-const total = ref(0)             // 总数据量
-
-// 表格配置
-const tableWidth = ref(1200)     // 表格宽度
-const tableHeight = ref(600)     // 表格高度
-const rowHeight = 50             // 固定行高
-const estimatedRowHeight = 50    // 预估行高（用于动态高度场景）
-
-// 列配置
-const columns = ref([
-  { key: 'code', title: '物料编码', width: 150, fixed: 'left' },
-  { key: 'name', title: '物料名称', width: 200 },
-  { key: 'version', title: '版本', width: 100, align: 'center' },
-  { key: 'quantity', title: '数量', width: 100, align: 'right' },
-  { key: 'unit', title: '单位', width: 80, align: 'center' }
-])
-
-const fixedColumns = ref(1)      // 左侧固定列数
-
-/**
- * 加载BOM数据
- * 虚拟滚动允许一次性加载所有数据，但只渲染可视区域
- */
-const loadBOMData = async () => {
-  loading.value = true
-  try {
-    const { data } = await getBOMList()
-    tableData.value = data.list || []   // 可能上万条数据
-    total.value = data.total || 0
-  } catch (error) {
-    ElMessage.error('数据加载失败')
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  loadBOMData()
-})
-</script>
-```
-
-```css
-<style scoped>
-.bom-table-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.loading-mask {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.table-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background: #fff;
-  border-top: 1px solid #ebeef5;
-}
-</style>
-```
-:::
 
 **实现原理**
 
@@ -945,7 +324,7 @@ const handleScroll = (e) => {
 
 **效果**：支持10万+数据流畅渲染，首次加载时间从8秒优化至1.5秒。
 
-### （三）图纸大文件上传
+### 3. 图纸大文件上传
 
 **问题描述**：工程图纸文件通常较大（100MB-2GB），传统上传方式容易出现超时、失败等问题，网络中断需要重新上传。
 
@@ -1116,7 +495,7 @@ class FileUploader {
 
 **效果**：支持2GB+文件上传，上传成功率提升至98%，网络中断后可续传。
 
-### （四）图纸大文件预览
+### 4. 图纸大文件预览
 
 **问题描述**：工程图纸格式多样（DWG、DXF、PDF等），需要实现在线预览功能，且要考虑大文件的预览性能。
 
@@ -1262,7 +641,7 @@ export default {
 
 此方案已在生产环境稳定运行，单文件支持 500MB+ 的 Office 文档预览，响应时间在 3-5 秒（取决于文件大小和服务器性能）。
 
-### （五）工序及工艺流程可视化
+### 5. 工序及工艺流程可视化
 
 **问题描述**：生产工艺流程复杂，工艺流程由工序组成，需要可视化编辑和管理。支持工序节点拖拽、连线、属性配置等操作。
 
@@ -1788,56 +1167,3 @@ document.addEventListener('keydown', (e) => {
 :::
 
 **效果**：支持50+工序节点的复杂流程设计，操作响应时间<100ms。
-
-## 四、项目介绍
-
-我负责的是**博欣信息管理系统（ERP系统）**的前端开发，这是一个面向制造研发类企业的企业级管理系统。
-
-### 项目背景
-
-这家企业在日常工作中存在很多痛点：进销存、产品物料、生产制造等各个环节分散管理，信息不流通，效率低下。我们的目标就是把这些环节整合到一个系统中，让企业从客户下单到产品交付的全流程都能在线管理，实现数字化转型。
-
-### 我做了什么
-
-在整个项目中，我主要负责**前端开发**，具体做了以下几方面工作：
-
-**1. 核心业务模块开发**
-
-我实现了进销存、BOM物料管理、生产制造等核心模块。比如BOM系统，它要处理复杂的产品物料清单，支持多层级展开，这是制造企业最核心的功能之一。
-
-**2. 权限管理系统**
-
-这是企业系统最关键的部分。我设计了一套细粒度的权限控制，包括：
-- **菜单权限**：不同角色看到的菜单不同
-- **按钮权限**：比如普通员工只有"查看"按钮，管理员才有"删除"按钮
-- **字段权限**：不同岗位的人看到的表格列也不一样
-
-我用RBAC（基于角色的访问控制）模型来实现这些，支持10多种角色类型，100多个权限点。
-
-**3. 性能优化**
-
-在开发过程中遇到了一些性能问题，比如BOM树的数据量可能达到几万条，用传统表格渲染会卡死浏览器。我用了**虚拟滚动**技术，只渲染屏幕上可见的行，这样即使10万条数据也能流畅滚动，加载时间从8秒优化到1.5秒。
-
-**4. 大文件处理**
-
-工程图纸文件都很大，从100MB到2GB不等。我实现了**分片上传 + 断点续传 + 秒传**：把大文件切成小片上传，支持断网后继续上传，如果服务器已经存过相同文件就秒传。这样上传成功率提升到98%。
-
-对于图纸预览，我集成了kkFileView，在服务端把文件转换成HTML，前端用iframe嵌入，这样浏览器不用处理大文件，预览很流畅。
-
-**5. 移动端开发**
-
-用UniApp做了移动端，一套代码适配iOS、Android和H5，让员工在手机上也能处理工作。
-
-### 技术栈
-
-- **PC端**：Vue3 + Vite + Pinia + Element Plus + TypeScript
-- **移动端**：UniApp + Vue3
-- **可视化**：ECharts图表 + LogicFlow流程图
-
-### 项目收获
-
-这个项目让我深入理解了企业级应用的开发，特别是权限管理、性能优化、大文件处理这些核心技术。也学会了如何在团队中协作，如何和后端配合设计接口。
-
-
-
-

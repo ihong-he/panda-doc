@@ -2,8 +2,6 @@
 outline: deep
 ---
 
-# JavaScript 基础核心
-
 ::: tip 📚 JavaScript 学习指南
 本文档涵盖JavaScript的核心概念，从基础数据类型到高级特性，帮助你掌握面试必备知识点！
 :::
@@ -188,19 +186,6 @@ array.splice(start, deleteCount, item1, item2, ...)
 1. slice和substring的区别？
    - slice支持负数索引，substring负数当0处理
    - slice可以反着写slice(-3)，substring不行
-
-2. replace和replaceAll的区别？
-   - replace只替换第一个，replaceAll替换所有
-   - replace可以用正则/g实现替换所有
-:::
-
-**实用技巧：**
-- 字符串反转：str.split('').reverse().join('')
-- 重复字符串：str.repeat(n)
-- 字符串补齐：padStart/padEnd（ES6）
-
-::: tip 💡 记住
-现代项目更多使用includes、startsWith、endsWith这些ES6方法！
 :::
 
 ### 7、闭包函数
@@ -524,72 +509,42 @@ console.log(result === 0.3) // true
 - 用误差范围或转整数的方式解决
 - 涉及金钱计算要特别注意！
 
-### 13、TypeScript vs JavaScript 区别
+### 🔥 13、TypeScript 是什么？
 
-::: danger 🔥 面试必问
-TS vs JS 是前端面试常问问题，核心区别要记住！
-:::
+**TypeScript** 是 JavaScript 的超集，由微软开发维护。它在 JavaScript 的基础上添加了**类型系统**和**面向对象特性**。
 
-**一句话概括：**
-TypeScript = JavaScript + 类型系统 + 编译时检查
+**核心特点：**
 
-**核心区别：**
+- **静态类型检查**：编译时就能发现类型错误，提高代码质量
+- **强大的类型系统**：支持接口、泛型、联合类型、交叉类型等
+- **面向对象**：支持类、模块、装饰器等 OOP 特性
+- **兼容 JavaScript**：所有 JS 代码都是有效的 TS 代码
 
-| 区别维度 | JavaScript | TypeScript |
-|---------|-----------|------------|
-| **类型** | 动态类型，变量类型可以随时改变 | 静态类型，变量类型声明后不能改变 |
-| **错误发现时机** | 运行时才发现错误 | 编译时就发现错误 |
-| **代码执行** | 直接解释执行 | 需要编译成JS再执行 |
-| **语法特性** | 只有ES规范特性 | ES特性 + 接口、泛型、枚举等高级特性 |
-| **代码提示** | 有限的智能提示 | 完整的类型推断和提示 |
-| **适用场景** | 小型项目、快速开发 | 大型项目、团队协作 |
+**为什么使用 TypeScript？**
 
-**最关键的三个区别：**
+- 减少运行时错误，提升代码可靠性
+- 提供更好的 IDE 智能提示和代码补全
+- 大型项目维护更轻松，代码更易读
+- 社区生态丰富，主流框架都支持
 
-**1. 类型检查时机不同**
-```javascript
-// JavaScript - 运行时才发现错误
-function add(a, b) {
-    return a + b
-}
-add('hello', 123) // 不会报错，但可能产生意外结果
+**记忆要点：**
 
-// TypeScript - 编译时就发现错误
-function add(a: number, b: number): number {
-    return a + b
-}
-add('hello', 123) // ❌ 编译时报错：类型不匹配
-```
+- TS = JS + 类型系统 + 面向对象
+- 最终编译为纯 JS，可在任何浏览器/Node.js 环境运行
+- 类型系统是核心优势，编译时检查是灵魂
 
-**2. 开发体验不同**
-- JS：写完代码运行才知道对不对
-- TS：写代码时就有提示，还没运行就知道哪错了
 
-**3. 适用场景不同**
-- JS：适合小项目、原型开发、学习阶段
-- TS：适合大项目、团队协作、生产环境
 
-**什么时候用TS？**
-✅ 团队协作，多人维护代码
-✅ 项目规模大，逻辑复杂
-✅ 需要长期维护的项目
 
-**什么时候用JS？**
-✅ 小型项目，快速开发
-✅ 学习阶段，理解基础
-✅ 原型验证，快速迭代
 
-::: tip 🧠 面试回答模板
-"TypeScript是JavaScript的超集，主要区别在于TS有静态类型系统和编译时类型检查。JS适合小型快速开发，TS适合大型团队项目。我在实际项目中使用TS，减少了大部分运行时错误。"
-:::
-
-### 14、事件循环 Event Loop
+### 🔥 14、事件循环 Event Loop
 
 ::: danger 🔥 核心机制必考
 事件循环是JS的核心机制，面试必问，一定要搞懂：
 :::
 
 **为什么需要事件循环？**
+
 JS是单线程的，为了不阻塞主线程，用异步处理耗时操作
 
 **执行顺序（重点）：**
@@ -609,22 +564,6 @@ JS是单线程的，为了不阻塞主线程，用异步处理耗时操作
 - UI渲染
 - requestAnimationFrame
 
-**经典面试题：**
-```javascript
-setTimeout(() => console.log('timeout'), 0)
-Promise.resolve().then(() => console.log('promise'))
-console.log('start')
-// 输出：start → promise → timeout
-```
-
-**执行过程：**
-1. 先执行同步：console.log('start')
-2. 检查微任务队列：执行promise的then
-3. 检查宏任务队列：执行setTimeout
-
-**浏览器 vs Node.js：**
-- 浏览器：多个宏任务队列，按时间排序
-- Node.js：分阶段处理，Timer、Poll、Check等阶段
 
 ::: tip 🧠 记忆口诀
 同步先执行，微任务紧跟着，宏任务最后来，一轮一轮转！
