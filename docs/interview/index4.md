@@ -34,8 +34,8 @@ outline: [1,3]
 :::
 
 **⚡ 响应式原理**（必考点）：
-- **Vue2**用`Object.defineProperty`，只能监听已有属性，新增属性要`Vue.set`
-- **Vue3**用`Proxy`，能监听整个对象，新增属性自动响应式
+- **Vue2**用`Object.defineProperty`，无法监听新增属性和数组索引变化，需用`this.$set`或变异方法
+- **Vue3**用`Proxy`，能监听对象/数组新增属性、索引变化，自动响应式
 
 **✨ 写法变化**：
 - **Vue2**主要是选项式API（data、methods分开写）

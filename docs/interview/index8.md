@@ -24,33 +24,84 @@ outline: [1,3]
 
 **核心代码：**
 ```js
-// 缓存每行的实际高度，key 为行索引，value 为高度值
-// 例如：{ 0: 60, 1: 120, 2: 80 }
-const rowHeights = ref({});
+// 1. 初始化配置
+const estimatedRowHeight = 50;  // 每行预估高度
+const rowCache = new Map();     // 缓存每行的实际高度
 
-// 预估的默认行高，用于行未渲染时的位置估算
-const estimatedRowHeight = 50;
-
-// 计算指定行的垂直偏移量（距离容器顶部的距离）
-// 例如：计算第 5 行的偏移量 = 第 0-4 行的高度之和
-const getRowOffset = (index) => {
+// 2. 计算某个位置的累计高度（用于定位）
+function getOffsetBefore(index) {
   let offset = 0;
   for (let i = 0; i < index; i++) {
-    // 如果该行已缓存真实高度则使用，否则使用预估高度
-    offset += rowHeights.value[i] || estimatedRowHeight;
+    offset += rowCache.get(i) || estimatedRowHeight;
   }
   return offset;
-};
+}
 
-// 行高度更新后的回调函数
-// @param index - 行索引
-// @param height - 该行的真实高度
-const handleRowResize = (index, height) => {
-  // 更新该行的高度缓存
-  rowHeights.value[index] = height;
-  // 触发虚拟列表重新计算位置和更新视图
-  // 例如：调用 updateVisibleRows() 重新渲染可见区域
-};
+// 3. 计算总高度
+function getTotalHeight() {
+  let height = 0;
+  for (let i = 0; i < totalRows; i++) {
+    height += rowCache.get(i) || estimatedRowHeight;
+  }
+  return height;
+}
+
+// 4. 根据滚动位置计算可见范围
+function getVisibleRange(scrollTop, containerHeight) {
+  let offset = 0;
+  let startIndex = 0;
+  
+  // 找到开始位置
+  for (let i = 0; i < totalRows; i++) {
+    const rowHeight = rowCache.get(i) || estimatedRowHeight;
+    if (offset + rowHeight > scrollTop) {
+      startIndex = i;
+      break;
+    }
+    offset += rowHeight;
+  }
+  
+  // 计算结束位置
+  let endIndex = startIndex;
+  let currentOffset = offset;
+  while (currentOffset < scrollTop + containerHeight && endIndex < totalRows) {
+    currentOffset += rowCache.get(endIndex) || estimatedRowHeight;
+    endIndex++;
+  }
+  
+  return { startIndex, endIndex };
+}
+
+// 5. 行渲染后测量真实高度
+function onRowRender(index, element) {
+  const realHeight = element.offsetHeight;
+  if (rowCache.get(index) !== realHeight) {
+    rowCache.set(index, realHeight);
+    // 触发重新计算和渲染
+    updateList();
+  }
+}
+
+// 6. 渲染函数
+function renderList(scrollTop, containerHeight) {
+  const { startIndex, endIndex } = getVisibleRange(scrollTop, containerHeight);
+  const offsetY = getOffsetBefore(startIndex);
+  
+  return (
+    <div style={{ height: getTotalHeight() }}>
+      <div style={{ transform: `translateY(${offsetY}px)` }}>
+        {rows.slice(startIndex, endIndex).map(row => (
+          <div 
+            key={row.id} 
+            ref={(el) => onRowRender(row.index, el)}
+          >
+            {row.content}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 ```
 
 ---
@@ -245,38 +296,86 @@ interface User {
 - 定义联合类型、元组等用 `type`
 - React 组件 props 用 `interface`（方便扩展）
 
-### 7、webpack 或者 vite 有哪些优化手段？
+### 7、在项目中你会使用webpack 或者 vite进行哪些配置？
 
-**构建速度优化：**
+**常用配置项：**
 
-- 开启缓存：webpack 使用 `cache`，vite 默认基于 esbuild，已经很快
-- 缩小构建范围：使用 `include/exclude` 排除不需要处理的文件
-- 多线程打包：`thread-loader` 或 `parallel-webpack`
-- 使用更快的工具：vite 的 esbuild 比 webpack 快 10-100 倍
+**1. 入口和出口配置**
+- 配置入口文件路径（多页面项目配置多个入口）
+- 配置输出文件名、路径、CDN 前缀
 
-**打包体积优化：**
+**2. 开发服务器配置**
+- 配置端口、代理接口解决跨域
+- 热更新（HMR）配置
+- 开启 gzip 压缩
 
-- 代码分割：`SplitChunks` 提取公共代码，按路由懒加载
+**3. 路径别名**
+```js
+// 简化导入路径
+import { Button } from '@/components/Button'  // 不用 '../../../components/Button'
+```
+
+**4. Loader 配置**
+- 处理 CSS、Sass、Less 等样式文件
+- 处理图片、字体等静态资源
+- 转译 TypeScript、JSX
+
+**5. 环境变量**
+- 区分开发/测试/生产环境
+- 配置不同环境的 API 地址
+
+**6. 构建优化**
+- 代码分割：按路由、第三方库拆分代码
 - Tree Shaking：删除未使用的代码
-- 压缩代码：`TerserPlugin` 或 `esbuild` 压缩
-- Gzip 压缩：服务器开启 gzip
+- 压缩代码、生成 source map
 
-**加载性能优化：**
+**7. 插件配置**
+- HTML 模板插件：自动生成 HTML 文件
+- 复制资源插件：复制静态文件到输出目录
+- 清理插件：每次构建前清空输出目录
 
-- CDN 加速：第三方库用 CDN
-- 图片优化：压缩、webp 格式、懒加载
-- 预加载：`<link rel="preload">` 提前加载关键资源
-- HTTP/2：利用多路复用
-
-**Vite 特有优势：**
-
-- 开发服务器使用 esbuild，启动秒开
-- HMR 基于原生 ESM，更新速度极快
-- 按需编译，不打包整个应用
-
-**实际效果：** 首屏加载时间减少 30%-50%，构建速度提升 2-5 倍。
+**Vite 优势：**
+- 开发启动快，基于 ESM 按需编译
+- 配置简单，开箱即用
+- 内置 TypeScript 支持
 
 
+
+### 8、在项目开发中，你是什么角色？是如何协作的？
+
+**我的角色定位：**
+
+在团队中我担任前端小组组长，主要职责包括：
+1. **技术方向把控** - 负责项目的技术选型、架构设计和代码规范制定
+2. **任务分配** - 根据团队成员的能力和特长合理分配任务
+3. **质量把控** - Code Review 评审代码，确保代码质量和一致性
+4. **技术指导** - 帮助团队成员解决技术难题，组织技术分享
+5. **跨部门协作** - 与产品、后端、设计等角色沟通协作
+
+**协作方式：**
+
+**1. 需求阶段**
+- 参与需求评审，从技术角度评估可行性和风险
+- 与产品经理确认需求细节，提前识别潜在问题
+- 输出技术方案文档，明确技术实现路径
+
+**2. 开发阶段**
+- 使用敏捷开发，每日站会同步进度和风险
+- 建立代码规范，统一 ESLint、Prettier 配置
+- 提交 PR 前自测，通过后进行 Code Review
+- 使用 Git 分支策略（develop/feature/hotfix）规范版本管理
+
+**3. 沟通协作**
+- 与后端对齐接口文档，使用 Swagger 或 TypeScript 类型定义
+- 与设计师确认 UI/UX 细节，使用 Figma/蓝湖 等协作工具
+- 内部搭建组件库和工具函数库，避免重复造轮子
+- 定期组织技术分享会，提升团队整体技术水平
+
+**实际成果：**
+- 将项目首屏加载时间优化了 40%
+- 搭建了内部组件库，提升开发效率 30%
+- 带领 5 人前端团队按时交付了 3 个大型项目
+- 建立了完善的代码规范和文档体系，降低新人上手成本
 ## 其它面试题
 
 ### 1、AI 工具在工作中的使用，以 codebuddy 为例
