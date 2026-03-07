@@ -19,86 +19,92 @@ outline: [1,3]
 - 初始时用预估高度计算滚动位置
 - 行渲染完成后通过 `ResizeObserver` 或 ref 获取真实高度
 - 缓存每行的实际高度到 Map 或数组中
-- 重新计算所有行的偏移位置和总高度
-- 滚动时根据缓存高度准确计算可见区域
+- 滚动时重新计算所有行的偏移位置和总高度
 
 **核心代码：**
+
 ```js
-// 1. 初始化配置
-const estimatedRowHeight = 50;  // 每行预估高度
-const rowCache = new Map();     // 缓存每行的实际高度
+// 预估高度 + 动态缓存的虚拟列表
+class VirtualList {
+  constructor(options) {
+    this.data = options.data || [];
+    this.estimatedItemHeight = options.estimatedItemHeight || 50; // 预估高度
+    this.bufferSize = options.bufferSize || 3; // 缓冲数量
 
-// 2. 计算某个位置的累计高度（用于定位）
-function getOffsetBefore(index) {
-  let offset = 0;
-  for (let i = 0; i < index; i++) {
-    offset += rowCache.get(i) || estimatedRowHeight;
+    // 缓存每行的真实高度
+    this.heights = new Map(); // key: index, value: height
+    // 缓存每行的偏移位置
+    this.positions = [];
   }
-  return offset;
-}
 
-// 3. 计算总高度
-function getTotalHeight() {
-  let height = 0;
-  for (let i = 0; i < totalRows; i++) {
-    height += rowCache.get(i) || estimatedRowHeight;
+  // 计算所有行的位置
+  calculatePositions() {
+    let offsetTop = 0;
+    this.positions = this.data.map((item, index) => {
+      const height = this.heights.get(index) || this.estimatedItemHeight;
+      const pos = { index, offsetTop, height };
+      offsetTop += height;
+      return pos;
+    });
+    // 总高度
+    this.totalHeight = offsetTop;
   }
-  return height;
-}
 
-// 4. 根据滚动位置计算可见范围
-function getVisibleRange(scrollTop, containerHeight) {
-  let offset = 0;
-  let startIndex = 0;
-  
-  // 找到开始位置
-  for (let i = 0; i < totalRows; i++) {
-    const rowHeight = rowCache.get(i) || estimatedRowHeight;
-    if (offset + rowHeight > scrollTop) {
-      startIndex = i;
-      break;
+  // 获取可见区域的起始和结束索引
+  getVisibleRange(scrollTop) {
+    const startIndex = this.binarySearch(0, this.data.length - 1, scrollTop);
+    const start = Math.max(0, startIndex - this.bufferSize);
+    const end = Math.min(this.data.length - 1, startIndex + this.visibleCount + this.bufferSize);
+    return { start, end };
+  }
+
+  // 二分查找快速定位
+  binarySearch(low, high, target) {
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      const pos = this.positions[mid];
+      if (pos.offsetTop + pos.height < target) {
+        low = mid + 1;
+      } else if (pos.offsetTop > target) {
+        high = mid - 1;
+      } else {
+        return mid;
+      }
     }
-    offset += rowHeight;
+    return low;
   }
-  
-  // 计算结束位置
-  let endIndex = startIndex;
-  let currentOffset = offset;
-  while (currentOffset < scrollTop + containerHeight && endIndex < totalRows) {
-    currentOffset += rowCache.get(endIndex) || estimatedRowHeight;
-    endIndex++;
-  }
-  
-  return { startIndex, endIndex };
-}
 
-// 5. 行渲染后测量真实高度
-function onRowRender(index, element) {
-  const realHeight = element.offsetHeight;
-  if (rowCache.get(index) !== realHeight) {
-    rowCache.set(index, realHeight);
-    // 触发重新计算和渲染
-    updateList();
+  // 行渲染完成后调用，更新真实高度
+  updateItemHeight(index, height) {
+    if (this.heights.get(index) !== height) {
+      this.heights.set(index, height);
+      this.calculatePositions(); // 重新计算位置
+    }
   }
 }
 
-// 6. 渲染函数
-function renderList(scrollTop, containerHeight) {
-  const { startIndex, endIndex } = getVisibleRange(scrollTop, containerHeight);
-  const offsetY = getOffsetBefore(startIndex);
-  
+// 使用示例
+const virtualList = new VirtualList({
+  data: Array.from({ length: 1000 }, (_, i) => ({ id: i, content: `第 ${i} 行` })),
+  estimatedItemHeight: 60
+});
+virtualList.calculatePositions();
+
+// 渲染行时记录ref并更新高度
+function Item({ item, index, style }) {
+  const itemRef = useRef(null);
+
+  useEffect(() => {
+    // 渲染后测量真实高度并缓存
+    if (itemRef.current) {
+      const height = itemRef.current.getBoundingClientRect().height;
+      virtualList.updateItemHeight(index, height);
+    }
+  }, []);
+
   return (
-    <div style={{ height: getTotalHeight() }}>
-      <div style={{ transform: `translateY(${offsetY}px)` }}>
-        {rows.slice(startIndex, endIndex).map(row => (
-          <div 
-            key={row.id} 
-            ref={(el) => onRowRender(row.index, el)}
-          >
-            {row.content}
-          </div>
-        ))}
-      </div>
+    <div style={style} ref={itemRef}>
+      {item.content}
     </div>
   );
 }
@@ -198,8 +204,6 @@ const getRowHeight = ({ rowData, rowIndex }) => {
 
 5. **其他调整**
    - 移除 `过滤器`，改用计算属性或方法
-   - `$listeners` 合并到 `$attrs`
-   - 移除 `keyCode` 修饰符
 
 **最佳实践：**
 - 小项目直接重写，大项目分模块渐进式迁移
@@ -209,7 +213,9 @@ const getRowHeight = ({ rowData, rowIndex }) => {
 ### 4、ESLint 和 prettier 冲突的解决
 
 **冲突原因：**
-ESLint 和 Prettier 都负责代码格式化，规则不一致时会相互覆盖。
+ESLint 和 Prettier 都有代码格式化功能，但两者的规则存在重叠且不完全一致：
+- ESLint 的格式化规则（如 `vue/html-indent`）和 Prettier 的缩进规则可能冲突
+- 同时运行时，两者会互相干扰，导致格式化结果不确定
 
 **解决方案：**
 1. **安装 `eslint-config-prettier`**
@@ -317,8 +323,26 @@ interface User {
 **常用配置项：**
 
 **1. 入口和出口配置**
-- 配置入口文件路径（多页面项目配置多个入口）
-- 配置输出文件名、路径、CDN 前缀
+- `entry`配置入口文件路径
+- `output`配置输出文件名、路径、CDN 前缀
+
+```js
+// webpack.config.js
+module.exports = {
+  // 入口配置
+  entry: './src/index.js',  // 单入口
+  
+  // 出口配置
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',  // 多入口时用 [name] 区分
+    // CDN 前缀（生产环境）
+    publicPath: process.env.NODE_ENV === 'production' ? 'https://cdn.example.com/' : '/',
+    // 清理输出目录
+    clean: true,
+  },
+};
+```
 
 **2. 开发服务器配置**
 - 配置端口、代理接口解决跨域
@@ -345,11 +369,6 @@ import { Button } from '@/components/Button'  // 不用 '../../../components/But
 - Tree Shaking：删除未使用的代码
 - 压缩代码、生成 source map
 
-**7. 插件配置**
-- HTML 模板插件：自动生成 HTML 文件
-- 复制资源插件：复制静态文件到输出目录
-- 清理插件：每次构建前清空输出目录
-
 **Vite 优势：**
 - 开发启动快，基于 ESM 按需编译
 - 配置简单，开箱即用
@@ -365,6 +384,14 @@ import { Button } from '@/components/Button'  // 不用 '../../../components/But
 1. **技术方向把控** - 负责项目的技术选型、架构设计和代码规范制定
 2. **任务分配** - 根据团队成员的能力和特长合理分配任务
 3. **质量把控** - Code Review 评审代码，确保代码质量和一致性
+
+**Code Review 流程：**
+
+```text
+开发完成 → 发起 PR → 自动化检查 → 代码评审 → 修改/合并
+         ↓           ↓           ↓
+      自测通过    CI 流水线    至少1人 review
+```
 4. **技术指导** - 帮助团队成员解决技术难题，组织技术分享
 5. **跨部门协作** - 与产品、后端、设计等角色沟通协作
 
@@ -382,7 +409,7 @@ import { Button } from '@/components/Button'  // 不用 '../../../components/But
 - 使用 Git 分支策略（develop/feature/hotfix）规范版本管理
 
 **3. 沟通协作**
-- 与后端对齐接口文档，使用 Swagger 或 TypeScript 类型定义
+- 与后端对齐接口文档，使用 Swagger 或 Apifox
 - 与设计师确认 UI/UX 细节，使用 Figma/蓝湖 等协作工具
 - 内部搭建组件库和工具函数库，避免重复造轮子
 - 定期组织技术分享会，提升团队整体技术水平
@@ -506,25 +533,43 @@ export default {
 **方案一：Fisher-Yates 洗牌算法（最优方案）**
 
 **实现步骤：**
-1. 复制原数组，避免修改原数据
-2. 从数组末尾开始遍历
-3. 每次随机选取一个 0 到当前位置的索引
-4. 交换当前元素和随机选中的元素
-5. 重复直到遍历完成
 
+1. **从后向前遍历**：从数组最后一个位置开始，逐步向前
+2. **生成随机索引**：在 [0, i] 范围内生成随机整数 j
+3. **交换元素**：将当前位置 i 与随机位置 j 的元素交换
+4. **重复执行**：直到遍历完所有位置
+
+**面试回答要点：**
+- 核心思想是**每次从待排序元素中随机选一个与当前元素交换**
+- 每个元素最终位于每个位置的概率都是 1/n，满足均匀分布
+- 时间复杂度 O(n)，空间复杂度 O(1)
+
+**代码示例**
 ```javascript
 function shuffleArray(array) {
-  const arr = [...array]; // 不修改原数组
+  // 1. 复制原数组，避免修改原数据（保持数据不可变性）
+  const arr = [...array];
+  
+  // 2. 从数组最后一个位置开始向前遍历
   for (let i = arr.length - 1; i > 0; i--) {
+    // 3. 生成 0 到 i 之间的随机整数（包括 0 和 i）
+    // 这里的随机范围确保每个元素都有机会被交换到前面
     const j = Math.floor(Math.random() * (i + 1));
+    
+    // 4. 交换当前位置 i 和随机位置 j 的元素
+    // 使用解构赋值实现值的交换，无需临时变量
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+  
+  // 5. 返回打乱后的新数组
   return arr;
 }
 
-// 使用
+// 使用示例
 const data = [1, 2, 3, 4, 5];
 const shuffled = shuffleArray(data);
+// 输出例如: [3, 1, 5, 2, 4]（每次运行结果不同）
+console.log(shuffled);
 // 直接渲染 shuffled 数组即可
 ```
 
