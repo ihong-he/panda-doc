@@ -320,36 +320,143 @@ interface User {
 
 ### 7、在项目中你会使用webpack 或者 vite进行哪些配置？
 
+
+::: code-group
+```js [Webpack 配置]
+// ========== Webpack 配置 (webpack.config.js) ==========
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
+  // 1. 入口和出口配置
+  entry: './src/index.js',             // 入口文件
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'js/[name].[contenthash].js',  // 加哈希解决缓存
+    publicPath: '/',                    // CDN 前缀
+    clean: true,                        // 清理输出目录
+  },
+
+  // 2. 开发服务器配置
+  devServer: {
+    port: 3000,
+    hot: true,                          // 热更新
+    proxy: {                            // 代理解决跨域
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
+    }
+  },
+
+  // 3. 路径别名配置
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    alias: {
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
+
+  // 4. Loader 配置
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        type: 'asset/resource'
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      }
+    ]
+  },
+
+  // 5. 插件配置
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './public/index.html'
+    })
+  ],
+
+  // 6. 构建优化
+  optimization: {
+    splitChunks: {                      // 代码分割
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
+  }
+}
+```
+
+``` js [Vite 配置]
+// ========== Vite 配置 (vite.config.js) ==========
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  // 1. 入口和出口配置
+  build: {
+    outDir: 'dist',                    // 输出目录
+    assetsDir: 'assets',               // 静态资源目录
+    rollupOptions: {
+      output: {
+        // 入口文件名加哈希，解决缓存问题
+        entryFileNames: 'js/[name].[hash].js',
+        chunkFileNames: 'js/[name].[hash].js',
+      }
+    }
+  },
+
+  // 2. 开发服务器配置
+  server: {
+    port: 3000,                        // 端口号
+    proxy: {                           // 代理配置，解决跨域
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
+    }
+  },
+
+  // 3. 路径别名配置
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src')  // @ 代表 src 目录
+    }
+  },
+
+  // 4. 环境变量
+  envPrefix: 'VITE_',                   // 环境变量前缀
+})
+```
+:::
+
 **常用配置项：**
 
 **1. 入口和出口配置**
 - `entry`配置入口文件路径
 - `output`配置输出文件名、路径、CDN 前缀
 
-```js
-// webpack.config.js
-module.exports = {
-  // 入口配置
-  entry: './src/index.js',  // 单入口
-  
-  // 出口配置
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',  // 多入口时用 [name] 区分
-    // CDN 前缀（生产环境）
-    publicPath: process.env.NODE_ENV === 'production' ? 'https://cdn.example.com/' : '/',
-    // 清理输出目录
-    clean: true,
-  },
-};
-```
-
 **2. 开发服务器配置**
 - 配置端口、代理接口解决跨域
 - 热更新（HMR）配置
-- 开启 gzip 压缩
 
 **3. 路径别名**
+
+使用`@`替代相对路径
+
 ```js
 // 简化导入路径
 import { Button } from '@/components/Button'  // 不用 '../../../components/Button'
@@ -445,50 +552,31 @@ import { Button } from '@/components/Button'  // 不用 '../../../components/But
 
 ### 2、Grid 布局方案的使用
 
-**核心概念：**
-- `grid-template-columns` - 定义列
-- `grid-template-rows` - 定义行
-- `grid-gap` - 单元格间距
-- `grid-area` - 指定单元格位置
+**核心概念**：二维布局系统，可同时控制行和列
 
-**常用场景：**
+**基本语法**：
+```css
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;  /* 三列等宽 */
+    grid-template-rows: 100px auto;     /* 两行 */
+    gap: 20px;                          /* 间距 */
+}
+```
 
-1. **圣杯布局**
-   ```css
-   .container {
-     display: grid;
-     grid-template-columns: 200px 1fr 200px;
-     grid-template-rows: 60px 1fr 40px;
-     grid-template-areas:
-       "header header header"
-       "left main right"
-       "footer footer footer";
-   }
-   ```
+**常用属性**：
+- `grid-template-columns/rows`：定义行列（支持 `fr`、`repeat()`、`minmax()`）
+- `gap`：单元格间距
+- `grid-area`：指定单元格位置
+- `justify-content`：主轴方向（水平）整体对齐，控制列在容器中的水平分布位置
+- `align-content`：交叉轴方向（垂直）整体对齐，控制行在容器中的垂直分布位置
 
-2. **响应式网格**
-   ```css
-   .grid {
-     display: grid;
-     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-     gap: 16px;
-   }
-   ```
+**优势**：
+- 比Flex更强大，适合复杂布局
+- 代码简洁，无需嵌套
+- 响应式友好
 
-3. **卡片对齐**
-   ```css
-   .card {
-     display: grid;
-     grid-template-columns: auto 1fr;
-     gap: 12px;
-     align-items: center;
-   }
-   ```
-
-**优势：**
-- 二维布局能力强大，一行代码搞定复杂布局
-- 响应式友好，配合 `minmax`、`auto-fit` 自适应
-- 性能好，浏览器原生支持
+**典型应用**：网页整体布局、图片网格、仪表盘
 
 ### 3、Options/Composition API有什么区别？
 
@@ -534,7 +622,7 @@ export default {
 
 **实现步骤：**
 
-1. **从后向前遍历**：从数组最后一个位置开始，逐步向前
+1. **从后向前遍历**：从数组最后一个位置开始，逐步向前遍历
 2. **生成随机索引**：在 [0, i] 范围内生成随机整数 j
 3. **交换元素**：将当前位置 i 与随机位置 j 的元素交换
 4. **重复执行**：直到遍历完所有位置
@@ -589,117 +677,51 @@ const shuffled = [...array].sort(() => Math.random() - 0.5);
 - sort 方法虽然简单，但洗牌不均匀，不适合要求严格的场景
 - 如果是 React 列表渲染，记得给每项加唯一 key
 
-### 5、如何封装一个通用的组件？
+### 5、前端组件的设计思想有哪些？以表格组件为例
 
-**封装原则：**
+**核心设计思想：**
 
-1. **单一职责** - 组件只做一件事，功能明确
-2. **可配置性** - 通过 props 控制行为和样式
-3. **插槽支持** - 预留插槽增强灵活性
-4. **事件透传** - 向外暴露关键事件
-5. **文档完善** - 说明使用方式和 props 说明
+**1. 单一职责**
+- 组件只做一件事，表格组件只负责数据展示
+- 复杂功能拆分：Table 容器、TableHeader 表头、TableRow 行、TableCell 单元格
 
-**示例：通用按钮组件**
-```vue
-<template>
-  <button
-    :class="['btn', `btn-${type}`, { 'btn-disabled': disabled }]"
-    :disabled="disabled"
-    @click="$emit('click', $event)"
-  >
-    <slot />
-  </button>
-</template>
-
-<script setup>
-defineProps({
-  type: { type: String, default: 'primary' }, // primary/secondary/danger
-  disabled: { type: Boolean, default: false }
-})
-defineEmits(['click'])
-</script>
-
-<style scoped>
-.btn { /* ... */ }
-.btn-primary { /* ... */ }
-</style>
+**2. 可配置性（Props 驱动）**
+```js
+<Table
+  :columns="columns"      // 列配置
+  :data="data"            // 数据源
+  :loading="loading"      // 加载状态
+  :pagination="pagination" // 分页配置
+  :rowKey="id"            // 行唯一标识
+/>
 ```
 
-**使用技巧：**
-- 从业务中抽取共性，逐步沉淀通用组件
-- 先有使用场景，再做封装，避免过度设计
-- 保持简单，复杂的业务场景用组合组件解决
-
-### 6、如何封装项目的通用逻辑？以 vue3 项目为例
-
-**封装方式：**
-
-1. **Composables（组合式函数）**
-   ```js
-   // useRequest.js - 封装请求逻辑
-   import { ref } from 'vue'
-   import axios from 'axios'
-
-   export function useRequest(url) {
-     const data = ref(null)
-     const loading = ref(false)
-     const error = ref(null)
-
-     const fetch = async () => {
-       loading.value = true
-       try {
-         const res = await axios.get(url)
-         data.value = res.data
-       } catch (e) {
-         error.value = e
-       } finally {
-         loading.value = false
-       }
-     }
-
-     return { data, loading, error, fetch }
-   }
-
-   // 使用
-   const { data, loading, fetch } = useRequest('/api/users')
-   ```
-
-2. **工具函数（utils）**
-   ```js
-   // format.js - 格式化工具
-   export const formatDate = (date) => { /* ... */ }
-   export const formatMoney = (num) => { /* ... */ }
-   ```
-
-3. **全局指令（Directives）**
-   ```js
-   // v-focus.js
-   export const focus = {
-     mounted: (el) => el.focus()
-   }
-   ```
-
-4. **全局插件（Plugins）**
-   ```js
-   // app.config.globalProperties.$message = showMessage
-   ```
-
-**组织结构：**
-```
-src/
-├── composables/      # 组合式函数
-├── utils/            # 纯函数工具
-├── directives/       # 全局指令
-└── plugins/          # 全局插件
+**3. 可扩展性（插槽机制）**
+```js
+<Table>
+  <template #headerCell="{ column }">
+    <!-- 自定义表头 -->
+  </template>
+  <template #bodyCell="{ record, column }">
+    <!-- 自定义单元格内容 -->
+  </template>
+</Table>
 ```
 
-**原则：**
-- 单一职责，每个模块只做一件事
-- 做好输入输出参数定义和类型提示
-- 提供使用示例和文档
+**4. 事件通信**
+- 组件内部状态不对外暴露，通过事件通知父组件
+- `@change` 分页变化、`@sort` 排序、`@select` 行选择
 
+**5. 受控与非受控**
+- 受控：父组件传入 value，完全控制组件状态
+- 非受控：组件内部维护状态，初始值通过 defaultValue 传入
 
-### 7、Vue 中的 diff算法
+**6. 性能优化**
+- 虚拟滚动处理大数据量
+- 分页减少渲染压力
+- 列冻结/列宽拖拽等复杂功能按需加载
+
+### 6、Vue 中的 diff算法原理
 
 **核心思路：**
 对比新旧虚拟 DOM 树，找出差异，最小化 DOM 操作。
@@ -709,7 +731,7 @@ src/
 1. **同层比较** - 只比较同一层级的节点，不跨层级
 2. **类型判断** - 节点类型不同直接替换，不再比较子节点
 3. **Key 优化** - 通过 key 判断节点是否可复用，提高 diff 效率
-4. **双端比较** - Vue2 使用双端指针优化列表 diff
+4. **双端比较** - Vue2 使用双端指针优化列表 diff（从两端向中间比较）
 
 **为什么要用 key？**
 ```js
@@ -724,7 +746,7 @@ src/
 - 补丁标记 - 记录节点变化类型，只更新变化部分
 - 长子序列优化 - 最长递增子序列算法，最小化移动操作
 
-### 8、大数据量表格渲染的解决方法有哪些？
+### 7、大数据量表格渲染的解决方法有哪些？
 
 **核心思路：减少 DOM 节点数量，只渲染可视区域数据**
 
@@ -753,7 +775,7 @@ src/
    - 减少不必要的计算属性和 watch
 
 
-### 9、如何控制页面的渲染顺序？比如说三栏布局先渲染中间的部分
+### 8、如何控制页面的渲染顺序？比如说三栏布局先渲染中间的部分
 
 **HTML 顺序控制 DOM 结构：**
 ```html
