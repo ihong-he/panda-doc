@@ -40,7 +40,7 @@ outline: [1,3]
 
 #### 2）架构与写法变化
 
-- **Vue2**：采用 Options API，数据、方法、计算属性分散在不同选项中
+- **Vue2**：采用 Options API，data、methods、computed 分开写
 - **Vue3**：推荐使用组合式 API，相同逻辑代码聚合一起，**逻辑复用能力更强**（自定义 Hooks）
 
 #### 3）性能提升
