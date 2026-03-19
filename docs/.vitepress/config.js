@@ -39,7 +39,7 @@ export default withMermaid({
     nav: [
       { text: '首页', link: '/' },
       { text: '技术', link: '/note/html&css' },
-      { text: '开发', link: '/dev/dev1' },
+      { text: '开发', link: '/dev/ERP系统快速入门' },
       {
         text: '提升',
         items: [
@@ -110,12 +110,9 @@ export default withMermaid({
           text: '开发',
           collapsed: true,
           items: [
-            { text: '前言', link: '/dev/dev1' },
-            { text: '项目搭建与环境配置', link: '/dev/dev2' },
-            { text: '组件与样式渲染', link: '/dev/dev3' },
-            { text: '数据处理与状态管理', link: '/dev/dev4' },
-            { text: '网络请求与接口调试', link: '/dev/dev5' },
-            { text: '性能优化与兼容调试', link: '/dev/dev6' },
+            { text: 'ERP系统快速入门', link: '/dev/ERP系统快速入门' },
+            { text: 'HJ 表格组件开发文档', link: '/dev/HJ 表格组件开发文档' },
+            { text: 'useTable 表格 Hook 开发文档', link: '/dev/useTable 表格 Hook 开发文档' },
           ]
         }
       ],
