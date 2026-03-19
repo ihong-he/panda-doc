@@ -2,7 +2,7 @@
 outline: deep
 ---
 
-# Electron
+# Electron入门
 
 ## 一、开始上手
 
