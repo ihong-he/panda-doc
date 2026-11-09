@@ -4,21 +4,9 @@ outline: deep
 
 # 开始
 
-<script setup>
-import Tip from '../components/Tip.vue'
-import { ref } from "vue";
-//父组件内部数据
-let todos = ref([
-  { id: 1, title: "本文档用来记录前端开发的基础知识", done: true },
-]);
-</script>
-
-<Tip title="提示" :todos="todos">
-  <template v-slot="{$row,$index}">
-      <!--父组件决定子组件的结构与外观-->
-      <span :style="{color:$row.done?'green':'red'}">{{$row.title}}</span>
-  </template>
-</Tip>
+::: tip 提示
+本文档用来记录前端开发的基础知识
+:::
 
 ## 一、HTML
 
