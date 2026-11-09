@@ -10,6 +10,13 @@ import MyLayout from './MyLayout.vue'
 import Pronounce from './components/Pronounce.vue'
 // 导入图片预览组件
 import ImgPreview from './components/ImgPreview.vue'
+// 导入文档展示组件
+import TermTip from './components/TermTip.vue'
+import AnswerReveal from './components/AnswerReveal.vue'
+import Steps from './components/Steps.vue'
+import Compare from './components/Compare.vue'
+import PreferenceSwitch from './components/PreferenceSwitch.vue'
+import PreferencePanel from './components/PreferencePanel.vue'
 
 /** @type {import('vitepress').Theme} */
 export default {
@@ -19,6 +26,13 @@ export default {
     app.component('MyGlobalComponent' /* ... */)
     app.component('Pronounce', Pronounce)
     app.component('ImgPreview', ImgPreview)
+    // 文档组件：Markdown 中可直接使用，无需 import
+    app.component('TermTip', TermTip)
+    app.component('AnswerReveal', AnswerReveal)
+    app.component('Steps', Steps)
+    app.component('Compare', Compare)
+    app.component('PreferenceSwitch', PreferenceSwitch)
+    app.component('PreferencePanel', PreferencePanel)
   },
   Layout: MyLayout,
 }

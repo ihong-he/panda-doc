@@ -91,6 +91,7 @@ export default withMermaid({
         ]
       },
       { text: 'Interview ', link: '/interview/index1' },
+      { text: '组件', link: '/guide/doc-components' },
     ],
 
     sidebar: {
@@ -223,6 +224,15 @@ export default withMermaid({
             { text: 'Harmony进阶', link: '/harmony/hm2' },
             { text: '云音乐项目一', link: '/harmony/hm3' },
             { text: '云音乐项目二', link: '/harmony/hm4' },
+          ]
+        }
+      ],
+      '/guide/': [
+        {
+          text: '文档组件',
+          collapsed: false,
+          items: [
+            { text: '使用示例', link: '/guide/doc-components' },
           ]
         }
       ],
