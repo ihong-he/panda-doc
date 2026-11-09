@@ -97,7 +97,7 @@ outline: [1, 3]
 
 - 效果图（兼容移动端）
 
-![An image](/item/rms-login.png)
+<ImgPreview :imgs="['/item/rms-login.png']" alt="An image" />
 
 - 登录页模板
   ::: details 点击查看
@@ -524,7 +524,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 > 效果图
 
-![An image](/item/rms-home.png)
+<ImgPreview :imgs="['/item/rms-home.png']" alt="An image" />
 
 1. 静态模板
 

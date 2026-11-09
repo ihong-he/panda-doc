@@ -136,7 +136,7 @@ ECharts 是一个基于 JavaScript 的开源数据可视化库，由百度开源
 </body>
 </html>
 ```
-![echarts1](/img/vis1.png)
+<ImgPreview :imgs="['/img/vis1.png']" alt="echarts1" />
 
 上面的代码展示了一个简单的折线图，显示了不同月份的销售数据。
 

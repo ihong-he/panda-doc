@@ -12,16 +12,16 @@ outline: deep
 
 ### 1. 首页
 
- ![An image](/item/home.png)
+ <ImgPreview :imgs="['/item/home.png']" alt="An image" />
 ### 2. 分类
 
- ![An image](/item/cate.png)
+ <ImgPreview :imgs="['/item/cate.png']" alt="An image" />
 ### 3. 购物车
 
- ![An image](/item/car.png)
+ <ImgPreview :imgs="['/item/car.png']" alt="An image" />
 ### 4. 我的
 
- ![An image](/item/my.png)
+ <ImgPreview :imgs="['/item/my.png']" alt="An image" />
 
  ## 二、重难点
 

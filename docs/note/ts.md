@@ -6,7 +6,7 @@ outline: deep
 
 ## 一、`TypeScript` 简介
 
-![An image](/img/ts1.png)
+<ImgPreview :imgs="['/img/ts1.png']" alt="An image" />
 
 1. `TypeScript` 由微软开发，是基于 `JavaScript` 的⼀个扩展语⾔。
 2. `TypeScript` 包含了 JavaScript 的所有内容，即： TypeScript 是 JavaScript 的超集。
@@ -1272,7 +1272,7 @@ class Student extends Person {
 
 1. 属性修饰符
 
-![An image](/img/ts2.png)
+<ImgPreview :imgs="['/img/ts2.png']" alt="An image" />
 
 - `public` 修饰符
 

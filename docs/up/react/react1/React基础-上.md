@@ -7,7 +7,7 @@ outline: deep
 > [!NOTE] 前言
 > React 由 Meta 公司开发，是一个用于构建 **Web 应用** 和 **原生交互界面** 的库。
 
-![image.png](assets/01.png)
+<ImgPreview :imgs="['/up/react/react1/assets/01.png']" alt="image.png" />
 
 ### React的优势
 相较于传统基于DOM开发的优势
@@ -21,7 +21,7 @@ outline: deep
 2. 跨平台支持
 ### React的市场情况
 全球最流行，大厂必备
-![image.png](assets/02.png)
+<ImgPreview :imgs="['/up/react/react1/assets/02.png']" alt="image.png" />
 
 ## 二、开发环境创建
 
@@ -72,7 +72,7 @@ function App(){
 ### JSX的本质
 > JSX并不是标准的JS语法，它是 JS的语法扩展，浏览器本身不能识别，需要通过解析工具如`Babel`做解析之后才能在浏览器中使用
 
-![image.png](assets/03.png)
+<ImgPreview :imgs="['/up/react/react1/assets/03.png']" alt="image.png" />
 
 ::: info 补充
 `Babel` 是一个JavaScript 编译器。它的一个作用是将非标准语法（如 JSX）编写的代码，转换成能在当前浏览器环境中运行的 JavaScript 代码。
@@ -110,7 +110,7 @@ function App(){
 }
 ```
 ### JSX高频场景-列表渲染
-![image.png](assets/04.png)
+<ImgPreview :imgs="['/up/react/react1/assets/04.png']" alt="image.png" />
 > 在JSX中可以使用原生js中的`map方法` 实现列表渲染
 
 ```jsx
@@ -129,7 +129,7 @@ function App(){
 }
 ```
 ### JSX高频场景-条件渲染
-![image.png](assets/05.png)
+<ImgPreview :imgs="['/up/react/react1/assets/05.png']" alt="image.png" />
 > 在React中，可以通过逻辑与运算符&&、三元表达式(?) 实现基础的条件渲染
 
 ```jsx
@@ -146,7 +146,7 @@ function App(){
 }
 ```
 ### JSX高频场景-复杂条件渲染
-<!-- ![image.png](assets/06.png) -->
+<!-- ![image.png](/up/react/react1/assets/06.png) -->
 > 需求：列表中需要根据文章的状态适配不同的显示模式
 
 解决方案：自定义函数 + 判断语句
@@ -232,7 +232,7 @@ function App(){
 ### 组件是什么
 > 一个组件就是一个用户界面的一部分，它可以有自己的逻辑和外观，组件之间可以互相嵌套，也可以复用多次
 
-![image.png](assets/07.png)
+<ImgPreview :imgs="['/up/react/react1/assets/07.png']" alt="image.png" />
 
 ### 组件基础使用
 > 在React中，一个组件就是**首字母大写的函数**，内部存放了组件的逻辑和视图UI，渲染组件只需要把组件当成标签书写即可
@@ -261,7 +261,7 @@ function App(){
 
 和普通JS变量不同的是：状态变量一旦发生变化，组件的视图UI也会跟着变化（数据驱动视图）
 
-![image.png](assets/08.png)
+<ImgPreview :imgs="['/up/react/react1/assets/08.png']" alt="image.png" />
 ```jsx
 function App(){
   const [ count, setCount ] = React.useState(0)
@@ -275,11 +275,11 @@ function App(){
 ### 状态的修改规则
 > 在React中状态被认为是只读的，我们应该始终`替换它而不是修改它`，直接修改状态不能引发视图更新
 
-![image.png](assets/09.png)
+<ImgPreview :imgs="['/up/react/react1/assets/09.png']" alt="image.png" />
 ### 修改对象状态
 > 对于对象类型的状态变量，应该始终给set方法一个`全新的对象` 来进行修改
 
-![image.png](assets/10.png)
+<ImgPreview :imgs="['/up/react/react1/assets/10.png']" alt="image.png" />
 ## 七、组件的基础样式处理
 > React组件基础的样式控制有两种方式，**行内样式**和**class类名控制**
 
@@ -308,7 +308,7 @@ function App(){
 }
 ```
 ## 八、B站评论案例
-![image.png](assets/11.png)
+<ImgPreview :imgs="['/up/react/react1/assets/11.png']" alt="image.png" />
 
 1. 渲染评论列表
 2. 删除评论实现

@@ -13,15 +13,15 @@ outline: deep
 
 ### 1. PC-行政机关-工作台
 
- ![An image](/item/工作台-行政机关.png)
+ <ImgPreview :imgs="['/item/工作台-行政机关.png']" alt="An image" />
 
 ### 2. PC-驾驶舱-首屏
 
- ![An image](/item/驾驶舱-首屏.jpg)
+ <ImgPreview :imgs="['/item/驾驶舱-首屏.jpg']" alt="An image" />
 
 ### 3. H5-法院-首页
 
- ![An image](/item/首页-法院.png)
+ <ImgPreview :imgs="['/item/首页-法院.png']" alt="An image" />
 
 
 ## 二、技术归纳

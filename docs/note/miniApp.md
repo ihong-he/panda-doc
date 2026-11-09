@@ -38,7 +38,7 @@ outline: [1, 3]
 - 前往[微信公众平台开发者工具官网](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)下载适合您操作系统的开发者工具。
 - 安装完成后，打开开发者工具。
 
-![An image](/img/miniapp-1.png)
+<ImgPreview :imgs="['/img/miniapp-1.png']" alt="An image" />
 
 #### 2. **注册微信小程序账号**
 
@@ -56,7 +56,7 @@ outline: [1, 3]
 
 2. **创建项目**：
 
-![An image](/img/miniapp-2.png)
+<ImgPreview :imgs="['/img/miniapp-2.png']" alt="An image" />
    - 点击“+ 创建小程序”按钮。
    - 在弹出的窗口中，输入以下信息：
      - **AppID**：在公众平台注册的小程序账号生成的 AppID。
@@ -72,7 +72,7 @@ outline: [1, 3]
 
 创建好项目后，您会看到以下主要文件和文件夹：
 
-![An image](/img/miniapp-3.png)
+<ImgPreview :imgs="['/img/miniapp-3.png']" alt="An image" />
 
 - **app.js**：小程序的逻辑文件，配置整个小程序的生命周期事件。
 - **app.json**：小程序的全局配置文件，定义页面路径、窗口表现等。
@@ -1185,7 +1185,7 @@ requestPromise('https://api.example.com/data', 'GET')
 
 uni-app 是由 [DCloud](https://uniapp.dcloud.net.cn/) 开发的一款前端框架，它可以让开发者使用 Vue.js 语法来构建跨平台的应用。uni-app 的核心优势在于“一次开发，多端运行”，即开发者只需编写一套代码，就可以在多个平台上运行，包括：
 
-![An Image](/img/miniapp-4.png)
+<ImgPreview :imgs="['/img/miniapp-4.png']" alt="An Image" />
 
 1. **小程序**：如微信小程序、支付宝小程序、百度小程序、字节跳动小程序等。
 2. **H5**：可以生成基于 Web 的移动端网页应用。
@@ -1368,7 +1368,7 @@ uni-app 基于 Vue.js 语法，具有与 Vue.js 类似的开发方式，同时�
 
 #### 2. **创建 uni-app 项目**
 
-   ![An Image](/img/miniapp-5.png)
+   <ImgPreview :imgs="['/img/miniapp-5.png']" alt="An Image" />
 
    - **启动 HBuilderX**：打开 HBuilderX 后，选择“文件” -> “新建” -> “项目”。
    - **选择 uni-app 模板**：在新建项目窗口中，选择“uni-app”项目模板，然后填写项目名称和存储路径。

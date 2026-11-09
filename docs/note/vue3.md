@@ -39,13 +39,13 @@ const addCount = ()=> count.value++
 2. 分散式维护变成集中式维护
 ## Vue3更多的优势
 
-![An image](/img/vue3-1.png)
+<ImgPreview :imgs="['/img/vue3-1.png']" alt="An image" />
 
 ## 使用create-vue搭建Vue3项目
 ### 1. 认识create-vue
 > create-vue是Vue官方新的脚手架工具，底层切换到了 vite （下一代前端工具链），为开发提供极速响应
 
-![An image](/img/vue3-2.png)
+<ImgPreview :imgs="['/img/vue3-2.png']" alt="An image" />
 
 ### 2. 使用create-vue创建项目
 > 前置条件 - 已安装16.0或更高版本的Node.js
@@ -55,11 +55,11 @@ const addCount = ()=> count.value++
 npm init vue@latest
 ```
 
-![An image](/img/vue3-3.png)
+<ImgPreview :imgs="['/img/vue3-3.png']" alt="An image" />
 
 ## 熟悉项目和关键文件
 
-![An image](/img/vue3-4.png)
+<ImgPreview :imgs="['/img/vue3-4.png']" alt="An image" />
 
 ## 组合式API - setup选项
 
@@ -80,7 +80,7 @@ npm init vue@latest
 执行时机
 > 在beforeCreate钩子之前执行
 
-![An image](/img/vue3-5.png)
+<ImgPreview :imgs="['/img/vue3-5.png']" alt="An image" />
 
 ### 2. setup中写代码的特点
 
@@ -276,7 +276,7 @@ const filterList = computed(item=>item > 2)
 ## 组合式API - 生命周期函数
 ### 1. 选项式对比组合式
 
-![An Image](/img/vue3-6.png)
+<ImgPreview :imgs="['/img/vue3-6.png']" alt="An Image" />
 
 ### 2. 生命周期函数基本使用
 > 1. 导入生命周期函数
@@ -311,41 +311,41 @@ const filterList = computed(item=>item > 2)
 > 1. 父组件中给子组件绑定属性
 > 2. 子组件内部通过props选项接收数据
 
-![An Image](/img/vue3-7.png)
+<ImgPreview :imgs="['/img/vue3-7.png']" alt="An Image" />
 
 ### 2. 子传父
 > 基本思想
 > 1. 父组件中给子组件标签通过@绑定事件
 > 2. 子组件内部通过 emit 方法触发事件
 
-![An Image](/img/vue3-8.png)
+<ImgPreview :imgs="['/img/vue3-8.png']" alt="An Image" />
 
 ## defineExpose
 默认情况下在 `<script setup>`语法糖下组件内部的属性和方法是不开放给父组件访问的，可以通过defineExpose编译宏指定哪些属性和方法容许访问
 
 > 说明：指定testMessage属性可以被访问到
 
-![An Image](/img/vue3-9.png)
+<ImgPreview :imgs="['/img/vue3-9.png']" alt="An Image" />
 
 ## 组合式API - provide和inject
 ### 1. 作用和场景
 > 顶层组件向任意的底层组件传递数据和方法，实现跨层组件通信
 
-![An Image](/img/vue3-10.png)
+<ImgPreview :imgs="['/img/vue3-10.png']" alt="An Image" />
 
 ### 2. 跨层传递普通数据
 > 实现步骤
 > 1. 顶层组件通过 `provide` 函数提供数据
 > 2. 底层组件通过 `inject` 函数提供数据
 
-![An Image](/img/vue3-11.png)
+<ImgPreview :imgs="['/img/vue3-11.png']" alt="An Image" />
 
 ### 3. 跨层传递响应式数据
 > 在调用provide函数时，第二个参数设置为ref对象
 
-![An Image](/img/vue3-12.png)
+<ImgPreview :imgs="['/img/vue3-12.png']" alt="An Image" />
 
 ### 4. 跨层传递方法
 > 顶层组件可以向底层组件传递方法，底层组件调用方法修改顶层组件的数据
 
-![An Image](/img/vue3-13.png)
+<ImgPreview :imgs="['/img/vue3-13.png']" alt="An Image" />

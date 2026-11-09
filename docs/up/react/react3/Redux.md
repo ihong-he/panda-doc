@@ -8,7 +8,7 @@ outline: [1,3]
 
 作用：通过集中管理的方式管理应用的状态
 
-![image.png](assets/1.png)
+<ImgPreview :imgs="['/up/react/react3/assets/1.png']" alt="image.png" />
 **为什么要使用 Redux？**
 
 1. 独立于组件，无视组件之间的层级关系，简化通信问题
@@ -19,7 +19,7 @@ outline: [1,3]
 
 > Redux 的难点是理解它对于数据修改的规则, 下图动态展示了在整个数据的修改中数据的流向
 
-![image.png](assets/3.png)
+<ImgPreview :imgs="['/up/react/react3/assets/3.png']" alt="image.png" />
 为了职责清晰，Redux 代码被分为三个核心的概念，我们学 redux，其实就是学这三个核心概念之间的配合，三个概念分别是:
 
 -  `Store`: 一个对象，存放着我们管理的数据
@@ -38,7 +38,7 @@ outline: [1,3]
 
 2. `react-redux` - 用来 连接 Redux 和 React 组件 的中间件
 
-![image.png](assets/4.png)
+<ImgPreview :imgs="['/up/react/react3/assets/4.png']" alt="image.png" />
 
 ### 2. 配置基础环境
 
@@ -62,7 +62,7 @@ npm run start
 
 ### 3. store 目录结构设计
 
-![image.png](assets/5.png)
+<ImgPreview :imgs="['/up/react/react3/assets/5.png']" alt="image.png" />
 
 1. 通常集中状态管理的部分都会单独创建一个单独的 `store` 目录
 
@@ -74,7 +74,7 @@ npm run start
 
 ### 1. 整体路径熟悉
 
-![image.png](assets/6.png)
+<ImgPreview :imgs="['/up/react/react3/assets/6.png']" alt="image.png" />
 
 ### 2. 使用 React Toolkit 创建 counterStore
 
@@ -147,28 +147,28 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 > 在 React 组件中使用 store 中的数据，需要用到一个钩子函数 `useSelector`，它的作用是把 store 中的数据映射到组件中，使用样例如下：
 
-![image.png](assets/7.png)
+<ImgPreview :imgs="['/up/react/react3/assets/7.png']" alt="image.png" />
 
 ### 5. React 组件修改 store 中的数据
 
 > React 组件中修改 store 中的数据需要借助另外一个 hook 函数 <Pronounce word="useDispatch" />，它的作用是生成提交 action 对象的 dispatch 函数，使用样例如下：
 
-![image.png](assets/8.png)
+<ImgPreview :imgs="['/up/react/react3/assets/8.png']" alt="image.png" />
 
 ## 五、提交 action 传参
 
 > [!NOTE] 需求
 > 组件中有两个按钮 `add to 10` 和 `add to 20` 可以直接把 count 值修改到对应的数字，目标 count 值是在组件中传递过去的，需要在提交 action 的时候传递参数
 
-![image.png](assets/9.png)
+<ImgPreview :imgs="['/up/react/react3/assets/9.png']" alt="image.png" />
 实现方式：在 reducers 的同步修改方法中添加 `action` 对象参数，在调用 actionCreater 的时候传递参数，参数会被传递到 action 对象 `payload` 属性上
 
-![image.png](assets/10.png)
+<ImgPreview :imgs="['/up/react/react3/assets/10.png']" alt="image.png" />
 
 ## 六、异步 action 处理
 
 **需求理解**
-![image.png](assets/11.png)
+<ImgPreview :imgs="['/up/react/react3/assets/11.png']" alt="image.png" />
 
 **实现步骤**
 
@@ -452,7 +452,7 @@ const handleRefresh = () => {
 
 > Redux 官方提供了针对于 Redux 的浏览器调试工具`Redux DevTools`，支持实时 state 信息展示、action 提交信息查看等
 
-![image.png](assets/12.png)
+<ImgPreview :imgs="['/up/react/react3/assets/12.png']" alt="image.png" />
 
 ## 九、美团小案例
 
@@ -461,7 +461,7 @@ const handleRefresh = () => {
 
 ### 1. 案例演示
 
-![image.png](assets/13.png)
+<ImgPreview :imgs="['/up/react/react3/assets/13.png']" alt="image.png" />
 
 ### 2. 准备并熟悉环境
 
@@ -491,7 +491,7 @@ npm run start
 
 ### 3. 分类和商品列表渲染
 
-![image.png](assets/14.png)
+<ImgPreview :imgs="['/up/react/react3/assets/14.png']" alt="image.png" />
 1- 编写 store 逻辑
 
 ```javascript
@@ -584,7 +584,7 @@ export default App;
 
 ### 4. 点击分类激活交互实现
 
-![image.png](assets/15.png)
+<ImgPreview :imgs="['/up/react/react3/assets/15.png']" alt="image.png" />
 1- 编写 store 逻辑
 
 ```javascript
@@ -653,7 +653,7 @@ const Menu = () => {
 
 ### 5. 商品列表切换显示
 
-![image.png](assets/16.png)
+<ImgPreview :imgs="['/up/react/react3/assets/16.png']" alt="image.png" />
 
 ```jsx
 <div className="list-content">
@@ -678,7 +678,7 @@ const Menu = () => {
 
 ### 6. 添加购物车实现
 
-![image.png](assets/17.png)
+<ImgPreview :imgs="['/up/react/react3/assets/17.png']" alt="image.png" />
 1- 编写 store 逻辑
 
 ```javascript
@@ -747,7 +747,7 @@ export default reducer;
 
 ### 7. 统计区域实现
 
-![image.png](assets/18.png)
+<ImgPreview :imgs="['/up/react/react3/assets/18.png']" alt="image.png" />
 
 实现思路
 
@@ -787,7 +787,7 @@ const totalPrice = cartList.reduce((a, c) => a + c.price * c.count, 0);
 
 ### 8. 购物车列表功能实现
 
-![image.png](assets/19.png)
+<ImgPreview :imgs="['/up/react/react3/assets/19.png']" alt="image.png" />
 
 1-控制列表渲染
 
@@ -879,7 +879,7 @@ clearCart (state) {
 
 ### 9. 控制购物车显示和隐藏
 
-![image.png](assets/20.png)
+<ImgPreview :imgs="['/up/react/react3/assets/20.png']" alt="image.png" />
 
 ```jsx
 // 控制购物车打开关闭的状态

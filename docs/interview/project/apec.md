@@ -13,15 +13,15 @@ outline: deep
 
 ### 1. APEC-首页
 
- ![An image](/item/APEC-首页.png)
+ <ImgPreview :imgs="['/item/APEC-首页.png']" alt="An image" />
 
 ### 2. APEC-纠纷登记页
 
- ![An image](/item/APEC-纠纷登记页.png)
+ <ImgPreview :imgs="['/item/APEC-纠纷登记页.png']" alt="An image" />
 
 ### 3. APEC-管理员页
 
- ![An image](/item/APEC-管理员页.png)
+ <ImgPreview :imgs="['/item/APEC-管理员页.png']" alt="An image" />
 
 
 ## 二、技术归纳

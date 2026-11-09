@@ -14,15 +14,15 @@ outline: deep
 
 ### 1. 浙江解纷码-首页
 
- ![An image](/item/浙江解纷码-首页.png)
+ <ImgPreview :imgs="['/item/浙江解纷码-首页.png']" alt="An image" />
 
 ### 2. 当事人-纠纷登记页
 
- ![An image](/item/当事人-纠纷登记页.png)
+ <ImgPreview :imgs="['/item/当事人-纠纷登记页.png']" alt="An image" />
 
 ### 3. 管理员-诸暨统计报表
 
- ![An image](/item/管理员-诸暨统计报表.png)
+ <ImgPreview :imgs="['/item/管理员-诸暨统计报表.png']" alt="An image" />
 
 
 ## 二、技术归纳
@@ -44,7 +44,7 @@ outline: deep
 ### 2、诸暨数字诉服项目
 
 - 司法鉴定和司法保全
- ![An image](/item/u0.png)
+ <ImgPreview :imgs="['/item/u0.png']" alt="An image" />
  
 - 诸暨统计报表模块
 - 萧山用户操作优化

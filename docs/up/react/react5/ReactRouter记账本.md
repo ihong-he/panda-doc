@@ -34,7 +34,7 @@ npm i @reduxjs/toolkit react-redux react-router-dom dayjs classnames antd-mobile
 - 路径解析配置（webpack），把 `@/` 解析为 `src/`
 - 路径联想配置（VsCode），VsCode 在输入 `@/` 时，自动联想出来对应的 `src/` 下的子级目录
 
-![image.png](assets/12.png)
+<ImgPreview :imgs="['/up/react/react5/assets/12.png']" alt="image.png" />
 ### 2. 路径解析配置
 配置步骤：
 
@@ -47,7 +47,7 @@ npm i -D @craco/craco
 3. 配置文件中添加路径解析配置
 4. 包文件中配置启动和打包命令
 
-![image.png](assets/13.png)
+<ImgPreview :imgs="['/up/react/react5/assets/13.png']" alt="image.png" />
 ### 3. 联想路径配置
 配置步骤：
 
@@ -71,7 +71,7 @@ npm i -D @craco/craco
 > 在前后端分类的开发模式下，前端可以在没有实际后端接口的支持下先进行接口数据的模拟，进行正常的业务功能开发
 
 ### 1. 常见的Mock方式
-![image.png](assets/14.png)
+<ImgPreview :imgs="['/up/react/react5/assets/14.png']" alt="image.png" />
 
 ### 2. json-server实现Mock
 实现步骤：
@@ -83,26 +83,26 @@ npm i -D @craco/craco
 2.  准备一个`json`文件（素材里获取）
 3.  添加启动命令 
 
-![image.png](assets/15.png)
+<ImgPreview :imgs="['/up/react/react5/assets/15.png']" alt="image.png" />
 
 4.  访问接口进行测试 
 ## 四、整体路由设计
-![image.png](assets/16.png)
+<ImgPreview :imgs="['/up/react/react5/assets/16.png']" alt="image.png" />
 - 两个一级路由 （Layout / new）
 - 两个二级路由 （Layout - mouth/year）
 
 ## 五、antD主题定制
 ### 1. 定制方案
-![image.png](assets/17.png)
+<ImgPreview :imgs="['/up/react/react5/assets/17.png']" alt="image.png" />
 ### 2. 实现方式
 
 1. 全局定制
 
-![image.png](assets/18.png)
+<ImgPreview :imgs="['/up/react/react5/assets/18.png']" alt="image.png" />
 
 2. 局部定制
 
-![image.png](assets/19.png)
+<ImgPreview :imgs="['/up/react/react5/assets/19.png']" alt="image.png" />
 
 ### 3. 记账本主题色
 ```css
@@ -112,7 +112,7 @@ npm i -D @craco/craco
 ```
 
 ## 六、Redux管理账目列表
-![image.png](assets/20.png)
+<ImgPreview :imgs="['/up/react/react5/assets/20.png']" alt="image.png" />
 
 ::: code-group
 ```javascript [billStore.js]
@@ -182,7 +182,7 @@ root.render(
 :::
 
 ## 七、TabBar功能实现
-![image.png](assets/21.png)
+<ImgPreview :imgs="['/up/react/react5/assets/21.png']" alt="image.png" />
 
 ### 1. 静态布局实现
 配套静态模版和样式文件
@@ -283,7 +283,7 @@ export default Layout
 
 ## 八、月度账单-统计区域
 
-![image.png](assets/22.png)
+<ImgPreview :imgs="['/up/react/react5/assets/22.png']" alt="image.png" />
 
 ### 1. 准备静态结构
 
@@ -480,7 +480,7 @@ const Month = () => {
 export default Month
 ```
 ### 3. 切换时间显示
-![image.png](assets/23.png)
+<ImgPreview :imgs="['/up/react/react5/assets/23.png']" alt="image.png" />
 
 > [!IMPORTANT] 实现思路：
 > 1. 以当前时间作为默认值
@@ -677,7 +677,7 @@ export default Month
 :::
 
 ## 九、月度账单-单日统计列表实现
-![image.png](assets/24.png)
+<ImgPreview :imgs="['/up/react/react5/assets/24.png']" alt="image.png" />
 ### 1. 准备组件和配套样式
 
 ::: code-group
@@ -852,7 +852,7 @@ export default DailyBill
 ```
 :::
 ### 2. 按日分组账单数据
-![image.png](assets/25.png)
+<ImgPreview :imgs="['/up/react/react5/assets/25.png']" alt="image.png" />
 
 ::: code-group
 ```javascript [Month/index.js]
@@ -917,7 +917,7 @@ const DailyBill = ({ date, billList }) => {
 export default DailyBill
 ```
 ## 十、月度账单-单日账单列表展示
-![image.png](assets/26.png)
+<ImgPreview :imgs="['/up/react/react5/assets/26.png']" alt="image.png" />
 
 ### 1. 渲染基础列表
 
@@ -1025,7 +1025,7 @@ export const billTypeToName = Object.keys(billListData).reduce((prev, key) => {
 ```
 ## 十一、月度账单-切换打开关闭
 
-![image.png](assets/27.png)
+<ImgPreview :imgs="['/up/react/react5/assets/27.png']" alt="image.png" />
 
 ```jsx
 // 声明状态
@@ -1041,7 +1041,7 @@ const [visible, setVisible] = useState(false)
 ```
 
 ## 十二、月度账单-Icon组件封装
-![image.png](assets/28.png)
+<ImgPreview :imgs="['/up/react/react5/assets/28.png']" alt="image.png" />
 ### 1. 准备静态结构
 
 ::: code-group

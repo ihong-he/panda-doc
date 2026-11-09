@@ -9,6 +9,7 @@
   "devDependencies": {
     "element-plus": "^2.4.3",
     "less": "^4.2.0",
+    "unplugin-vue-components": "^32.1.0",
     "vitepress": "^1.5.0"
   },
   "dependencies": {

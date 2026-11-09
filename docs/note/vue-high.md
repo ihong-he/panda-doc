@@ -988,7 +988,7 @@ Vuex 是一个专为 Vue.js 应用设计的状态管理模式和库。它通过�
 
 #### Vuex 的核心概念：
 
-![vuex](/img/vuex.png)
+<ImgPreview :imgs="['/img/vuex.png']" alt="vuex" />
 
 1. **集中式存储（Centralized Store）**
    - Vuex 将应用的所有状态保存在一个全局的 store 中，这样你可以在任何组件中访问和修改这些状态。与在各个组件中分别管理状态相比，集中式存储使得状态的管理更加统一和简洁。

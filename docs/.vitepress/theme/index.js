@@ -1,9 +1,8 @@
 // .vitepress/theme/index.js
 import DefaultTheme from 'vitepress/theme'
 import './custom.less'
-// 全局引入elementPlus样式和组件
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
+// Element Plus 的组件与样式由 unplugin-vue-components + ElementPlusResolver 自动按需引入
+// 暗色变量 resolver 不处理，需在此引入一次
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import MyLayout from './MyLayout.vue'
 // import Layout from './Layout.vue'
@@ -16,8 +15,6 @@ import ImgPreview from './components/ImgPreview.vue'
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    // 注册Element Plus组件
-    app.use(ElementPlus)
     // 注册你的全局组件
     app.component('MyGlobalComponent' /* ... */)
     app.component('Pronounce', Pronounce)

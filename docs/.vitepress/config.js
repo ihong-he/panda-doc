@@ -1,4 +1,6 @@
 import { withMermaid } from 'vitepress-plugin-mermaid';
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // 部署路径统一在此定义：head 中的资源不会自动拼接 base，需显式引用
 const BASE = '/panda-doc/'
@@ -18,6 +20,21 @@ export default withMermaid({
       lazyLoading: true
     },
     lineNumbers: true // 启用行号
+  },
+  vite: {
+    // resolver 注入的按需样式模块内含 CSS import，SSR 构建需由 Vite 处理而非 externalize 给 Node
+    ssr: {
+      noExternal: ['element-plus'],
+    },
+    plugins: [
+      Components({
+        // 仅扫描 .vue（含带 query 的编译产物），避免 md 代码块里的 <el-*> 被误判为组件
+        include: [/\.vue($|\?)/],
+        dirs: [], // 关闭目录自动注册
+        dts: false, // 项目未配置 TypeScript
+        resolvers: [ElementPlusResolver({ importStyle: 'css' })],
+      }),
+    ],
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

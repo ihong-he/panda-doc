@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import DefaultTheme from 'vitepress/theme'
 import DocFooter from './components/DocFooter.vue';
-import { ElBacktop } from 'element-plus'
 const { Layout } = DefaultTheme
 
 // 在切换颜色模式时提供自定义过渡 
@@ -55,7 +54,7 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
     </template>
   </Layout>
   <!-- 回到顶部 -->
-  <el-backtop :right="60" :bottom="75" />
+  <ElBacktop :right="60" :bottom="75" />
 </template>
 
 <style>

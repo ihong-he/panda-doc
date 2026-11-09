@@ -6,7 +6,7 @@ outline: [1, 3]
 
 ## 一、页面布局及配置
 
-![An image](/item/rms-layout.png)
+<ImgPreview :imgs="['/item/rms-layout.png']" alt="An image" />
 
 ### 1. 首页页面
 
@@ -156,7 +156,7 @@ import Footer from "./footer/index.vue";
 
 > 抽屉组件，用于设置主题和页面布局。
 
-![image](/item/rms-draw.png)
+<ImgPreview :imgs="['/item/rms-draw.png']" alt="image" />
 
 - 核心代码
 

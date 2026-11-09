@@ -10,7 +10,7 @@ outline: [1, 3]
 
 **客户端**和**服务器**是计算机网络中的两个重要概念，它们定义了计算机如何在网络中进行交互和通信。理解客户端和服务器之间的关系是理解现代计算机网络、Web 开发和软件架构的基础。
 
-![An image](/img/http1.png)
+<ImgPreview :imgs="['/img/http1.png']" alt="An image" />
 
 #### 客户端（Client）
 
@@ -192,7 +192,7 @@ https://www.example.com:8080/path/to/resource?query=example#section
 
 #### 客户端-服务器通信的基本过程
 
-![An image](/img/http2.png)
+<ImgPreview :imgs="['/img/http2.png']" alt="An image" />
 
 1. **客户端发起请求**：
 
@@ -403,7 +403,7 @@ HTTP 状态码是服务器在响应中返回的数字代码，用来指示请求
 
 HTTP 请求消息（HTTP Request Message）是客户端向服务器发送的请求，用于获取资源、提交数据等。HTTP 请求消息由以下几个部分组成：
 
-![An image](/img/http3.png)
+<ImgPreview :imgs="['/img/http3.png']" alt="An image" />
 
 #### 1. **请求行（Request Line）**
 
@@ -481,7 +481,7 @@ Content-Length: 34
 
 HTTP 响应消息（HTTP Response Message）是服务器对客户端发出的请求所返回的消息。它由以下几个部分组成：
 
-![An image](/img/http4.png)
+<ImgPreview :imgs="['/img/http4.png']" alt="An image" />
 
 #### 1. **状态行（Status Line）**
 

@@ -6,7 +6,7 @@ outline: deep
 ### 受控绑定
 > 概念：使用React组件的状态（useState）控制表单的状态
 
-![image.png](assets/01.png)
+<ImgPreview :imgs="['/up/react/react2/assets/01.png']" alt="image.png" />
 ```jsx
 function App(){
   const [value, setValue] = useState('')
@@ -40,20 +40,20 @@ function App(){
 }
 ```
 ## 二、案例-B站评论案例
-![image.png](assets/02.png)
+<ImgPreview :imgs="['/up/react/react2/assets/02.png']" alt="image.png" />
 
 1. 手机输入框评论内容，并发布评论
 2. id处理和时间处理（uuid 和 day.js）
 ## 三、React组件通信
 > 组件通信就是`组件之间的数据传递`， 根据组件嵌套关系的不同，有不同的通信手段和方法
 
-![image.png](assets/03.png)
+<ImgPreview :imgs="['/up/react/react2/assets/03.png']" alt="image.png" />
 
 1. A-B 父子通信
 2. B-C 兄弟通信
 3. A-E 跨层通信
 ## 四、父子通信-父传子
-![image.png](assets/04.png)
+<ImgPreview :imgs="['/up/react/react2/assets/04.png']" alt="image.png" />
 ### 基础实现
 **实现步骤**
 1. 父组件传递数据 - 在子组件标签上绑定属性
@@ -75,16 +75,16 @@ function App(){
 ```
 ### props说明
 **props可以传递任意的合法数据**，比如数字、字符串、布尔值、数组、对象、函数、JSX
-![image.png](assets/05.png)
+<ImgPreview :imgs="['/up/react/react2/assets/05.png']" alt="image.png" />
 
 **props是只读对象**：子组件只能读取props中的数据，不能直接进行修改，父组件的数据只能由父组件修改 
 
 ### 特殊的prop-chilren
 > 场景：当我们把内容嵌套在组件的标签内部时，组件会自动在名为`children`的prop属性中接收该内容
 
-![image.png](assets/06.png)
+<ImgPreview :imgs="['/up/react/react2/assets/06.png']" alt="image.png" />
 ## 五、父子通信-子传父
-![image.png](assets/07.png)
+<ImgPreview :imgs="['/up/react/react2/assets/07.png']" alt="image.png" />
 > 核心思路：在子组件中调用父组件中的函数并传递参数
 
 ```tsx
@@ -111,7 +111,7 @@ function App(){
 }
 ```
 ## 六、兄弟组件通信
-![image.png](assets/08.png)
+<ImgPreview :imgs="['/up/react/react2/assets/08.png']" alt="image.png" />
 实现思路: 借助 **状态提升** 机制，通过共同的父组件进行兄弟之间的数据传递
 
 1. A组件先通过子传父的方式把数据传递给父组件App
@@ -161,7 +161,7 @@ function App () {
 export default App
 ```
 ## 七、跨层组件通信
-![image.png](assets/09.png)
+<ImgPreview :imgs="['/up/react/react2/assets/09.png']" alt="image.png" />
 **实现步骤：**
 
 1. 使用 `createContext`方法创建一个上下文对象Ctx 
@@ -222,7 +222,7 @@ useEffect与Vue中的`watch`功能类似：
   - useEffect的依赖项控制执行时机，watch通过watch选项或配置控制
   - useEffect提供清理函数机制，watch通过handler的参数控制
 :::
-![image.png](assets/10.png)
+<ImgPreview :imgs="['/up/react/react2/assets/10.png']" alt="image.png" />
 :::info 说明
 上面的组件中没有发生任何的用户事件，组件渲染完毕之后就需要和服务器要数据，整个过程属于“只由渲染引起的操作”
 :::
@@ -230,7 +230,7 @@ useEffect与Vue中的`watch`功能类似：
 ### 基础使用
 > 需求：在组件渲染完毕之后，立刻从服务端获取频道列表数据并显示到页面中
 
-![image.png](assets/11.png)
+<ImgPreview :imgs="['/up/react/react2/assets/11.png']" alt="image.png" />
 说明： 
 
 1. 参数一是一个函数，可以把它叫做副作用函数，在函数内部可以放置要执行的操作 
@@ -253,7 +253,7 @@ useEffect副作用函数的执行时机存在多种情况，根据传入依赖�
 
 比如在useEffect中开启了一个定时器，我们想在组件卸载时把这个定时器再清理掉，这个过程就是清理副作用
 
-![image.png](assets/12.png)
+<ImgPreview :imgs="['/up/react/react2/assets/12.png']" alt="image.png" />
 :::info
 说明：清除副作用的函数最常见的执行时机是在组件卸载时自动执行
 :::
@@ -292,7 +292,7 @@ export default App
 ## 九、自定义Hook实现
 > 概念：自定义Hook是以 `use打头的函数`，通过自定义Hook函数可以用来**实现逻辑的封装和复用**
 
-![image.png](assets/13.png)
+<ImgPreview :imgs="['/up/react/react2/assets/13.png']" alt="image.png" />
 
 ```jsx
 // 封装自定义Hook
@@ -340,10 +340,10 @@ export default App
 > 1. 只能在组件中或者其他自定义Hook函数中调用
 > 2. 只能在组件的顶层调用，不能嵌套在if、for、其它的函数中
 
-![image.png](assets/14.png)
+<ImgPreview :imgs="['/up/react/react2/assets/14.png']" alt="image.png" />
 
 ## 十、案例-优化B站评论案例
-![image.png](assets/15.png)
+<ImgPreview :imgs="['/up/react/react2/assets/15.png']" alt="image.png" />
 1. 使用请求接口的方式获取评论列表并渲染 
 2. 使用自定义Hook函数封装数据请求的逻辑 
 3. 把评论中的每一项抽象成一个独立的组件实现渲染

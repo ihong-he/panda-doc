@@ -12,7 +12,7 @@ outline: deep
 
 **Electron**（原名为**Atom Shell**）是 **GitHub** 开发的一个开源框架。它通过使用 **Node.js** 和 **Chromium** 的渲染引擎完成**跨平台的桌面** GUI 应用程序的开发。Electron 现已被多个开源 Web 应用程序用于前端与后端的开发，著名项目包括 GitHub 的 Atom 、微软的 Visual Studio Code 和腾讯的 QQNT。
 
-![application-build-with-electron](/img/application-build-with-electron.jpg)
+<ImgPreview :imgs="['/img/application-build-with-electron.jpg']" alt="application-build-with-electron" />
 
 **Electron** 并不是一门新的技术，自 2013 年开始至今已有 10 年历史了，最初是由 GitHub 团队开发，现由 OpenJS 基金会负责维护。
 
@@ -24,7 +24,7 @@ outline: deep
 
 Electron Fiddle [下载地址](https://www.electronjs.org/zh/fiddle)，下载符合各自操作系统的版本，正常安装即可。
 
-![fiddle](/img/install-fiddle.jpg)
+<ImgPreview :imgs="['/img/install-fiddle.jpg']" alt="fiddle" />
 
 打开 Electron Fiddle 后可以看到自动创建了 Electron 项目的模板，左侧是文件列表，右侧是文件的内容，可以简单的看到 **Electron 的项目代码是由 HTML、CSS、JavaScript 构成。**
 
@@ -32,7 +32,7 @@ Electron Fiddle [下载地址](https://www.electronjs.org/zh/fiddle)，下载符
 
 点击 Electron Fiddle 工具栏中的 【Run】按钮：
 
-![run_electron](/img/run-electron.jpg)
+<ImgPreview :imgs="['/img/run-electron.jpg']" alt="run_electron" />
 
 3. 修改 Electron 项目代码
 
@@ -81,7 +81,7 @@ npm config set ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
 npm config list
 ```
 
-![npm-config](/img/npm-config.jpg)
+<ImgPreview :imgs="['/img/npm-config.jpg']" alt="npm-config" />
 
 3. 启动项目
 
@@ -149,7 +149,7 @@ Electron 是内部集成了两个运行环境：
 - Nodejs 环境，称为主进程（ Main Process ）
 - Chromium 环境，称为渲染器进程（Renderer Process）
 
-![electron-processes](/img/electron-processes.png)
+<ImgPreview :imgs="['/img/electron-processes.png']" alt="electron-processes" />
 
 可以理解成在主进程中就是在写 Nodejs 的代码，在渲染器进程中是在写网页相关的代码（如 HTML、CSS、JavaScript 等）。
 

@@ -11,7 +11,7 @@ MVVM（Model-View-ViewModel）是一种软件架构模式，常用于构建前�
 
 #### MVVM的组成部分：
 
-![An image](/img/mvvm.png)
+<ImgPreview :imgs="['/img/mvvm.png']" alt="An image" />
 
 1. **Model（模型）**:
    - **数据**：应用中的数据或业务逻辑，通常与后台 API 进行交互。
