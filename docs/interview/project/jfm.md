@@ -54,11 +54,11 @@ outline: deep
 
 ### 1. Angualrjs的使用
 
-详见  [文档链接](/note/Angularjs)
+> 详细文档待补充（原链接 `/note/Angularjs` 已失效）。
 
 ### 2. el-form滚动到校验失败的位置
 
-详见  [文档链接](/note/guide/guide2#_6-6-el-form滚动到校验失败的位置)
+> 详细文档待补充（原链接 `/note/guide/guide2` 已失效）。
 
 ### 3. 在单个页面中使用vue+elementUI
 

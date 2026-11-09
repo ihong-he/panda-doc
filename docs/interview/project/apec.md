@@ -184,4 +184,5 @@ beforeDestroy() {
 ```
 
 ### 3. vue-i18n实现国际化
-详见  [文档链接](/note/guide/I18n.md)
+
+> 详细文档待补充（原链接 `/note/guide/I18n.md` 已失效）。

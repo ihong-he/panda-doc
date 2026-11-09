@@ -41,42 +41,23 @@
 3. 打包
 
    ```bash
-   npm run build
+   npm run docs:build
    ```
+   `npm run build` 是等价别名，与 CI 中使用的命令保持一致。
+
 > [!WARNING]
-> 如果需要部署到服务器上，务必修改`config.js`文件中的`base`相对路径地址
+> 如果部署到非根路径，只需修改 `docs/.vitepress/config.js` 顶部的 `BASE` 常量：`favicon` 显式引用它，图片预览组件通过 `withBase()` 自动跟随。
 
 4. 自动化部署
 
-> 支持 github 自动化部署,参照 [GitHub Pages 部署指南](https://vitepress.dev/zh/guide/deploy#github-pages)
+仓库已配置 [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)：推送 `main` 分支，或在 Actions 页手动触发，即自动构建并发布到 GitHub Pages。更多说明参照 [GitHub Pages 部署指南](https://vitepress.dev/zh/guide/deploy#github-pages)。
 
-```bash
-# 构建工作
-build:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
-    # - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释
-    # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: npm # 或 pnpm / yarn
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-    - name: Install dependencies
-      run: npm ci # 或 pnpm install / yarn install / bun install
-    - name: Build with VitePress
-      run: npm run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: docs/.vitepress/dist # 修改为自己的路径
-```
+关键配置：
+
+- `fetch-depth: 0`：启用 `lastUpdated` 需要完整 git 历史
+- `run: npm run docs:build`：构建命令需与 `package.json` 保持一致
+- `path: docs/.vitepress/dist`：上传的构建产物目录
+- `docs/public/.nojekyll`：避免 GitHub Pages 的 Jekyll 忽略下划线开头的资源
 
 #### 使用说明
 

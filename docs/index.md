@@ -14,7 +14,7 @@ hero:
       link: /note/html&css
     - theme: alt
       text: View on GitHub
-      link: https://github.com/fhguo/panda-doc
+      link: https://github.com/ihong-he/panda-doc
   image:
     src: /doc-logo.png
     alt: VitePress

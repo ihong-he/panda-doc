@@ -1,15 +1,17 @@
-import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid';
+
+// 部署路径统一在此定义：head 中的资源不会自动拼接 base，需显式引用
+const BASE = '/panda-doc/'
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
   title: "PandaDoc",
   description: "A VitePress Document",
-  head: [['link', { rel: 'icon', href: '/panda-doc/favicon.ico' }]],
-  base: '/panda-doc/', // 使用相对路径，线上部署非根路径时需要修改
+  head: [['link', { rel: 'icon', href: `${BASE}favicon.ico` }]],
+  base: BASE,
   lastUpdated: true,
   cleanUrls: false, // 当设置为 true 时，VitePress 将从 URL 中删除 .html 后缀
-  ignoreDeadLinks: true,
+  ignoreDeadLinks: false, // 构建时校验失效链接，避免死链静默累积
   markdown: {
     image: {
       // 设置图片懒加载
@@ -101,7 +103,6 @@ export default withMermaid({
             { text: '数据可视化', link: '/note/visualization' },
             { text: 'Electron', link: '/note/electron' },
             { text: 'React入门', link: '/note/react' },
-            { text: 'test', link: '/note/test' },
           ]
         },
       ],
@@ -209,8 +210,8 @@ export default withMermaid({
         }
       ],
     },
-    // 层级
-    sidebarDepth: 3,
+    // 站点级大纲层级（VitePress 1.x 已移除 sidebarDepth，页面 frontmatter 的 outline 可覆盖）
+    outline: { level: [2, 3], label: '本页目录' },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ihong-he/panda-doc' }
     ]
