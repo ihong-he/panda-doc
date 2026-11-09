@@ -39,7 +39,7 @@ export default withMermaid({
     nav: [
       { text: '首页', link: '/' },
       { text: '技术', link: '/note/html&css' },
-      { text: '开发', link: '/dev/ERP系统快速入门' },
+      { text: '开发', link: '/ai/AI开发入门' },
       {
         text: '提升',
         items: [
@@ -105,14 +105,12 @@ export default withMermaid({
           ]
         },
       ],
-      '/dev/': [
+      '/ai/': [
         {
-          text: '开发',
+          text: 'AI开发',
           collapsed: true,
           items: [
-            { text: 'ERP系统快速入门', link: '/dev/ERP系统快速入门' },
-            { text: 'HJ 表格组件开发文档', link: '/dev/HJ 表格组件开发文档' },
-            { text: 'useTable 表格 Hook 开发文档', link: '/dev/useTable 表格 Hook 开发文档' },
+            { text: 'AI快速入门', link: '/ai/AI开发入门' },
           ]
         }
       ],
