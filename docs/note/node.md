@@ -3,7 +3,19 @@ outline: deep
 ---
 # Nodejs&Git
 
+Node.js 把 JS 带到了服务端：事件驱动、非阻塞 I/O 是它的核心；Git 则是工程协作的地基。
+
+::: tip 怎么读这篇
+Node 部分先理解模块与事件循环，再看文件 / 网络 API；Git 按「提交 → 分支 → 合并」顺序读。
+:::
+
+<Steps :steps="[{ title: '入门：环境与 API', desc: 'fs / http 基础与模块系统。' }, { title: '进阶：异步模型', desc: '事件循环、流与错误处理。' }, { title: '复习：Git 速查', desc: '按自测题回顾分支与合并策略。' }]" />
+
+<Compare :left="{ title: 'Node.js', items: ['服务端运行环境', 'CommonJS / ESM 模块', '可访问文件系统与网络', '事件循环驱动异步'] }" :right="{ title: '浏览器 JavaScript', items: ['运行在沙箱环境中', '以 ES Module 为主', '受同源策略限制', '可使用 DOM / BOM API'] }" caption="语言相同，能力边界由宿主环境决定" />
+
 ## 一、node.js
+
+理解 Node 的关键不是「单线程」三个字，而是：主线程只执行 JS，异步 I/O 由线程池承担，事件循环负责回调调度。所以 Node 擅长 I/O 密集型场景，而不擅长 CPU 密集型计算——这个判断比记 API 更重要。
 
 ### 1、nodejs简介
 
@@ -17,7 +29,7 @@ Node.js 是一个开源的、跨平台的 JavaScript 运行环境。它让开发
 
 3. **NPM（Node Package Manager）**：Node.js 提供了一个包管理器，叫做 npm，它包含了成千上万的开源包，开发者可以轻松安装并使用这些包来构建应用。
 
-4. **单线程**：虽然 Node.js 是单线程的，但它使用了事件循环来管理多个并发连接，因此它能够高效地处理大量的 I/O 操作。
+4. **并发模型**：JS 执行只有一个主线程，但文件、网络等异步 I/O 会交给 libuv 线程池处理，完成后由事件循环把回调调度回主线程。「单线程」指的是 JS 执行线程，不等于「只能串行处理请求」；CPU 密集型任务会阻塞主线程，需要 Worker Threads 或子进程分担。
 
 5. **广泛的用途**：除了构建 Web 服务器，Node.js 还可以用于构建工具（如构建脚本、打包工具）、桌面应用程序（通过 Electron 框架）等。
 
@@ -658,7 +670,11 @@ MySQL 可以与多种编程语言集成，以下是与Node.js的集成方式：
 - MySQL 可以与多种编程语言集成，使你能够在应用程序中轻松使用数据库功能。
 - 管理 MySQL 可以通过命令行或图形化工具，如 MySQL Workbench 或 phpMyAdmin。
 
+<TermTip term="事件循环" definition="Node 将异步任务分阶段处理（timers、poll、check 等），每个阶段执行对应队列的回调；process.nextTick 与 Promise 微任务会在阶段切换时优先清空。" /> —— 理解阶段划分，才能解释 setTimeout 与 setImmediate 的顺序差异。
+
 ## 二、Git
+
+Git 不必死记命令，抓住「工作区 → 暂存区 → 本地仓库 → 远程仓库」四个区域即可：`add` 进暂存区，`commit` 进本地仓库，`push` 推到远端。遇到问题时先想「改动现在在哪个区域」，大多数操作就选对了。
 
 ### 1、Git简介
 
@@ -803,4 +819,13 @@ git commit -m "Add .gitignore file"
 `.gitignore` 文件是一个非常有用的工具，可以帮助您保持Git仓库的干净和整洁，同时排除不必要的文件和敏感信息。在开发项目时，根据项目的需求和使用的编程语言、开发工具等，可以根据需要编辑 `.gitignore` 文件。
 
 
+## 自测清单
 
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. CommonJS 与 ESM 的主要差异？" :points="['CommonJS 用 require / module.exports，运行时加载', 'ESM 用 import / export，编译时确定依赖', 'ESM 支持顶层 await 与更好的 tree-shaking']" />
+<AnswerReveal title="2. git merge 与 git rebase 怎么选？" :points="['merge 保留完整分支历史，适合多人协作分支', 'rebase 让历史线性，适合本地整理提交', '已推送到远端的提交不要随意 rebase']" />
+
+::: tip 接下来读什么
+[前后端交互](/note/link) · [React 学习笔记](/up/up1)
+:::

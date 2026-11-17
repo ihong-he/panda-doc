@@ -4,6 +4,16 @@ outline: deep
 
 # Typescript 快速上手
 
+TypeScript 的价值不在「给变量标类型」，而在把约定写进代码，让编辑器与编译器替你发现错误。
+
+::: tip 怎么读这篇
+先建立类型系统全貌（声明 / 推断 / 总览），再深入泛型与声明文件。
+:::
+
+<Steps :steps="[{ title: '入门：类型与推断', desc: '基础类型、类型声明与自动推断。' }, { title: '进阶：高级类型', desc: '联合、交叉、泛型与类型守卫。' }, { title: '复习：易混点自测', desc: '按题目回查 any / unknown / 断言。' }]" />
+
+<Compare :left="{ title: 'type', items: ['可定义基本、联合、交叉与元组', '支持函数与对象签名', '可配合 typeof 复用已有类型', '不能重复声明同名类型别名'] }" :right="{ title: 'interface', items: ['擅长描述对象结构', '同名接口可声明合并', '能被 class implements', '更适合定义 API 契约'] }" caption="描述对象结构优先 interface，需要组合或运算时用 type" />
+
 ## 一、`TypeScript` 简介
 
 <ImgPreview :imgs="['/img/ts1.png']" alt="An image" />
@@ -65,6 +75,8 @@ message.toUperCase(); // [!code error]
 - 同样的功能，TypeScript 的代码量要大于 JavaScript，但由于 TypeScript 的代码结构更加清晰，在后期代码的维护中 TypeScript 却胜于 JavaScript。
 
 ## 三、编译 TypeScript
+
+TypeScript 不是另一门语言，而是带静态类型检查的 JavaScript。类型只存在于编译期，运行时会被完全擦除——所以「类型写错」不会让浏览器崩溃，但会在你写代码时就被编辑器标出来。
 
 > 浏览器不能直接运行 TypeScript 代码，需要编译为 JavaScript 再交由浏览器解析器执行。
 
@@ -1111,7 +1123,11 @@ duck.fly(); // 输出: 鸭⼦可以⻜
 duck.swim(); // 输出: 鸭⼦可以游泳
 ```
 
+<TermTip term="泛型" definition="把类型作为参数传递：函数或组件在定义时不指定具体类型，使用时再传入，从而保留类型信息又不牺牲复用性。" /> —— 泛型约束（extends）可以在灵活与类型安全之间取得平衡。
+
 ## 八、泛型
+
+泛型的核心价值是「复用代码的同时保留类型对应关系」。如果一个函数能处理多种类型，且传进去什么类型就要返回什么类型，就该用泛型，而不是 `any`。
 
 > 泛型允许我们在定义函数、类或接口时，使用类型参数来表示未指定的类型，这些参数在具体使用时，才被指定具体的类型
 
@@ -1522,3 +1538,15 @@ e1.printPackage();
 3. 确保`关键实现` ：强制派⽣类实现⼀些关键⾏为。
 4. `共享`代码和逻辑：当多个类需要共享部分代码时，抽象类可以避免代码重复。
    :::
+
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. any、unknown、never 有什么区别？" :points="['any 关闭类型检查，会污染后续推导', 'unknown 是安全的顶部类型，使用前必须收窄', 'never 表示不会出现的类型，常用于穷尽检查']" />
+<AnswerReveal title="2. 类型断言和类型守卫怎么选？" :points="['as 是断言：你告诉编译器「我确定」，不做运行时检查', 'typeof / instanceof / in 是守卫：运行时真的判断', '能用守卫就少用断言']" />
+
+::: tip 接下来读什么
+[Vue3 基础](/note/vue3) · [JS 进阶](/note/js-high)
+:::

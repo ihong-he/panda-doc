@@ -4,7 +4,19 @@ outline: deep
 
 # JS 基础
 
+JS 基础的重点不是记住 API，而是把「值与引用」「作用域与 this」「原型链」三件事想通。
+
+::: tip 怎么读这篇
+按章节顺序读；遇到 this 与原型不要跳，配合自测题验证理解。
+:::
+
+<Steps :steps="[{ title: '入门：语法与类型', desc: '变量、基本类型、语句与数组对象。' }, { title: '进阶：函数与 this', desc: '参数、作用域、this 指向与原型链。' }, { title: '复习：做自测', desc: '用题目回查容易混淆的概念。' }]" />
+
+<Compare :left="{ title: '基本类型', items: ['string / number / boolean 等 7 种', '按值存放', '比较看值是否相等', '本身不可变'] }" :right="{ title: '引用类型', items: ['object / array / function', '变量保存的是地址', '比较看是否指向同一对象', '对象内容可变'] }" caption="大多数「改了却没变」的 bug 都源于混淆这两者" />
+
 ## 一、JS 基础语法
+
+声明变量时建议优先用 `const`，需要重新赋值再用 `let`，尽量不用 `var`。这不是风格偏好：`var` 是函数作用域且会提升，`let/const` 是块级作用域并有暂时性死区，后者更符合直觉，也能绕开循环闭包的经典坑。
 
 ### 1、JavaScript 是什么
 
@@ -278,7 +290,7 @@ console.log(typeof bigNumber); // 输出: "bigint"
 
 **注意事项**
 
-1. **对象类型**：所有非原始类型（例如数组、对象、`null`）都会返回`"object"`。特别要注意的是，`typeof null` 也会返回 `"object"`，这是 JavaScript 中的一个历史遗留问题。
+1. **对象类型**：数组、对象、`null` 都会返回 `"object"`。`typeof null === "object"` 是早期实现缺陷：当时用类型标签区分值，对象的标签是 `0`，而 `null` 的指针也是 `0`，于是被误判；为兼容旧代码沿用到今天。判断 null 请用 `value === null`。
 
    ```javascript
    let obj = { key: "value" };
@@ -1253,7 +1265,11 @@ console.log(person.age); // 输出: 31
 
 这些是 JavaScript 中对象的基本操作和用法。对象是非常强大的数据结构，可以用来建模复杂的数据和行为。
 
+<TermTip term="原型链" definition="对象通过内部原型指向另一个对象，原型又有自己的原型，形成链式查找；访问属性时沿链向上找，直到 null。" /> —— 理解它就能解释为什么数组能用 push、对象能用 toString。
+
 ## 二、函数及 this
+
+`this` 不是「函数身上的属性」，而是在**调用时**由调用方式决定：`obj.fn()` 指向 obj，普通调用指向全局（严格模式为 undefined），箭头函数则在定义时捕获外层 this。先问「谁调用的」，再问「是不是箭头函数」。
 
 ### 1、函数的用法
 
@@ -1492,3 +1508,15 @@ person.greet(); // 输出: 'Hello, Alice'
 - **`bind`**: 创建一个新函数，将 `this` 绑定到指定对象。
 
 理解 `this` 的行为是掌握 JavaScript 函数和对象操作的关键。
+
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. const 声明的对象还能改属性吗？" :points="['能：const 限制的是变量绑定不可重新赋值', '不能：再执行 obj = {} 会报错', '想彻底冻结用 Object.freeze（注意是浅冻结）']" />
+<AnswerReveal title="2. this 指向什么时候确定？" :points="['普通函数：调用时确定，取决于调用方式', '箭头函数：定义时捕获外层 this', 'call / apply / bind 可以显式指定']" />
+
+::: tip 接下来读什么
+[JS 进阶](/note/js-high) · [TypeScript 快速上手](/note/ts)
+:::

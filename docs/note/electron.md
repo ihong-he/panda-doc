@@ -4,6 +4,16 @@ outline: deep
 
 # Electron入门
 
+Electron = Chromium（界面）+ Node.js（系统能力），让你用前端技术写跨平台桌面应用。它难的不是语法，而是「两个进程各司其职」。
+
+::: tip 怎么读这篇
+先搞清主进程与渲染进程的边界，再看 IPC 与预加载脚本，最后才是打包发布。
+:::
+
+<Steps :steps="[{ title: '入门：跑起来', desc: '搭建 Hello World，认识主进程与渲染进程的分工。' }, { title: '进阶：打通通信', desc: '理解 IPC、preload 与安全边界，避免直接开放 Node 权限。' }, { title: '复习：查漏', desc: '按自测清单回看进程模型与打包配置。' }]" />
+
+<Compare :left="{ title: '主进程', items: ['每个应用只有一个', '管理窗口与生命周期', '可使用 Node 全部能力', '负责系统级 API'] }" :right="{ title: '渲染进程', items: ['每个窗口一个', '运行 Web 页面', '默认不开放 Node', '通过 IPC 与主进程通信'] }" caption="主进程管「系统」，渲染进程管「界面」" />
+
 ## 一、开始上手
 
 > 通过这一小节可以对 Eelectron 有个大概的了解
@@ -140,7 +150,11 @@ app.on("ready", () => {
 
 至此最基本的 Electron 项目就创建好了。
 
+<TermTip term="IPC" definition="进程间通信（Inter-Process Communication）：Electron 中主进程与渲染进程交换数据的机制，常用 ipcMain / ipcRenderer 及 contextBridge 暴露的安全接口。" /> —— 这是 Electron 安全模型的核心，理解它就知道为什么不建议直接开启 nodeIntegration。
+
 ## 二、基本概念
+
+先建立一个心智模型：Electron 应用 = 一个主进程（Node.js 环境，拥有系统权限）+ 若干个渲染进程（Chromium 页面，负责界面）。两者内存隔离，必须通过 IPC 通信。把这条边界记牢，后面的 `BrowserWindow`、`preload`、`ipcMain` 就各归其位了。
 
 > 在这一小节对 Eelectron 的技术架构有个基本的认识
 
@@ -210,7 +224,6 @@ app.on("activate", () => {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hello World!</title>
     <link rel="stylesheet" href="./style.css" />
@@ -400,9 +413,11 @@ button.addEventListener("click", async () => {
 
 ## 三、项目开发
 
+现代 Electron 项目很少从零手写模板。推荐用 electron-vite 这类脚手架：它把 Vite 的开发体验带进来，HMR、构建、主进程与渲染进程的配置都已接好。Vue、React、Svelte 都可以作为渲染层，关键是理解它们只是「跑在渲染进程里的前端应用」。
+
 > 在这一小节掌握 Electron 整合前端框架来进行开发
 
-通过学习我们了解了 Electron 中是可以运行前端项目的，因此完全可以使用 Vue、React、jQuery 等开发 Electron 项目，接下来我们选择使用 Vue 来实现发送消息的功能。
+Electron 的渲染进程本质就是一个 Chromium 页面，因此 Vue、React、Svelte 等现代框架都能直接用于开发（jQuery 这类老式库虽然也能跑，但已不适合新项目选型）。接下来我们选择使用 Vue 来实现发送消息的功能。
 
 ### 3.1 创建项目
 
@@ -526,3 +541,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
 ### 3.3 打包应用
 
 将准备好的图片放到 `build` 目录中，然后 `npm run build:mac` 或 `npm run build:win`
+
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. 为什么渲染进程不应开启 nodeIntegration？" :points="['渲染进程可能加载远程内容，开放 Node 等于把系统权限交给页面', '正确做法是用 preload + contextBridge 暴露最小接口', '这也是 Electron 默认安全策略的原因']" />
+<AnswerReveal title="2. ipcMain 与 ipcRenderer 分别在哪个进程？" :points="['ipcMain 在主进程监听', 'ipcRenderer 在渲染进程发送与监听', '跨进程传递的对象会被结构化克隆，函数无法传递']" />
+
+::: tip 接下来读什么
+[React & Electron 面试题](/interview/index6) · [项目实战](/project/ggzx/index1)
+:::

@@ -3,7 +3,19 @@ outline: [1, 3]
 ---
 # 数据可视化
 
+数据可视化 = 绘图基础（Canvas / SVG）+ 图表库（ECharts）+ 大屏布局与实时通信。
+
+::: tip 怎么读这篇
+先搞清 Canvas 与 SVG 的选型，再学 ECharts 配置，最后看大屏布局与数据更新。
+:::
+
+<Steps :steps="[{ title: '入门：绘图基础', desc: 'Canvas 与 SVG 的适用场景。' }, { title: '进阶：ECharts', desc: '配置项、交互与常用图表。' }, { title: '复习：大屏专题', desc: '梳理适配方案与实时通信。' }]" />
+
+<Compare :left="{ title: 'Canvas', items: ['像素级绘制', '适合大量图形与高频重绘', '缩放可能失真', '事件命中需自行计算'] }" :right="{ title: 'SVG', items: ['矢量图形', 'DOM 节点可直接绑定事件', '缩放清晰不失真', '元素过多时性能下降'] }" caption="大量动态图元选 Canvas，需要交互与清晰缩放选 SVG" />
+
 ## 一、绘图基础
+
+Canvas 与 SVG 不是「谁更先进」，而是两种渲染模型：Canvas 是画布像素，适合大量图元与高频重绘；SVG 是 DOM 节点，适合少量但需要交互和清晰缩放的图形。ECharts 默认用 Canvas，大数据量时再考虑切换到 SVG 渲染器。
 ### 1、SVG
 
 **SVG**（Scalable Vector Graphics，可缩放矢量图形）是一种基于XML的图形格式，用于描述二维矢量图形。它的主要特点是可以无损缩放，适用于网页中的图形展示。
@@ -79,6 +91,8 @@ Canvas 是 HTML5 引入的一种用于绘制图形的元素。与 SVG 不同，C
 如果你需要处理实时更新的复杂场景（如游戏或动画），Canvas 会是一个很好的选择。
 
 
+
+<TermTip term="ECharts" definition="基于 Canvas / SVG 的开源图表库，通过 option 描述数据、坐标系、系列与交互，适合快速搭建折线、柱状、地图等常见图表。" /> —— 配置的核心是把「数据」和「表现」拆开看。
 
 ## 二、Echarts
 
@@ -488,6 +502,8 @@ backgroundColor: '#ffffff'     // 例如设置为白色
 
 ## 三、大屏展示布局
 
+大屏适配先定基准（如 1920×1080），再选方案：整体 `transform: scale` 最省事但要处理留白，rem / vw 更灵活但需要全局换算。图表容器一定要监听尺寸变化并调用 `resize`，否则缩放后图形会错位。
+
 ### 1、大屏布局
 
 构建适用于大屏展示的布局，通常用于控制台、数据可视化场景（如数字驾驶舱、大屏展示等）。大屏展示的布局需要适应不同屏幕尺寸，保证数据和图表的清晰呈现，同时布局合理、响应灵活。下面是构建大屏展示布局的关键点和具体实施步骤。
@@ -734,3 +750,13 @@ socket.onclose = function(event) {
 WebSocket 的实时性和效率非常适合你在开发数字驾驶舱时展示实时数据。
 
 
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. 大屏适配常用哪些方案？" :points="['rem / vw 等比缩放，配合设计稿基准', 'transform: scale 整体缩放，简单但要处理留白', '关键图表监听容器尺寸变化并 resize']" />
+<AnswerReveal title="2. ECharts 更新数据为什么要 setOption？" :points="['setOption 会按配置合并并触发增量渲染', '只传变化的 series 数据可以减少开销', 'notMerge 参数决定是否保留旧配置']" />
+
+::: tip 接下来读什么
+[项目实战](/project/ggzx/index1) · [数据可视化面试题](/interview/index5)
+:::

@@ -4,11 +4,23 @@ outline: deep
 
 # webAPI
 
+Web API 是浏览器提供给 JS 的能力：DOM 操作页面，BOM 操作浏览器，正则处理文本。
+
+::: tip 怎么读这篇
+先掌握 DOM 查询与事件，再看宽高位置与 BOM；正则部分建议边查边练。
+:::
+
+<Steps :steps="[{ title: '入门：DOM 查询', desc: '选择元素、修改内容与样式。' }, { title: '进阶：事件与尺寸', desc: '事件流、事件委托与宽高位置。' }, { title: '复习：BOM 与正则', desc: '按自测题梳理常用对象与正则语法。' }]" />
+
+<Compare :left="{ title: 'DOM', items: ['document / element 树', '查询与修改节点', '事件绑定与冒泡', '样式与类名操作'] }" :right="{ title: 'BOM', items: ['window / location / history / navigator', '定时器与弹窗', '屏幕与历史记录', '不直接操作文档内容'] }" caption="DOM 管「页面内容」，BOM 管「浏览器本身」" />
+
 ::: tip 提示
 学习 DOM 和 BOM 对象的属性和方法,以完成网页常见的交互效果。
 :::
 
 ## 一、DOM 基础
+
+DOM 操作的性能瓶颈在「频繁触发重排」：批量修改时先用 DocumentFragment 或离线节点，改完再一次性插入；读取布局属性（如 `offsetTop`）会强制刷新布局，尽量与写操作分离。
 
 DOM（Document Object Model，文档对象模型）是一种跨平台且语言无关的接口，它把 HTML 文档结构表示为树结构，使得程序可以通过脚本语言（如 JavaScript）访问和操作文档内容、结构和样式。每一个节点都可以通过编程语言进行访问，从而对其进行增删改查。
 
@@ -149,7 +161,11 @@ container.removeChild(paragraph);
 
 通过这些方法，我们可以高效地操作和管理 DOM，实现动态更新网页内容的功能。
 
+<TermTip term="事件冒泡" definition="事件从目标元素向父级逐层向上传播；addEventListener 第三个参数为 true 时在捕获阶段触发，stopPropagation 可阻止继续传播。" /> —— 事件委托正是利用了冒泡机制。
+
 ## 二、DOM 事件
+
+事件流分捕获、目标、冒泡三个阶段，默认绑定在冒泡阶段。事件委托正是利用冒泡，把监听放在父节点上，既减少绑定数量，又能覆盖动态新增的子元素——前提是用 `event.target` 判断真正的来源。
 
 ### 1、事件监听
 
@@ -1145,3 +1161,14 @@ console.log(result); // 输出: 7
 
 这些正则表达式在实际项目中非常常用，尤其是在表单验证、数据解析和内容过滤等场景下。根据项目的具体需求，可以对这些正则表达式进行调整和优化。
 
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. 事件委托为什么能提升性能？" :points="['只在父元素绑定一个监听，减少绑定数量', '动态新增的子元素自动生效', '利用冒泡，通过 event.target 判断来源']" />
+<AnswerReveal title="2. offsetWidth / clientWidth / scrollWidth 区别？" :points="['offsetWidth 含内容 + padding + border', 'clientWidth 含内容 + padding，不含边框与滚动条', 'scrollWidth 含实际内容总宽（包括溢出部分）']" />
+
+::: tip 接下来读什么
+[JS 进阶](/note/js-high) · [HTML & CSS 基础](/note/html&css)
+:::

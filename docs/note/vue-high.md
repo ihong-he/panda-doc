@@ -3,7 +3,19 @@ outline: [1, 3]
 ---
 # vue进阶
 
+Vue 进阶主要两块：Vue Router 管理页面导航，状态管理（Vuex / Pinia）管理跨组件共享数据。
+
+::: tip 怎么读这篇
+先理解路由匹配与守卫执行顺序，再对比状态管理方案；配合项目实战效果更好。
+:::
+
+<Steps :steps="[{ title: '入门：路由配置', desc: '路径匹配、命名路由与页面跳转。' }, { title: '进阶：守卫与状态', desc: '导航守卫、动态路由与 Pinia。' }, { title: '复习：执行顺序', desc: '按自测题梳理守卫与状态管理差异。' }]" />
+
+<Compare :left="{ title: 'hash 模式', items: ['URL 中带 #', '不需要服务端额外配置', '兼容性好', '对 SEO 不友好'] }" :right="{ title: 'history 模式', items: ['URL 更干净', '需要服务端回退到 index.html', '刷新 404 需配置', '实际项目更常用'] }" caption="路由模式的选择往往由部署环境决定" />
+
 ## 一、Vue Router
+
+路由的本质是「URL 与视图的映射」。先决定模式（hash 免服务端配置、history 需要回退规则），再理解导航守卫的执行顺序（全局前置 → 路由独享 → 组件内 → 全局后置），鉴权逻辑放在哪一层就清楚了。
 
 ### 1、路由概念
 
@@ -980,7 +992,11 @@ export default {
 **总结**：路由守卫是 Vue Router 强大的功能之一，它为开发者提供了丰富的钩子，可以在路由导航的不同阶段进行拦截、验证和控制。合理使用路由守卫，可以有效提升应用的安全性和用户体验。
 
 
+<TermTip term="导航守卫" definition="路由跳转过程中的钩子，如 beforeEach / beforeEnter / beforeRouteEnter；常用于鉴权、埋点与页面标题设置，Vue Router 4 可 return true / false 决定是否继续。" /> —— 鉴权逻辑放全局前置守卫，页面级权限放路由独享守卫。
+
 ## 二、状态管理
+
+什么时候需要状态管理？当多个不相邻的组件共享同一份数据、且修改逻辑需要集中管理时。Vuex 把数据流规范为 State → Actions → Mutations，适合大型团队；新项目推荐 Pinia（去掉 Mutations、天然支持 TS），Vuex 已进入维护模式。
 
 ### 1、Vuex概述
 
@@ -1001,7 +1017,7 @@ Vuex 是一个专为 Vue.js 应用设计的状态管理模式和库。它通过�
      4. **Actions**：用于处理异步操作，并通过提交 Mutations 来间接改变 State。
 
 3. **可调试性（Debugging）**
-   - 由于状态的变化是通过 Mutations 以可预测的方式发生的，Vuex 可以轻松地与 Vue Devtools 集成，让开发者方便地调试和追踪状态的变化。通过时间旅行调试（Time Travel Debugging）功能，开发者可以回到任何一个状态，查看具体的变更过程。
+   - 由于状态变化通过 Mutations 发生，Vuex 可以与 Vue Devtools 集成，追踪状态变更并做时间旅行调试。不过 Vuex 已进入**维护模式**，新项目更推荐 Pinia：它去掉了 Mutations、可直接修改 state，且对 TypeScript 更友好；两者的核心思想（集中管理、单向数据流）是一致的。
 
 #### Vuex 的适用场景：
 
@@ -1221,3 +1237,15 @@ Vuex 是 Vue.js 的官方状态管理库，它通过集中化和结构化的方�
 
 #### 总结
 通过这些步骤，你就能在Vue项目中成功集成和使用Vuex进行状态管理。掌握了这些基本操作后，你可以根据项目的需求进行更复杂的状态管理配置。
+
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. 全局前置守卫中忘记放行会怎样？" :points="['导航会中断，页面停在原地', 'Vue Router 4 可 return true / false 代替 next', '鉴权失败应 return false 或重定向到登录页']" />
+<AnswerReveal title="2. Pinia 相比 Vuex 的优势？" :points="['去掉 mutations，可直接修改 state', '天然支持 TypeScript 类型推导', 'API 更精简，按 store 自然分模块']" />
+
+::: tip 接下来读什么
+[Vue3 基础](/note/vue3) · [项目实战](/project/ggzx/index1)
+:::

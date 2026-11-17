@@ -3,7 +3,19 @@ outline: deep
 ---
 # vue3基础
 
+Vue3 的组合式 API 把同一功能的代码聚合在一起，配合更好的 TypeScript 支持，尤其适合中大型组件。
+
+::: tip 怎么读这篇
+从 setup 与 ref / reactive 入手，再理解 computed / watch 与生命周期，最后看组件通信。
+:::
+
+<Steps :steps="[{ title: '入门：项目与 setup', desc: '用 create-vue 建项目，理解 setup。' }, { title: '进阶：响应式 API', desc: 'ref、reactive、computed 与 watch。' }, { title: '复习：组件通信', desc: '父子通信、defineExpose 与 provide / inject。' }]" />
+
+<Compare :left="{ title: 'Options API', items: ['data / methods / computed 分块', '逻辑按选项组织', '通过 this 访问实例', '小组件直观易读'] }" :right="{ title: 'Composition API', items: ['逻辑按功能聚合在 setup', '直接使用 ref / reactive', '便于抽成 composable 复用', 'TypeScript 推导更友好'] }" caption="不是谁替代谁，而是大组件里组合式更好组织" />
+
 ## Vue3组合式API体验
+
+组合式 API 不是把 Options API 的选项打散，而是按「功能」重新组织代码：同一功能的状态、计算与副作用放在一起。组件小的时候两者差别不大，组件变大后组合式的优势才会显现。
 > 通过 Counter 案例 体验Vue3新引入的组合式API
 
 ```vue
@@ -117,7 +129,11 @@ npm init vue@latest
 </script>
 ```
 
+<TermTip term="ref" definition="把基本类型（或对象）包装成响应式引用，通过 .value 读写；模板中会自动解包，无需写 .value。" /> —— 统一用 ref 可以减少「什么时候该解包」的心智负担。
+
 ## 组合式API - reactive和ref函数
+
+`ref` 与 `reactive` 的选择可简化成一句话：基本类型用 ref，对象用 reactive；但 reactive 解构会丢失响应性，需要 `toRefs`。想少踩坑就全程用 ref，模板里又会自动解包，无需写 `.value`。
 ### 1. reactive
 > 接受对象类型数据的参数传入并返回一个响应式的对象
 
@@ -349,3 +365,15 @@ const filterList = computed(item=>item > 2)
 > 顶层组件可以向底层组件传递方法，底层组件调用方法修改顶层组件的数据
 
 <ImgPreview :imgs="['/img/vue3-13.png']" alt="An Image" />
+
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. ref 和 reactive 怎么选？" :points="['基本类型用 ref，对象 / 数组可用 reactive', 'ref 整体替换仍保持响应式，reactive 解构会丢响应', '统一用 ref 心智负担最小']" />
+<AnswerReveal title="2. watch 和 watchEffect 的区别？" :points="['watch 明确指定监听源，能拿到新旧值', 'watchEffect 立即执行并自动收集依赖', '需要旧值或精确控制时用 watch']" />
+
+::: tip 接下来读什么
+[Vue 进阶](/note/vue-high) · [TypeScript 快速上手](/note/ts)
+:::

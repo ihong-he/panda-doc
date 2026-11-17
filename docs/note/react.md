@@ -4,9 +4,21 @@ outline: deep
 
 # React
 
+这篇笔记用最小例子串起 React 的核心：组件、JSX、状态、事件与 Hooks。
+
+::: tip 怎么读这篇
+按章节顺序读完前八节就能写出简单应用；第九节 Hooks 是进阶关键。
+:::
+
+<Steps :steps="[{ title: '入门：组件与 JSX', desc: '创建组件、嵌套与标签语法。' }, { title: '进阶：状态与事件', desc: '条件渲染、列表与响应事件。' }, { title: '复习：Hooks 与通信', desc: '用自测题检验 props / state 理解。' }]" />
+
+<Compare :left="{ title: 'Props', items: ['由父组件传入', '只读，不可在子组件修改', '用于配置与回调', '变化会触发重新渲染'] }" :right="{ title: 'State', items: ['组件内部管理', '用 setState / setX 更新', '变化触发重新渲染', '适合交互产生的状态'] }" caption="数据从上往下用 props，自己变化的用 state" />
+
 [React](https://zh-hans.react.dev/learn) 是用于构建 Web 和原生交互界面的库
 
 ## 一、创建和嵌套组件
+
+组件就是「接收输入（props）、返回 UI」的函数。建议从函数组件入手，不必先纠结类组件：Hooks 出现后，函数组件已能覆盖绝大多数场景，心智负担也更低。
 
 React 应用程序是由 **组件** 组成的。一个组件是 UI（用户界面）的一部分，它拥有自己的逻辑和外观。组件可以小到一个按钮，也可以大到整个页面。
 
@@ -54,6 +66,8 @@ export default function MyApp() {
 ```
 
 `export default` 关键字指定了文件中的主要组件。如果你对 JavaScript 某些语法不熟悉，可以参考 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/export)。
+
+<TermTip term="JSX" definition="JavaScript 的语法扩展，看起来像 HTML，最终被编译成 React.createElement 调用；类名用 className、事件用 onClick 这类驼峰写法。" /> —— 它不是模板字符串，本质仍是 JavaScript 表达式。
 
 ## 二、使用 JSX 编写标签
 
@@ -336,6 +350,8 @@ function MyButton() {
 
 ## 九、使用 Hook
 
+Hooks 有两条铁律：只在组件顶层调用（不能放进条件或循环），只在 React 函数组件或自定义 Hook 中调用。原因不是「规定如此」，而是 React 靠**调用顺序**把 Hook 与状态对应起来，顺序变了状态就会错位。
+
 以 use 开头的函数被称为 `Hook`。`useState` 是 React 提供的一个内置 Hook。你可以在 [React API 参考](https://zh-hans.react.dev/reference/react/hooks) 中找到其他内置的 Hook。你也可以通过组合现有的 Hook 来编写属于你自己的 Hook。
 
 Hook 比普通函数更为严格。你只能在你的组件（或其他 Hook）的 顶层 调用 Hook。如果你想在一个条件或循环中使用 useState，请提取一个新的组件并在组件内部使用它。
@@ -444,3 +460,15 @@ function MyButton({ count, onClick }) {
 }
 ```
 至此，你已经了解了如何编写 React 代码的基本知识。
+
+
+## 自测清单
+
+先自己回答，再展开核对：
+
+<AnswerReveal title="1. setState 后立刻读状态，为什么还是旧值？" :points="['状态更新是异步批处理的', '新值要在下一次渲染中才能拿到', '基于前一个值更新时传函数：setCount(c => c + 1)']" />
+<AnswerReveal title="2. 列表渲染为什么需要 key？" :points="['帮助 React 识别哪些元素变化、新增或删除', 'key 应稳定且唯一，不建议用数组下标', '下标在插入或删除时可能导致错误的复用']" />
+
+::: tip 接下来读什么
+[React 学习笔记](/up/up1) · [JS 进阶](/note/js-high)
+:::
