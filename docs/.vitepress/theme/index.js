@@ -17,6 +17,7 @@ import Steps from './components/Steps.vue'
 import Compare from './components/Compare.vue'
 import PreferenceSwitch from './components/PreferenceSwitch.vue'
 import PreferencePanel from './components/PreferencePanel.vue'
+import BoxModelDemo from './components/BoxModelDemo.vue'
 
 /** @type {import('vitepress').Theme} */
 export default {
@@ -33,6 +34,7 @@ export default {
     app.component('Compare', Compare)
     app.component('PreferenceSwitch', PreferenceSwitch)
     app.component('PreferencePanel', PreferencePanel)
+    app.component('BoxModelDemo', BoxModelDemo)
   },
   Layout: MyLayout,
 }
